@@ -40,7 +40,7 @@ classdef (Abstract) FunctionND < handle
         xm(k) = x(k);
       end
     end
-    
+
     function H = hessian( self, x )
       % finite difference approximation of the hessian
       % Baseed on a code by Brendan C. Wood
@@ -69,6 +69,23 @@ classdef (Abstract) FunctionND < handle
         % help
         H = 0.5*(H+H.') ;
       end
+    end
+
+    function contour( self, xmm, ymm, fz, nc )
+      if self.N ~= 2
+        error('FunctionND:contour can be used only for 2D functions');
+      end
+      x     = linspace(xmm(1),xmm(2),400);
+      y     = linspace(ymm(1),ymm(2),400);
+      [X,Y] = meshgrid(x,y);
+      %
+      % X and Y are matrices, to evaluate in [X(i,j);Y(i,j)]
+      %
+      XY        = zeros(2,size(X,1),size(X,2)) ;
+      XY(1,:,:) = X ;
+      XY(2,:,:) = Y ;
+      Z         = self.eval(XY);
+      contour(X,Y,feval(fz,Z),nc);
     end
   end
 end
