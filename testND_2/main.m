@@ -17,6 +17,8 @@ axis equal ;
 search_method   = LinesearchArmijo();
 gradient_method = MinimizationGradientMethod(search_method,1e-6,10000,true);
 
+search_method.setDebug();
+gradient_method.no_FD_D();
 gradient_method.setFunction( r ) ;
 
 

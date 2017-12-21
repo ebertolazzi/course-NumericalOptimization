@@ -27,15 +27,16 @@ classdef (Abstract) FunctionND < handle
 
     function g = grad( self, x )
       % finite difference approximation of the gradient
-      h  = (1+abs(x))*eps^(1/3); % ricetta di cucina, attenzione x e' un vettore
+      h  = max(1,abs(x))*eps^(1/3);
       xp = x ;
       xm = x ;
+      g  = zeros(1,self.N);
       for k=1:self.N
         xp(k) = x(k)+h(k);
         xm(k) = x(k)-h(k);
         fp    = self.eval(xp) ;
         fm    = self.eval(xm) ;
-        g(k)  = (fp-fm)./(2*h(k)) ; %#ok<AGROW> % vectorial expression g(i) = (fp(i)-fm(i))/(2*h(i))
+        g(k)  = (fp-fm)./(2*h(k)) ;
         xp(k) = x(k);
         xm(k) = x(k);
       end
@@ -46,7 +47,7 @@ classdef (Abstract) FunctionND < handle
       % Baseed on a code by Brendan C. Wood
       % Copyright (c) 2011, Brendan C. Wood <b.wood@unb.ca>
       H = zeros(self.N,self.N);
-      h  = (1+abs(x))*eps^(1/3); %0.1*ones(3,1); % ricetta di cucina, attenzione x e' un vettore
+      h = max(1,abs(x))*eps^(1/3); %0.1*ones(3,1); % ricetta di cucina, attenzione x e' un vettore
       % for each dimension of objective function
       for i=1:self.N
         % derivative at first point (left)

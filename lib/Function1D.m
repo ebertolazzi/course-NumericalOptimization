@@ -17,7 +17,7 @@ classdef (Abstract) Function1D < handle
 
     function Dy = eval_D( self, x )
       % Finite difference approximation of the first derivative
-      h  = (1+abs(x))*sqrt(eps) ; % "eps" is the "machine epsilon precision"
+      h  = max(1,abs(x))*eps^(1/3) ; % "eps" is the "machine epsilon precision"
       fp = self.eval(x+h) ;
       fm = self.eval(x-h) ;
       Dy = (fp-fm)./(2*h) ;
@@ -25,7 +25,7 @@ classdef (Abstract) Function1D < handle
 
     function DDy = eval_DD( self, x )
       % Finite difference approximation of the second derivative
-      h   = (1+abs(x))*(eps^(1/3)) ;
+      h   = max(1,abs(x))*(eps^(1/3)) ;
       fp  = self.eval(x+h) ;
       fm  = self.eval(x-h) ;
       fc  = self.eval(x) ;
