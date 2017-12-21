@@ -31,8 +31,22 @@ classdef LinesearchArmijo < handle
       self.c1 = c1 ;
     end
     
-    % aggiungere altri parametri da cambiare
-
+    function self = setTau_LS( self, tau_LS )
+      self.tau_LS = tau_LS ;
+    end
+    
+    function self = setTau_acc( self, tau_acc )
+      self.tau_acc = tau_acc ;
+    end
+    
+    function self = setAlpha_min( self, alpha_min )
+      self.alpha_min = alpha_min ;
+    end
+    
+    function self = setAlpha_max( self, alpha_max )
+      self.alpha_max = alpha_max ;
+    end
+    
     function self = setFunction( self, fun1D )
       self.fun1D = fun1D ;
     end
