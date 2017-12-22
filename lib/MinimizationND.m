@@ -34,14 +34,14 @@ classdef MinimizationND < handle
       self.linesearch = ls ;
     end
 
-    function self = setTolerance( self, tol )
+    function setTolerance( self, tol )
       if tol <= 0
         error('MinimizationND, bad tolerance %g\n',tol) ;
       end
       self.tol = tol ;
     end
 
-    function self = setMaxIteration( self, max_iter )
+    function setMaxIteration( self, max_iter )
       if length(max_iter) > 1 || ~isinteger(max_iter)
         error('MinimizationND, expected a scalar  integer\n') ;
       end
@@ -51,19 +51,19 @@ classdef MinimizationND < handle
       self.max_iter = max_iter ;
     end
 
-    function self = debug_on( self )
+    function debug_on( self )
       self.debug_state = true ;
     end
 
-    function self = debug_off( self )
+    function debug_off( self )
       self.debug_state = false ;
     end
 
-    function self = use_FD_D( self )
+    function use_FD_D( self )
       self.FD_D = true ;
     end
 
-    function self = no_FD_D( self )
+    function no_FD_D( self )
       self.FD_D = false ;
     end
 

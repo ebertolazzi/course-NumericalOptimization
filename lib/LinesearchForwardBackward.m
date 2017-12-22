@@ -12,26 +12,26 @@ classdef LinesearchForwardBackward < handle
     tau_acc % modify tau to accelerate exploration for large or very small interval
     alpha_min
     alpha_max
-    debug_on
+    debug_status
   end
   
   methods
 
     function self = LinesearchForwardBackward()
-      self.c1        = 0.1 ;
-      self.tau_LS    = 1.5 ;
-      self.tau_acc   = 1.2 ;
-      self.alpha_min = 1e-10 ;
-      self.alpha_max = 1e10 ;
-      self.debug_on  = true ;
+      self.c1           = 0.1 ;
+      self.tau_LS       = 1.5 ;
+      self.tau_acc      = 1.2 ;
+      self.alpha_min    = 1e-10 ;
+      self.alpha_max    = 1e10 ;
+      self.debug_status = false ;
     end
 
-    function self = setFunction( self, fun1D )
+    function setFunction( self, fun1D )
       % set the function object used in the 1D minimization
       self.fun1D = fun1D ;
     end
 
-    function self = setInitialTau( self, tau_LS )
+    function setInitialTau( self, tau_LS )
       % set the initial dumping factor tau
       if ( tau_LS > 1 ) || (tau_LS < 1000 )
         error('LinesearchForwardBackward::setInitialTau, constant tau_LS = %g must be > 1 and < 1000, tau_LS = %g\n',tau_LS);
@@ -39,7 +39,7 @@ classdef LinesearchForwardBackward < handle
       self.tau_LS = tau_LS ;
     end
 
-    function self = setAccelerationTau( self, tau_acc )
+    function setAccelerationTau( self, tau_acc )
       % set the initial dumping factor tau
       if ( tau_acc > 1 ) || (tau_acc < 10 )
         error('LinesearchForwardBackward::setAccelerationTau, acceleration factor tau = %g must be > 1 and < 10, tau_acc = %g\n',tau_acc);
@@ -47,7 +47,7 @@ classdef LinesearchForwardBackward < handle
       self.tau_acc = tau_acc ;
     end
 
-    function self = setAlphaRange( self, arange )
+    function setAlphaRange( self, arange )
       % set the range for alpha step
       if length(arange) ~= 2
         error('LinesearchForwardBackward::setAlphaRange, argument must be a 2 element vector\n');
@@ -59,7 +59,7 @@ classdef LinesearchForwardBackward < handle
       self.alpha_max = arange(2);
     end
 
-    function self = setC1( self, c1 )
+    function setC1( self, c1 )
       % set the c1 coefficients for lineasearch
       if (c1 >= 0.5) || (c1 < sqrt(eps) )
         error('LinesearchForwardBackward, constant c1 = %g must be <= 0.5 and >= %10f\n',c1,sqrt(eps));
@@ -67,12 +67,12 @@ classdef LinesearchForwardBackward < handle
       self.c1 = c1 ;
     end
 
-    function self = setDebug( self )
-      self.debug_on = true ;
+    function debug_on( self )
+      self.debug_status = true ;
     end
 
-    function self = setNoDebug( self )
-      self.debug_on = false ;
+    function debug_off( self )
+      self.debug_status = false ;
     end
 
     function [alpha0,alpha1,ierr] = ForwardBackward( self, alpha_guess )
@@ -87,13 +87,15 @@ classdef LinesearchForwardBackward < handle
       end
       Df0 = self.fun1D.eval_D(0) ;
       if (Df0 >= 0)
-        figure();
-        subplot(3,1,1);
-        self.plot(alpha_guess*10);
-        subplot(3,1,2);
-        self.plot(alpha_guess);
-        subplot(3,1,3);
-        self.plot(alpha_guess/10);
+        if self.debug_status
+          figure();
+          subplot(3,1,1);
+          self.plot(alpha_guess*10);
+          subplot(3,1,2);
+          self.plot(alpha_guess);
+          subplot(3,1,3);
+          self.plot(alpha_guess/10);
+        end
         error('LinesearchForwardBackward::ForwardBackward, Df0 = %g must be negative\n', Df0 );        
       end
       f0   = self.fun1D.eval(0) ;
