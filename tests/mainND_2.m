@@ -13,10 +13,14 @@ disp(r.arity());
 r.contour([-1,1],[-1,1],@(z) log(1+z), 80)
 axis equal ;
 
-%search_method   = GoldenSearch();
-search_method   = LinesearchArmijo();
+%5search_method   = GoldenSearch();
+%search_method.setMaxIteration( int32(100) ) ;
+%search_method.setTolerance(1e-10);
+
+search_method = LinesearchArmijo();
+search_method.debug_on();
 gradient_method = MinimizationGradientMethod(r,search_method);
-gradient_method.setMaxIteration( int32(1000) );
+gradient_method.setMaxIteration( int32(10000) );
 gradient_method.setTolerance(1e-6);
 gradient_method.debug_on();
 

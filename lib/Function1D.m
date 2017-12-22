@@ -12,7 +12,7 @@ classdef (Abstract) Function1D < handle
     % will be defined in the derived class
     y = eval( self, x )
   end
-  
+
   methods
 
     function Dy = eval_D( self, x )
