@@ -1,4 +1,4 @@
-classdef GoldenSearch < LinesearchForwardBackward
+classdef LinesearchGoldenSection < LinesearchForwardBackward
   
     properties (SetAccess = private, Hidden = true)
     tau
@@ -8,7 +8,7 @@ classdef GoldenSearch < LinesearchForwardBackward
   
   methods
   
-    function self = GoldenSearch()
+    function self = LinesearchGoldenSection()
       % PASSA al costruttore della super-classe
       self@LinesearchForwardBackward() ;
       self.tau      = (sqrt(5)-1)/2 ;
@@ -18,23 +18,23 @@ classdef GoldenSearch < LinesearchForwardBackward
 
     function setMaxIteration( self, max_iter )
       if length(max_iter) > 1 || ~isinteger(max_iter)
-        error('GoldenSearch, expected a scalar  integer\n') ;
+        error('LinesearchGoldenSection, expected a scalar  integer\n') ;
       end
       if max_iter < 0 || max_iter > 10000
-        error('GoldenSearch, bad number of iterator %d\n',max_iter) ;
+        error('LinesearchGoldenSection, bad number of iterator %d\n',max_iter) ;
       end
       self.max_iter = max_iter ;
     end
 
     function setTolerance( self, tol )
       if tol <= 0
-        error('GoldenSearch, bad tolerance %g\n',tol) ;
+        error('LinesearchGoldenSection, bad tolerance %g\n',tol) ;
       end
       self.tol = tol ;
     end
 
     function [a,b] = minimize( self, a_in, b_in )
-      % controllo che b > al
+      % check that b > al
       a      = a_in ;
       b      = b_in ;
       dlen   = self.tau*(b-a) ;
@@ -46,14 +46,14 @@ classdef GoldenSearch < LinesearchForwardBackward
       for k=1:self.max_iter
         if (b-a) < tolerance ; break ; end
         if fl > fm
-          % seleziono intervallo [lambda,b]
+          % select interval [lambda,b]
           a      = lambda ;
           lambda = mu;      fl = fm ;
           dlen   = self.tau*(b-a) ;
           mu     = a+dlen ;
           fm     = self.fun1D.eval(mu);
         else
-          % seleziono intervallo [a,mu]
+          % select interval [a,mu]
           b      = mu;
           mu     = lambda; fm = fl ;
           dlen   = self.tau*(b-a) ;

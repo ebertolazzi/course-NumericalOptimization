@@ -14,12 +14,16 @@ r.contour([-2,2],[-1,3],@(z) log(1+z), 80)
 axis equal ;
 
 %ls = 'Armijo' ;
-ls = 'GS' ;
+ls = 'Wolfe' ;
+%ls = 'GS' ;
 switch ls
 case 'Armijo'
   search_method = LinesearchArmijo();
+case 'Wolfe'
+  search_method = LinesearchWolfe();
+  search_method.strongWolfe_on();
 case 'GS'
-  search_method = GoldenSearch();
+  search_method = LinesearchGoldenSection();
   search_method.setMaxIteration( int32(10) ) ;
   search_method.setTolerance(1e-6);
 end
