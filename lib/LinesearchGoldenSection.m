@@ -64,10 +64,10 @@ classdef LinesearchGoldenSection < LinesearchForwardBackward
     end
 
     function [alpha,ok] = search( self, alpha_guess )
-      [~,alpha1,ierr] = self.ForwardBackward( alpha_guess );
+      [aLO,aHI,fLO,fHI,ierr] = self.ForwardBackward( alpha_guess ) ;
       ok = ierr >= 0 ;
       if ok
-        [a,b] = self.minimize( 0, alpha1 ) ;
+        [a,b] = self.minimize( aLO, aHI ) ;
         alpha = (a+b)/2 ;
       else
         alpha = alpha_guess/100 ;
