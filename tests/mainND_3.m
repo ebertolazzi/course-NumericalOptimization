@@ -5,9 +5,15 @@ clc;
 addpath('../lib');
 addpath('../functions');
 
-fun_name = 'Rosen';
+fun_name = 'Quad';
 
 switch fun_name
+    case 'Quad'
+    r = Quadratic2D();
+    disp(r.arity());
+    r.contour([-1.5 1.5],[-1.5 1.5],@(z) log(1+z), 80)
+    axis equal ;
+    x0 = [-1; 1 ];
   case 'Rosen'
     r = Rosenbrock();
     disp(r.arity());
