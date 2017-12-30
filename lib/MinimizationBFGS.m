@@ -1,4 +1,9 @@
 classdef MinimizationBFGS < MinimizationND
+  %
+  % ADD comment describing the class what do etc )
+  %
+  %
+  %
 
   methods
     function self = MinimizationBFGS( fun, ls )

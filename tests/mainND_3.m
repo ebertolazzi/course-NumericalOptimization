@@ -5,7 +5,7 @@ clc;
 addpath('../lib');
 addpath('../functions');
 
-fun_name = 'Quad';
+fun_name = 'Rosen';
 
 switch fun_name
     case 'Quad'
@@ -29,8 +29,9 @@ switch fun_name
 end
 
 
-search_method   = GoldenSearch();
+%%search_method   = LinesearchGoldenSection();
 %search_method = LinesearchArmijo();
+search_method = LinesearchWolfe();
 
 search_method.debug_on();
 

@@ -1,7 +1,9 @@
 classdef (Abstract) FunctionND < handle
 
   properties (SetAccess = private, Hidden = true)
-    N  % arity of the function
+    N               % arity of the function
+    exact_solutions % matrix N x dim with all the known solutions. dim can be 0 if no known solution arer available 
+    guesses          % matrix N x dim with suggested inital guess used for testing.
   end
 
   methods (Abstract)
@@ -19,9 +21,46 @@ classdef (Abstract) FunctionND < handle
         error('FunctionND: argument must be a positive integer, found %d',N);
       end
       self.N = N ;
+      self.guesses         = zeros(N,0); % no inital guess
+      self.exact_solutions = zeros(N,0); % no exact solutions
+    end
+
+    function n = num_guess( self )
+      n = size(self.guesses,2);
+    end
+
+    function g = guess( self, idx )
+      if ~isscalar(idx)
+        error('FunctionND:guess, argument must be a scalar, found %s',class(idx));
+      end
+      if ~isinteger(idx)
+        error('FunctionND:guess, argument must be an integer, found %s',class(idx));
+      end
+      if idx < 1 || idx > size(self.guesses,2)
+        error('FunctionND:guess, argument must be an integer in [1,%d] found %s',size(self.guesses,2),idx);
+      end
+      g = self.guesses(:,idx);
+    end
+
+    function n = num_exact( self )
+      n = size(self.exact_solutions,2);
+    end
+
+    function g = exact( self, idx )
+      if ~isscalar(idx)
+        error('FunctionND:exact, argument must be a scalar, found %s',class(idx));
+      end
+      if ~isinteger(idx)
+        error('FunctionND:exact, argument must be an integer, found %s',class(idx));
+      end
+      if idx < 1 || idx > size(self.exact_solutions,2)
+        error('FunctionND:exact, argument must be an integer in [1,%d] found %s',size(self.exact_solutions,2),idx);
+      end
+      g = self.exact_solutions(:,idx);
     end
 
     function N = arity( self )
+      % return the number of arguments of the function 
       N = self.N ;
     end
 
@@ -73,6 +112,7 @@ classdef (Abstract) FunctionND < handle
     end
 
     function contour( self, xmm, ymm, fz, nc )
+      % plot 2D contour of the function
       if self.N ~= 2
         error('FunctionND:contour can be used only for 2D functions');
       end
