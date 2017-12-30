@@ -13,9 +13,9 @@ disp(r.arity());
 r.contour([-2,2],[-1,3],@(z) log(1+z), 80)
 axis equal ;
 
-%ls = 'Armijo' ;
+ls = 'Armijo' ;
 %ls = 'Wolfe' ;
-ls = 'GS' ;
+%ls = 'GS' ;
 switch ls
 case 'Armijo'
   search_method = LinesearchArmijo();

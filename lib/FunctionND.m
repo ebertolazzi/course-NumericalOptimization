@@ -1,15 +1,15 @@
 classdef (Abstract) FunctionND < handle
 
-  properties (SetAccess = private, Hidden = true)
+  properties (SetAccess = protected, Hidden = true)
     N               % arity of the function
     exact_solutions % matrix N x dim with all the known solutions. dim can be 0 if no known solution arer available 
-    guesses          % matrix N x dim with suggested inital guess used for testing.
+    guesses         % matrix N x dim with suggested inital guess used for testing.
   end
 
   methods (Abstract)
     y = eval( self, x )
   end
-  
+
   methods
 
     function self = FunctionND( N )
@@ -46,7 +46,7 @@ classdef (Abstract) FunctionND < handle
       n = size(self.exact_solutions,2);
     end
 
-    function g = exact( self, idx )
+    function e = exact( self, idx )
       if ~isscalar(idx)
         error('FunctionND:exact, argument must be a scalar, found %s',class(idx));
       end
@@ -56,12 +56,24 @@ classdef (Abstract) FunctionND < handle
       if idx < 1 || idx > size(self.exact_solutions,2)
         error('FunctionND:exact, argument must be an integer in [1,%d] found %s',size(self.exact_solutions,2),idx);
       end
-      g = self.exact_solutions(:,idx);
+      e = self.exact_solutions(:,idx);
     end
 
     function N = arity( self )
       % return the number of arguments of the function 
       N = self.N ;
+    end
+
+    function check_x( self, x )
+      szdim = size(x);
+      if szdim ~= 2
+        error('FunctionND, dimension of x = %%d expected 2\n',szdim);
+      end
+      n = size(x,1);
+      m = size(x,2);
+      if ~( n == self.N && m == 1 )
+        error('FunctionND, size(x) = %d x %d, expected %d x 1\n',n,m,self.N);
+      end 
     end
 
     function g = grad( self, x )
@@ -104,11 +116,10 @@ classdef (Abstract) FunctionND < handle
         
         % assign as column i of Hessian
         H(:,i) = d2f;
-        
-        % Make H symmetric numerically, this is not mandatory but could
-        % help
-        H = 0.5*(H+H.') ;
       end
+
+      % Make H symmetric numerically, this is not mandatory but could help
+      H = 0.5*(H+H.') ;
     end
 
     function contour( self, xmm, ymm, fz, nc )
@@ -116,17 +127,22 @@ classdef (Abstract) FunctionND < handle
       if self.N ~= 2
         error('FunctionND:contour can be used only for 2D functions');
       end
-      x     = linspace(xmm(1),xmm(2),400);
-      y     = linspace(ymm(1),ymm(2),400);
+      NX    = 400 ;
+      NY    = 400 ;
+      x     = linspace(xmm(1),xmm(2),NX);
+      y     = linspace(ymm(1),ymm(2),NY);
       [X,Y] = meshgrid(x,y);
       %
       % X and Y are matrices, to evaluate in [X(i,j);Y(i,j)]
       %
-      XY        = zeros(2,size(X,1),size(X,2)) ;
-      XY(1,:,:) = X ;
-      XY(2,:,:) = Y ;
-      Z         = self.eval(XY);
-      contour(X,Y,feval(fz,Z),nc);
+      Z = zeros(NX,NY) ;
+      for i=1:NX
+        for j=1:NY
+         XY = [ X(i,j) ; Y(i,j) ] ;
+         Z(i,j) = feval(fz,self.eval(XY)) ;
+        end
+      end
+      contour(X,Y,Z,nc);
     end
   end
 end
