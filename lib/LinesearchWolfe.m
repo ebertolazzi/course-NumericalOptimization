@@ -8,7 +8,7 @@ classdef LinesearchWolfe < LinesearchForwardBackward
   methods
 
     function self = LinesearchWolfe()
-      self@LinesearchForwardBackward();
+      self@LinesearchForwardBackward('Wolfe');
       self.strongWolfe = false ;
     end
 

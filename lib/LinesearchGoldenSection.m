@@ -10,7 +10,7 @@ classdef LinesearchGoldenSection < LinesearchForwardBackward
   
     function self = LinesearchGoldenSection()
       % PASSA al costruttore della super-classe
-      self@LinesearchForwardBackward() ;
+      self@LinesearchForwardBackward('GoldenSection') ;
       self.tau      = (sqrt(5)-1)/2 ;
       self.tol      = 1e-3 ;
       self.max_iter = 10 ;

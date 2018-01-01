@@ -4,7 +4,7 @@ classdef LinesearchArmijo < LinesearchForwardBackward
   methods
 
     function self = LinesearchArmijo()
-      self@LinesearchForwardBackward();
+      self@LinesearchForwardBackward('Armijo');
     end
 
     function [alpha_ott,ok] = search( self, alpha_guess )

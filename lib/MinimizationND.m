@@ -98,8 +98,8 @@ classdef MinimizationND < handle
         self.x_history = [ self.x_history reshape( x1, length(x1), 1 ) ] ;
       end 
     end
-    
-    function plotiter( self )
+
+    function plotIter( self )
       if size(self.x_history,1) == 2
         hold on ;
         xo = self.x_history(:,1) ;
@@ -110,6 +110,17 @@ classdef MinimizationND < handle
           plot(xo(1),xo(2),'or');
           xo = xn;
         end
+      end
+    end
+
+    function plotResidual( self, varargin )
+      N = length(self.x_history) ;
+      if N > 0
+        r = zeros(N,1);
+        for k=1:N
+          r(k) = norm(self.funND.grad(self.x_history(:,k)),inf);
+        end
+        semilogy(1:N, r,varargin{:});
       end
     end
   end

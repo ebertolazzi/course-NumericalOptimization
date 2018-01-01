@@ -23,11 +23,12 @@ classdef LinesearchForwardBackward < handle
     debug_status % if true activate debug messages
     f0           % stored value f(0)
     Df0          % stored value f'(0)
+    name         % name of linesearch, set by the serived classed
   end
   
   methods
 
-    function self = LinesearchForwardBackward()
+    function self = LinesearchForwardBackward( name )
       %
       % constructor
       %
@@ -41,6 +42,7 @@ classdef LinesearchForwardBackward < handle
       self.dumpMax      = 0.95 ;
       self.alpha_epsi   = eps^(1/3);
       self.debug_status = false ;
+      self.name        = name ;
     end
 
     function setFunction( self, fun1D )
@@ -51,7 +53,7 @@ classdef LinesearchForwardBackward < handle
     function setInitialTau( self, tau_LS )
       % set the initial dumping factor tau used in forward backward search
       if ( tau_LS > 1 ) || (tau_LS < 1000 )
-        error('LinesearchForwardBackward::setInitialTau, constant tau_LS = %g must be > 1 and < 1000, tau_LS = %g\n',tau_LS);
+        error('Linesearch[%s]::setInitialTau, constant tau_LS = %g must be > 1 and < 1000, tau_LS = %g\n',self.name,tau_LS);
       end
       self.tau_LS = tau_LS ;
     end
@@ -59,7 +61,7 @@ classdef LinesearchForwardBackward < handle
     function setAccelerationTau( self, tau_acc )
       % set acceleration factor used in forward backward search
       if ( tau_acc >= 1 ) || (tau_acc < 10 )
-        error('LinesearchForwardBackward::setAccelerationTau, acceleration factor tau = %g must be >= 1 and < 10, tau_acc = %g\n',tau_acc);
+        error('Linesearch[%s]::setAccelerationTau, acceleration factor tau = %g must be >= 1 and < 10, tau_acc = %g\n',self.name,tau_acc);
       end
       self.tau_acc = tau_acc ;
     end
@@ -67,10 +69,10 @@ classdef LinesearchForwardBackward < handle
     function setAlphaRange( self, amin, amax )
       % set the range for alpha step
       if ~ (isscalar(amin) && isscalar(amax))
-        error('LinesearchForwardBackward::setAlphaRange, arguments must be a 2 scalars\n');
+        error('Linesearch[%s]::setAlphaRange, arguments must be a 2 scalars\n',self.name);
       end
       if amin >= amax && amin > 1e-50 && amax < 1e50
-        error('LinesearchForwardBackward::setAlphaRange, bad range [%g,%g]\n',amin,amax);
+        error('Linesearch[%s]::setAlphaRange, bad range [%g,%g]\n',self.name,amin,amax);
       end
       self.alpha_min = amin;
       self.alpha_max = amax;
@@ -81,21 +83,20 @@ classdef LinesearchForwardBackward < handle
       seps = sqrt(eps) ;
       % set the c1 coefficients for lineasearch
       if c1 > 0.5
-        warning('LinesearchForwardBackward, constant c1 = %g must be <= 0.5, set to 0.5\n',c1);
+        warning('Linesearch[%s], constant c1 = %g must be <= 0.5, set to 0.5\n',self.name,c1);
         self.c1 = 0.5;
       elseif c1 < seps
-        warning('LinesearchForwardBackward, constant c1 = %g must be >= %g, set to %g\n', ...
-                c1,seps,seps);
+        warning('Linesearch[%s], constant c1 = %g must be >= %g, set to %g\n',self.name,c1,seps,seps);
         self.c1 = seps;
       else
         self.c1 = c1 ;
       end
       % set the c2 coefficients for lineasearch
       if c2 < self.c1
-        warning('LinesearchForwardBackward, constant c2 = %g must be >= c1 = %g\n',c2,self.c1);
+        warning('Linesearch[%s], constant c2 = %g must be >= c1 = %g\n',self.name,c2,self.c1);
         self.c2 = self.c1 ;
       elseif c2 > 0.5
-        warning('LinesearchForwardBackward, constant c2 = %g must be <= 0.5, set to 0.5\n',c2);
+        warning('Linesearch[%s], constant c2 = %g must be <= 0.5, set to 0.5\n',self.name,c2);
         self.c2 = 0.5;
       else
         self.c2 = c2 ;
@@ -105,13 +106,13 @@ classdef LinesearchForwardBackward < handle
     function setDump( self, d1, d2 )
       % set dumping coefficients for Zoom
       if d1 > 0.4
-        warning('LinesearchForwardBackward, dump d1 = %g must be <= 0.4, set to 0.4\n',d1);
+        warning('Linesearch[%s], dump d1 = %g must be <= 0.4, set to 0.4\n',self.name,d1);
         self.dumpMin = 0.4 ;
       else
         self.dumpMin = d1 ;
       end
       if d2 < 0.6
-        warning('LinesearchForwardBackward, dump d2 = %g must be >= 0.6, set to 0.6\n',d2);
+        warning('Linesearch[%s], dump d2 = %g must be >= 0.6, set to 0.6\n',self.name,d2);
         self.dumpMax = 0.6 ;
       else
         self.dumpMax = d2 ;
@@ -168,7 +169,7 @@ classdef LinesearchForwardBackward < handle
           subplot(3,1,3);
           self.plot(alpha_guess/10);
         end
-        error('LinesearchForwardBackward::ForwardBackward, Df0 = %g must be negative\n', self.Df0 );        
+        error('Linesearch[~s]::ForwardBackward, Df0 = %g must be negative\n',self.name,self.Df0 );        
       end
       % initialize search parameters
       c1Df0 = self.c1*self.Df0;
@@ -287,7 +288,7 @@ classdef LinesearchForwardBackward < handle
         end
         Delta = aHI - aLO ;
       end
-      error( 'LinesearchForwardBackward (Zoom): failed aHI=%g aLO=%g DfLO=%g\n', aHI, aLO, DfLO ) ;
+      error( 'Linesearch[%s] (Zoom): failed aHI=%g aLO=%g DfLO=%g\n', self.name, aHI, aLO, DfLO ) ;
     end 
 
     function plot( self, alpha_max )

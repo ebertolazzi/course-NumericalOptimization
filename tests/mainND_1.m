@@ -44,5 +44,5 @@ minimization_method.setTolerance(1e-6);
 minimization_method.debug_on();
 
 [xs,converged] = minimization_method.minimize( [-1;2] ) ;
-minimization_method.plotiter();
+minimization_method.plotIter();
 xs

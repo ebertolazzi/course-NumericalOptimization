@@ -43,7 +43,7 @@ dir_method.setTolerance(1e-6);
 dir_method.debug_on();
 
 [xs,converged] = dir_method.minimize( x0 ) ;
-dir_method.plotiter();
+dir_method.plotIter();
 
 xs
 
