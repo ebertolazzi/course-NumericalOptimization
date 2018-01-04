@@ -41,7 +41,7 @@ classdef (Abstract) FunctionND < handle
       if idx < 1 || idx > size(self.guesses,2)
         error('FunctionND:guess, argument must be an integer in [1,%d] found %s',size(self.guesses,2),idx);
       end
-      g = self.guesses(:,idx);
+      g = double(self.guesses(:,idx));
     end
 
     function n = num_exact( self )
@@ -58,7 +58,7 @@ classdef (Abstract) FunctionND < handle
       if idx < 1 || idx > size(self.exact_solutions,2)
         error('FunctionND:exact, argument must be an integer in [1,%d] found %s',size(self.exact_solutions,2),idx);
       end
-      e = self.exact_solutions(:,idx);
+      e = double(self.exact_solutions(:,idx));
     end
 
     function N = arity( self )
@@ -67,9 +67,9 @@ classdef (Abstract) FunctionND < handle
     end
 
     function check_x( self, x )
-      szdim = size(x);
+      szdim = length(size(x));
       if szdim ~= 2
-        error('FunctionND, dimension of x = %%d expected 2\n',szdim);
+        error('FunctionND, number of dimension of x = %d expected 2\n',szdim);
       end
       n = size(x,1);
       m = size(x,2);
