@@ -33,8 +33,10 @@ classdef MinimizationCG < MinimizationND
   %
 
   properties (SetAccess = private, Hidden = true)
-    method       % selected nonliner CG method
-    method_names % list of available methods
+    method          % selected nonliner CG method
+    method_names    % list of available methods
+    direction_short %
+    angle_too_small %
   end
 
   methods (Hidden = true)
@@ -184,8 +186,10 @@ classdef MinimizationCG < MinimizationND
       % fun = function to be minimized
       % ls  = linesearch used, can be LinesearchArmijo, LinesearchWolfe, LinesearchGoldenSection
       self@MinimizationND( fun, ls ) ;
-      self.method_names = {'GRAD','HS','HS+','FR','PRP','PRP+','CD','LS','DY','N','HyTAS','HyHS','HyNG','HyDY'} ;
-      self.method       = self.method_names{1} ;
+      self.method_names    = {'GRAD','HS','HS+','FR','PRP','PRP+','CD','LS','DY','N','HyTAS','HyHS','HyNG','HyDY'} ;
+      self.method          = self.method_names{1} ;
+      self.direction_short = 1e-3 ;
+      self.angle_too_small = pi/180 ; % 1 degree
     end
 
     function n = numOfMethods( self )
@@ -209,8 +213,8 @@ classdef MinimizationCG < MinimizationND
     function selectByName( self, name )
       % select the CG method by its name
       if ischar(name)
-        for n=self.method_names
-          if n==name
+        for k=1:length(self.method_names)
+          if strcmp(name,self.method_names{k})
             self.method = name ;
             return ;
           end
@@ -261,13 +265,24 @@ classdef MinimizationCG < MinimizationND
           beta = self.betaEval( g1, g0, d0 ) ;
           d1   = -g1 + beta*d0 ;
           % check if the direction is descending, if direction is >= 89 degree from gradient reset to gradient directions
-          if dot( d1, g1 ) > -norm(d1) * nrm_g1 * (pi/180)
+          % use >= to catch d1 == 0
+          nrm_d1 = norm(d1) ;
+          if dot( d1, g1 ) >= -nrm_d1 * nrm_g1 * (pi-self.angle_too_small)
             if self.debug_state
-              fprintf(1,'reset direction search, ...' ) ;
+              fprintf(1,'direction angle about 90 degree, reset direction search, ...' ) ;
+            end
+            d1 = -g1 ; % reset direction
+          elseif nrm_d1 <= self.direction_short * nrm_g1
+            if self.debug_state
+              fprintf(1,'direction length too short, reset direction search, ...' ) ;
             end
             d1 = -g1 ; % reset direction
           end
         end
+      %
+      if norm(d1,inf) == 0
+        error('MinimizationCG, bad direction d == 0\n') ;
+      end
         %
         % minimize along search direction
         [xs,alpha] = self.step1D( xs, d1, alpha ) ;

@@ -31,14 +31,9 @@ end
 search_method.debug_on();
 
 %method = 'gradient' ;
-method = 'PR' ;
-switch method 
-case 'gradient'
-  minimization_method = MinimizationGradientMethod( r, search_method ) ;
-case 'PR'
-  minimization_method = MinimizationPolackRibiere( r, search_method ) ;
-end
-
+method = 'PRP' ;
+minimization_method = MinimizationCG( r, search_method ) ;
+minimization_method.selectByName(method);
 minimization_method.setMaxIteration( int32(1000) );
 minimization_method.setTolerance(1e-6);
 minimization_method.debug_on();

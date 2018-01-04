@@ -36,7 +36,8 @@ classdef LinesearchWolfe < LinesearchForwardBackward
       case 2 % LO and HI exchanged
         [alpha_ott,ok] = self.Zoom( aHI, fHI, aLO, fLO, self.strongWolfe ) ;
       otherwise
-        ok = false ;
+        ok        = false ;
+        alpha_ott = 0 ;
       end
     end
   end

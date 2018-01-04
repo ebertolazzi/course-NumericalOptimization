@@ -27,14 +27,7 @@ classdef (Abstract) FunctionMap < FunctionND
       m = self.M ;
     end
 
-    function f = eval( self, x )
-      % compute the function as the sum of the squares of the components of the map
-      self.check_x(x);
-      F = self.evalMap( x ) ;
-      f = 0.5*dot(F,F);
-    end
-
-    function J = jacobian( self, x )
+    function J = FD_jacobian( self, x )
       % finite difference approximation of the jacobian
       self.check_x(x);
       h  = max(1,abs(x))*eps^(1/3);
@@ -52,7 +45,7 @@ classdef (Abstract) FunctionMap < FunctionND
       end
     end
 
-    function T = tensor( self, x )
+    function T = FD_tensor( self, x )
       % finite difference approximation of the second derivative
       % T(k,:,:) is the hessian of the k-th components of the map
       self.check_x(x);
@@ -84,7 +77,15 @@ classdef (Abstract) FunctionMap < FunctionND
     end
 
     % rewrite of gradient and hessian of the sum of the squares of the map
-
+    
+    % Virtual methods definitions
+    function f = eval( self, x )
+      % compute the function as the sum of the squares of the components of the map
+      self.check_x(x);
+      F = self.evalMap( x ) ;
+      f = 0.5*dot(F,F);
+    end
+    
     function g = grad( self, x )
       % gradient of sum f_k(x)^2 --> sum f_k(x) grad_k(x) = 2*F(x)^T J(x)
       self.check_x(x);

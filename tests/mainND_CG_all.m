@@ -5,7 +5,7 @@ clc;
 addpath('../lib');
 addpath('../functions');
 
-fun_name = 'Rosen';
+fun_name = 'SchafferF6';
 fplot    = @(z) log(1+z) ;
 switch fun_name
 case 'Quad'
@@ -24,6 +24,12 @@ case 'Bro'
   RX = [0,4000] ;
   RY = [-600,600] ;
   x0 = 0.9*[ 10^6  ; 2*10^(-6) ] ;
+case 'SchafferF6'
+  r = SchafferF6();
+  RX = [-20,20] ;
+  RY = [-20,20] ;
+  x0 = r.guess(int32(1));
+  fplot = @(z) z ;
 end
 
 disp(r.arity());
@@ -31,26 +37,27 @@ disp(r.arity());
 ls = 'Wolfe';
 switch ls
 case 'GS'
-  search_method   = LinesearchGoldenSection();
-  search_method.setTolerance( 1e-9 );
-  search_method.setMaxIteration( int32(150) );
+  linesearch_method = LinesearchGoldenSection();
+  linesearch_method.setTolerance( 1e-9 );
+  linesearch_method.setMaxIteration( int32(150) );
 case 'Armijo'
-  search_method = LinesearchArmijo();
+  linesearch_method = LinesearchArmijo();
 case 'Wolfe'
-  search_method = LinesearchWolfe();
+  linesearch_method = LinesearchWolfe();
 end
-search_method.debug_on();
+
+linesearch_method.debug_on() ;
 
 %min_method = MinimizationGradientMethod(r,search_method);
-min_method = MinimizationCG( r, search_method );
-
+min_method = MinimizationCG( r, linesearch_method );
 min_method.setMaxIteration( int32(1000) );
 min_method.setTolerance(1e-8);
 min_method.debug_on();
+min_method.no_FD_D();
 
 first = true ;
 %for kk=2:14
-for kk=2:14
+for kk=2
 
   min_method.selectByNumber( int32(kk) );
   
@@ -75,5 +82,7 @@ for kk=2:14
 end
 
 xs
+
+fprintf('All done folks!\n\n') ;
 
 

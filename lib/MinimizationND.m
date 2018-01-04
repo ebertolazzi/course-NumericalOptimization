@@ -69,6 +69,10 @@ classdef MinimizationND < handle
 
     function [x1,alpha] = step1D( self, x0, d, alpha_guess )
       %
+      if norm(d,inf) == 0
+        error('MinimizationND, bad direction d == 0\n') ;
+      end
+      %
       % build the 1D function along the search direction
       fcut = Function1Dcut( self.funND, x0, d );
       %
@@ -78,6 +82,7 @@ classdef MinimizationND < handle
       else
         fcut.no_FD_D() ;
       end
+
       %
       % do a 1D minimization
       self.linesearch.setFunction( fcut ) ;
@@ -87,6 +92,7 @@ classdef MinimizationND < handle
       %
       % check error
       if ~ok
+        self.linesearch.plotDebug(alpha_guess);
         error('MinimizationGradientMethod:step1D, linesearch failed\n');
       end
       %

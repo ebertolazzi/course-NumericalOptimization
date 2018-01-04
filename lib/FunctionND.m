@@ -8,6 +8,8 @@ classdef (Abstract) FunctionND < handle
 
   methods (Abstract)
     y = eval( self, x )
+    J = grad( self, x )
+    H = hessian( self, x )
   end
 
   methods
@@ -76,7 +78,7 @@ classdef (Abstract) FunctionND < handle
       end 
     end
 
-    function g = grad( self, x )
+    function g = FD_grad( self, x )
       % finite difference approximation of the gradient
       h  = max(1,abs(x))*eps^(1/3);
       xp = x ;
@@ -93,7 +95,7 @@ classdef (Abstract) FunctionND < handle
       end
     end
 
-    function H = hessian( self, x )
+    function H = FD_hessian( self, x )
       % finite difference approximation of the hessian
       % Baseed on a code by Brendan C. Wood
       % Copyright (c) 2011, Brendan C. Wood <b.wood@unb.ca>

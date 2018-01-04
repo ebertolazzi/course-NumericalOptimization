@@ -42,7 +42,7 @@ classdef LinesearchForwardBackward < handle
       self.dumpMax      = 0.95 ;
       self.alpha_epsi   = eps^(1/3);
       self.debug_status = false ;
-      self.name        = name ;
+      self.name         = name ;
     end
 
     function setFunction( self, fun1D )
@@ -126,10 +126,17 @@ classdef LinesearchForwardBackward < handle
     function debug_off( self )
       self.debug_status = false ;
     end
-
-    %function ok = check_Armijo( self, alpha )
-    %  ok = self.fun1D.eval(alpha) <= self.f0 + alpha * self.c1 * self.Df0 ;
     %end
+
+    function plotDebug( self, alpha_guess )
+      figure();
+      subplot(3,1,1);
+      self.plot(alpha_guess*10);
+      subplot(3,1,2);
+      self.plot(alpha_guess);
+      subplot(3,1,3);
+      self.plot(alpha_guess/10);
+    end
 
     %                         _           _   _
     %    __ _ _   _  __ _  __| |_ __ __ _| |_(_) ___ 
@@ -161,15 +168,9 @@ classdef LinesearchForwardBackward < handle
       % if not decreasing issue an error (if in debug also plot the function)
       if (self.Df0 >= 0)
         if self.debug_status
-          figure();
-          subplot(3,1,1);
-          self.plot(alpha_guess*10);
-          subplot(3,1,2);
-          self.plot(alpha_guess);
-          subplot(3,1,3);
-          self.plot(alpha_guess/10);
+          self.plotDebug(alpha_guess);
         end
-        error('Linesearch[~s]::ForwardBackward, Df0 = %g must be negative\n',self.name,self.Df0 );        
+        error('Linesearch[%s]::ForwardBackward, Df0 = %g must be negative\n',self.name,self.Df0 );        
       end
       % initialize search parameters
       c1Df0 = self.c1*self.Df0;

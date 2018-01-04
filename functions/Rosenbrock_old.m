@@ -13,5 +13,14 @@ classdef Rosenbrock_old < FunctionND
       Y = squeeze(x(2,:,:)) ;
       f = 100*(Y-X.^2).^2 + (1-X).^2;
     end
+    
+    % Use finite difference for grad and hessian
+    function g = grad( self, x )
+      g = self.FD_grad( self, x );
+    end
+
+    function h = hessian( self, x )
+      h = self.FD_hessian( self, x );
+    end
   end
 end
