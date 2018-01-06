@@ -1,17 +1,20 @@
-classdef Easy_function_3D < FunctionND
+classdef Brown_bsf < FunctionND
   methods
-    function self = Easy_function_3D()
+    function self = Brown_bsf()
       arity = 2;
       self@FunctionND(int32(arity)) ;
     end
     
     function f = eval(self,x)
-      % evaluate a simple (2D) function.
+      % Evaluate Brown badly scaled 2D function.
       % if x is a 2 by m matrix return m values in a row vector.
       % if x is a 2 by m x n matrix return m x n values in a matrix vector.
       X = squeeze(x(1,:,:)) ;
       Y = squeeze(x(2,:,:)) ;
-      f = (X.^2)+ abs(Y);
+      f1 = X - 10^6;
+      f2 = Y -2*10^(-6);
+      f3 = X.*Y - 2;
+      f = f1^2 + f2^2 + f3^2;
     end
     
     % Use finite difference for grad and hessian
@@ -22,6 +25,6 @@ classdef Easy_function_3D < FunctionND
     function h = hessian( self, x )
       h = self.FD_hessian( self, x );
     end
-
+ 
   end
 end

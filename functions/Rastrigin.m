@@ -21,5 +21,10 @@ classdef Rastrigin < FunctionND
       g(1) = 2*x(1)+40*pi*x(1)*sin(2*pi*x(1)^2) ;
       g(2) = 2*x(2)+40*pi*x(2)*sin(2*pi*x(2)^2) ;
     end
+    
+    % Use finite difference for hessian
+    function h = hessian( self, x )
+      h = self.FD_hessian( self, x );
+    end
   end
 end

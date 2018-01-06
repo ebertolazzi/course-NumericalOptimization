@@ -13,5 +13,15 @@ classdef SinFun < Function1D
       y = sin(x);
     end
 
+    function Dy = eval_D( self, x )
+      disp('Use FD first derivative for SinFun');
+      Dy = self.FD_eval_D(x);
+    end
+
+    function DDy = eval_DD( self, x )
+      disp('Use FD second derivative for SinFun');
+      DDy = self.FD_eval_DD(x);
+    end
+
   end
 end
