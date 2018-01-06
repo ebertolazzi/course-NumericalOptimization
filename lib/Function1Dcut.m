@@ -60,7 +60,8 @@ classdef Function1Dcut < Function1D
       if self.FD_D
         res = self.FD_eval_D( alpha ) ;
       else
-        res = dot( self.funND.grad( self.x0 + alpha * self.d ), self.d ) ;
+        g   = self.funND.grad( self.x0 + alpha * self.d ) ;
+        res = dot( g.', self.d ) ;
       end
     end
 
@@ -68,7 +69,8 @@ classdef Function1Dcut < Function1D
       if self.FD_DD
         res = self.FD_eval_DD( alpha ) ;
       else
-        res = dot( self.funND.hessian( self.x0 + alpha * self.d )*self.d', self.d ) ; 
+        H   = self.funND.hessian( self.x0 + alpha * self.d ) ; 
+        res = dot( H * self.d, self.d ) ;
       end
     end
     

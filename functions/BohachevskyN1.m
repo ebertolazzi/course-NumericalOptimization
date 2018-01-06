@@ -25,8 +25,6 @@ classdef BohachevskyN1 < FunctionND
   %   Universita` degli Studi di Trento
   %   email: enrico.bertolazzi@unitn.it
   %
-  %   based on a code of John Burkardt (http://people.sc.fsu.edu/~jburkardt/)
-  %
 
   methods
 
@@ -41,7 +39,7 @@ classdef BohachevskyN1 < FunctionND
       self.check_x(x);
       a1 = 3.0 * pi * x(1) ;
       a2 = 4.0 * pi * x(2) ;
-      f  = x(1)^2 - 0.3 * cos (a1) + 2.0 * x(2)^2 - 0.4 * cos (a2) + 0.7;
+      f  = x(1)^2 + 2.0 * x(2)^2 - 0.3 * cos(a1) - 0.4 * cos(a2) + 0.7;
     end
 
     function g = grad( self, x )

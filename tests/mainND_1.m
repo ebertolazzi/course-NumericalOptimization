@@ -6,38 +6,53 @@ addpath('../lib');
 addpath('../functions');
 
 r = Rosenbrock();
+%r = BohachevskyN1();
 
 disp(r.arity());
 
-%r.contour([-1,3],[-1,2],@(z) log(1+z), 100 );
-r.contour([-2,2],[-1,3],@(z) log(1+z), 80)
-axis equal ;
 
-ls = 'Armijo' ;
-%ls = 'Wolfe' ;
+%ls = 'Armijo' ;
+ls = 'Wolfe' ;
 %ls = 'GS' ;
 switch ls
 case 'Armijo'
-  search_method = LinesearchArmijo();
+  linesearch_method = LinesearchArmijo();
 case 'Wolfe'
-  search_method = LinesearchWolfe();
-  search_method.strongWolfe_on();
+  linesearch_method = LinesearchWolfe();
+  linesearch_method.strongWolfe_on();
 case 'GS'
-  search_method = LinesearchGoldenSection();
-  search_method.setMaxIteration( int32(10) ) ;
-  search_method.setTolerance(1e-6);
+  linesearch_method = LinesearchGoldenSection();
+  linesearch_method.setMaxIteration( int32(10) ) ;
+  linesearch_method.setTolerance(1e-6);
 end
   
-search_method.debug_on();
+linesearch_method.debug_on();
 
-%method = 'gradient' ;
-method = 'PRP' ;
-minimization_method = MinimizationCG( r, search_method ) ;
-minimization_method.selectByName(method);
+%method = 'GRAD' ;
+method = 'FR' ;
+minimization_method = MinimizationCG( r, linesearch_method ) ;
+%minimization_method.selectByName(method);
+minimization_method.selectByNumber(14);
+
+
 minimization_method.setMaxIteration( int32(1000) );
-minimization_method.setTolerance(1e-6);
+minimization_method.setTolerance(1e-9);
 minimization_method.debug_on();
+minimization_method.no_FD_D();
+
+fprintf('method = %s\n',minimization_method.activeMethod()) ;
 
 [xs,converged] = minimization_method.minimize( [-1;2] ) ;
+
+subplot(2,1,1) ;
+[xmin,ymin,xmax,ymax] = minimization_method.iterRange();
+r.contour([xmin,xmax],[ymin,ymax],@(z) z, 80)
+axis equal ;
 minimization_method.plotIter();
+
+subplot(2,1,2) ;
+minimization_method.plotResidual();
 xs
+
+fprintf('method = %s\n',minimization_method.activeMethod()) ;
+

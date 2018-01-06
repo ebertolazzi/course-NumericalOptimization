@@ -18,7 +18,8 @@ classdef LinesearchArmijo < LinesearchForwardBackward
       case {1,2} % only alpha0 and alpha1 satisfy Armijo, take average
         alpha_ott = (alpha0+alpha1)/2 ;
       otherwise
-        ok = false ;
+        alpha_ott = 0 ;
+        ok        = false ;
       end
     end
 

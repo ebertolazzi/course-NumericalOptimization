@@ -33,7 +33,7 @@ classdef LinesearchForwardBackward < handle
       % constructor
       %
       self.c1           = 0.05 ;
-      self.c2           = 0.1 ;
+      self.c2           = 0.2 ;
       self.tau_LS       = 1.5 ;
       self.tau_acc      = 1.2 ;
       self.alpha_min    = 1e-10 ;
@@ -169,8 +169,16 @@ classdef LinesearchForwardBackward < handle
       if (self.Df0 >= 0)
         if self.debug_status
           self.plotDebug(alpha_guess);
+          error('Linesearch[%s]::ForwardBackward, Df0 = %g must be negative\n',self.name,self.Df0 );
+        else
+          ierr = -2 ;
+          alpha0 = 0 ;
+          alpha1 = 0 ;
+          fa0    = 0 ;
+          fa1    = 0 ;
+          warning('Linesearch[%s]::ForwardBackward, Df0 = %g must be negative\n',self.name,self.Df0 );
         end
-        error('Linesearch[%s]::ForwardBackward, Df0 = %g must be negative\n',self.name,self.Df0 );        
+        return ;
       end
       % initialize search parameters
       c1Df0 = self.c1*self.Df0;
@@ -260,9 +268,10 @@ classdef LinesearchForwardBackward < handle
       %  |_| \_\_____|_|   |___|_| \_|_____|
       %
  
-      Delta = aHI - aLO ;
- 
-      while abs(Delta) > self.alpha_epsi
+      Delta    = aHI - aLO ;
+      minDelta = Delta*self.alpha_epsi ;
+
+      while abs(Delta) > minDelta
 
         deltaLambda = self.quadratic( fLO, DfLO, fHI, Delta ) ;
         if Delta > 0
@@ -289,7 +298,8 @@ classdef LinesearchForwardBackward < handle
         end
         Delta = aHI - aLO ;
       end
-      error( 'Linesearch[%s] (Zoom): failed aHI=%g aLO=%g DfLO=%g\n', self.name, aHI, aLO, DfLO ) ;
+      ok = false ;
+      warning( 'Linesearch[%s] (Zoom): failed aHI=%g aLO=%g DfLO=%g\n', self.name, aHI, aLO, DfLO ) ;
     end 
 
     function plot( self, alpha_max )

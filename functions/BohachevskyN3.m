@@ -25,8 +25,6 @@ classdef BohachevskyN3 < FunctionND
   %   Universita` degli Studi di Trento
   %   email: enrico.bertolazzi@unitn.it
   %
-  %   based on a code of John Burkardt (http://people.sc.fsu.edu/~jburkardt/)
-  %
 
   methods
 

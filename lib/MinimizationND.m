@@ -67,20 +67,25 @@ classdef MinimizationND < handle
       self.FD_D = false ;
     end
 
-    function [x1,alpha] = step1D( self, x0, d, alpha_guess )
+    function [ x1, alpha, ok ] = step1D( self, x0, d, alpha_guess )
+      %
+      % Perform linesearch of ND-function starting from x0 along direction d
+      % grad0 is the gradient of the function at x0
+      % alpha_guess is a guess for the linesearch
       %
       if norm(d,inf) == 0
         error('MinimizationND, bad direction d == 0\n') ;
       end
       %
       % build the 1D function along the search direction
+      % use grad0 to scale the function for numerical stability
       fcut = Function1Dcut( self.funND, x0, d );
       %
       % set analitic gradient if necessary
       if self.FD_D
-        fcut.use_FD_D() ;
+        fcut.use_FD_D();
       else
-        fcut.no_FD_D() ;
+        fcut.no_FD_D();
       end
 
       %
@@ -93,16 +98,34 @@ classdef MinimizationND < handle
       % check error
       if ~ok
         self.linesearch.plotDebug(alpha_guess);
-        error('MinimizationGradientMethod:step1D, linesearch failed\n');
+        warning('MinimizationGradientMethod:step1D, linesearch failed\n');
+        x1 = x0 ;
+      else
+        %
+        % advance
+        x1 = x0 + alpha * d ;
+        % only for debug
+        if self.debug_state
+          self.x_history = [ self.x_history reshape( x1, length(x1), 1 ) ] ;
+        end
       end
-      %
-      % advance
-      x1 = x0 + alpha * d ;
+    end
 
-      % only for debug
-      if self.debug_state
-        self.x_history = [ self.x_history reshape( x1, length(x1), 1 ) ] ;
-      end 
+    function [xmin,ymin,xmax,ymax] = iterRange( self )
+      if size(self.x_history,1) == 2
+        xmin = min(self.x_history(1,:)) ;
+        xmax = max(self.x_history(1,:)) ;
+        ymin = min(self.x_history(2,:)) ;
+        ymax = max(self.x_history(2,:)) ;
+        dx   = xmax-xmin ; dy   = ymax-ymin ;
+        xmin = xmin - dx ; ymin = ymin - dy ;
+        xmax = xmax + dx ; ymax = ymax + dy ;
+      else
+        xmin = 0 ;
+        xmax = 0 ;
+        ymin = 0 ;
+        ymax = 0 ;
+      end
     end
 
     function plotIter( self )
