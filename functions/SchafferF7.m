@@ -25,7 +25,7 @@ classdef SchafferF7 < FunctionND
 
   methods
 
-    function self = SchafferF6()
+    function self = SchafferF7()
       self@FunctionND(int32(2)) ;
       self.exact_solutions = [ 0 ; 0 ];       % one known solution 
       self.guesses         = [ -5.0 ; +10.0 ] ; % one guess

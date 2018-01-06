@@ -29,20 +29,26 @@ classdef Powell3D < FunctionND
       self.guesses         = [ 0.0; 1.0; 2.0 ];
     end
 
-    function f = eval(self,x)
+    function f = eval(self,X)
       % evaluate function
-      self.check_x(x);
-      if ( x(2) == 0.0 )
+      self.check_x(X);
+      
+      x = X(1) ;
+      y = X(2) ;
+      z = X(3) ;
+      
+      if ( y == 0.0 )
         term = 0.0;
       else
-        arg  = ( x(1) + 2.0 * x(2) + x(3) ) / x(2);
-        term = exp ( - arg^2 );
+        %arg  = ( x + 2.0 * y + z ) / y ;
+        arg  = 2.0 + ( x + z ) / y ;
+        term = exp( - arg^2 );
       end
 
       f = 3.0 ...
-        - 1.0 / ( 1.0 + ( x(1) - x(2) )^2 ) ...
-        - sin ( 0.5 * pi * x(2) * x(3) ) ...
-        - term;
+        - 1.0 / ( 1.0 + ( x - y )^2 ) ...
+        - sin ( 0.5 * pi * y * z ) ...
+        - term ;
     end
 
     function g = grad( self, X )
@@ -52,25 +58,20 @@ classdef Powell3D < FunctionND
       x = X(1) ;
       y = X(2) ;
       z = X(3) ;
+      
+      tmp1 = 2*(x-y) / (1+(x-y)^2)^2 ;
+      tmp2 = (pi/2)*cos( (pi/2)*y*z ) ;
 
-      t1   = (x - y);
-      t2   = (t1 ^ 2);
-      t4   = (1 + t2) ^ 2;
-      t5   = 1 / t4;
-      t11  = cos(pi * y * z / 0.2e1);
-      t12  = t11 * pi;
-      g(1) = 2 * t5 * t1;
-      g(2) = (-(2 * t5 * t1) - t12 * z / 0.2e1);
-      g(3) = -(t12 * y / 0.2e1);
+      g(1) = tmp1 ;
+      g(2) = -tmp1 - tmp2 * z ;
+      g(3) =       - tmp2 * y ;
 
       if ( y ~= 0.0 )
-        t1 = 0.1e1 / y;
-        t5 = exp((-x - 0.20e1 * y - z) * t1);
-        t6 = t5 * t1;
-        t9 = y ^ 2;
-        g(1) = g(1) - t6 ;
-        g(2) = g(2) + (x + z) * t5 / t9;
-        g(3) = g(3)-t6;
+        tmp1 = (2*y+x+z)/y ;
+        tmp2 = 2*(2*y+x+z)*exp(-tmp1^2)/y^2 ;
+        g(1) = g(1) - tmp2 ;
+        g(2) = g(2) + tmp2*(x+z)/y ;
+        g(3) = g(3) - tmp2 ;
       end
     end
 
@@ -81,51 +82,50 @@ classdef Powell3D < FunctionND
       x = X(1) ;
       y = X(2) ;
       z = X(3) ;
+      xy2  = (x-y)^2 ;
+      tmp1 = 2-6*xy2 ;
+      tmp2 = (1+xy2)^3 ;
+      S    = sin((pi/2)*y*z) ;
+      C    = cos((pi/2)*y*z) ;
+      
+      h(1,1) = tmp1/tmp2 ;
+      h(1,2) = -h(1,1) ;
+      h(1,3) = 0 ;
+      
+      h(2,2) = z^2*(pi/2)^2*S+(2-6*xy2)/tmp2 ;
+      h(2,3) = (pi/4)*(pi*y*z*S-2*C) ;
 
-      t2 = ((x - y) ^ 2);
-      t3 = (x ^ 2);
-      t4 = (x * y);
-      t6 = (y ^ 2);
-      t7 = 1 + t3 - 2 * t4 + t6;
-      t8 = t7 ^ 2;
-      t10 = 1 / t8 / t7;
-      t12 = 8 * t2 * t10;
-      t14 = (1 + t2) ^ 2;
-      t16 = 2 / t14;
-      t22 = (6 * t3 - 12 * t4 + 6 * t6 - 2) * t10;
-      t25 = pi * y * z / 0.2e1;
-      t26 = sin(t25);
-      t27 = pi ^ 2;
-      t28 = t26 * t27;
-      t29 = z ^ 2;
-      t36 = cos(t25);
-      t40 = pi * (t26 * pi * y * z - 0.2e1 * t36) / 0.4e1;
-      h(1,1) = -t12 + t16;
-      h(1,2) = t22;
-      h(1,3) = 0;
-      h(2,1) = t22;
-      h(2,2) = (-t12 + t16 + t28 * t29 / 0.4e1);
-      h(2,3) = t40;
-      h(3,1) = 0;
-      h(3,2) = t40;
-      h(3,3) = (t28 * t6 / 0.4e1);
+      h(3,3) = (pi*y/2)^2*S ;
 
       if ( y ~= 0.0 )
-        t1 = y ^ 2;
-        t7 = exp((-x - 0.20e1 * y - z) / y);
-        t8 = 0.1e1 / t1 * t7;
-        t13 = t7 * (-y + x + z) / t1 / y;
-        t18 = t1 ^ 2;
-        h(1,1) = t8;
-        h(1,2) = -t13;
-        h(1,3) = t8;
-        h(2,1) = -t13;
-        h(2,2) = (x + z) * t7 * (-0.2e1 * y + x + z) / t18;
-        h(2,3) = -t13;
-        h(3,1) = t8;
-        h(3,2) = -t13;
-        h(3,3) = t8;
+        t1  = (x + z);
+        t2  = t1 + 2 * y;
+        t3  = 1 / y;
+        t4  = t3 ^ 2;
+        t5  = t4 ^ 2;
+        t6  = y ^ 2;
+        t7  = 4 * y;
+        t8  = t1 ^ 2;
+        t9  = 3 * z;
+        t2  = (0.4e1 * exp(-(t2 ^ 2 * t4)));
+        t10 = t2 * ((t1 * (t7 + t1)) + 0.7e1 / 0.2e1 * t6) * t5;
+        t3  = t2 * (t1 * t8 - y * t6 + t1 * y * (4 * t1 + 3 * y)) * t3 * t5;
+        tmp = [ t10, ...
+                -t3, ...
+                t10, ...
+                t2 * (y * ((0.5e1 / 0.2e1 * y + (4 * z)) * z - (2 * t6)) + (z ^ 3) + (((t7 + t9 + x) * x) + ((t9 + 8 * y) * z) + 0.5e1 / 0.2e1 * t6) * x) * t1 * t4 * t5, ...
+                -t3, ...
+                t10 ];
+        h(1,1) = h(1,1) + tmp(1);
+        h(1,2) = h(1,2) + tmp(2);
+        h(1,3) = h(1,3) + tmp(3);
+        h(2,2) = h(2,2) + tmp(4);
+        h(2,3) = h(2,3) + tmp(5);
+        h(3,3) = h(3,3) + tmp(6);
       end
+      h(2,1) = h(1,2) ;
+      h(3,1) = h(1,3) ;
+      h(3,2) = h(2,3) ;      
     end
   end
 end

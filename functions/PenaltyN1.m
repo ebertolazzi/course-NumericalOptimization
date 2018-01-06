@@ -21,12 +21,19 @@ classdef PenaltyN1 < FunctionND
 
   methods
 
-    function self = PenaltyN1(n)
+    function self = PenaltyN1( varargin )
+      if nargin == 0
+        n = int32(2) ;
+      elseif nargin == 1
+        n = varargin{1} ;          
+      else
+        error('PenaltyN1: too much argument in constructor') ;
+      end
       if ~isinteger(n)
-        error('Hilbert: argument must be an integer, found %s',class(n));
+        error('PenaltyN1: argument must be an integer, found %s',class(n));
       end
       if n <= 1
-        error('Hilbert: argument must be an integer > 1, found %d',n);
+        error('PenaltyN1: argument must be an integer > 1, found %d',n);
       end
       self@FunctionND(int32(n)) ;
       self.exact_solutions = zeros(n,0) ; % unknown solution 

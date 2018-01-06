@@ -22,7 +22,14 @@ classdef GregoryAndKarney < FunctionND
 
   methods
 
-    function self = GregoryAndKarney( n )
+    function self = GregoryAndKarney( varargin )
+      if nargin == 0
+        n = int32(2) ;
+      elseif nargin == 1
+        n = varargin{1} ;          
+      else
+        error('GregoryAndKarney: too much argument in constructor') ;
+      end
       if ~isinteger(n)
         error('GregoryAndKarney: argument must be an integer, found %s',class(n));
       end

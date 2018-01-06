@@ -79,7 +79,8 @@ classdef MinimizationND < handle
       %
       % build the 1D function along the search direction
       % use grad0 to scale the function for numerical stability
-      fcut = Function1Dcut( self.funND, x0, d );
+      d_nrm = norm(d);
+      fcut  = Function1Dcut( self.funND, x0, d./d_nrm );
       %
       % set analitic gradient if necessary
       if self.FD_D
@@ -90,10 +91,10 @@ classdef MinimizationND < handle
 
       %
       % do a 1D minimization
-      self.linesearch.setFunction( fcut ) ;
-      %
       % search an interval for minimization
-      [alpha,ok] = self.linesearch.search( alpha_guess ) ;
+      self.linesearch.setFunction( fcut ) ;
+      [alpha,ok] = self.linesearch.search( alpha_guess * d_nrm ) ;
+      alpha = alpha / d_nrm ;
       %
       % check error
       if ~ok
@@ -143,13 +144,13 @@ classdef MinimizationND < handle
     end
 
     function plotResidual( self, varargin )
-      N = length(self.x_history) ;
+      N = size(self.x_history,2) ;
       if N > 0
         r = zeros(N,1);
         for k=1:N
           r(k) = norm(self.funND.grad(self.x_history(:,k)),inf);
         end
-        semilogy(1:N, r,varargin{:});
+        semilogy( 1:N, r, varargin{:} );
       end
     end
   end

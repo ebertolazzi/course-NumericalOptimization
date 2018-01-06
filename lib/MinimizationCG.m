@@ -465,7 +465,9 @@ classdef MinimizationCG < MinimizationND
           d = -g1 ;
           [xs,alpha,ok] = self.step1D( xs, d, alpha ) ;
           if ~ok
-            error('MinimizationCG, step1D failed') ;
+            % cannot advance see if accept a low precision solution
+            warning('MinimizationCG, step1D failed') ;
+            return ;
           end
         end
         %

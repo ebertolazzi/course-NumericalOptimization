@@ -21,13 +21,21 @@ classdef PenaltyN2 < FunctionND
 
   methods
 
-    function self = PenaltyN2(n)
-      if ~isinteger(n)
-        error('Hilbert: argument must be an integer, found %s',class(n));
-      end
-      if n <= 1
-        error('Hilbert: argument must be an integer > 1, found %d',n);
-      end
+
+  function self = PenaltyN2( varargin )
+    if nargin == 0
+      n = int32(2) ;
+    elseif nargin == 1
+      n = varargin{1} ;          
+    else
+      error('PenaltyN2: too much argument in constructor') ;
+    end
+    if ~isinteger(n)
+      error('PenaltyN2: argument must be an integer, found %s',class(n));
+    end
+    if n <= 1
+      error('PenaltyN2: argument must be an integer > 1, found %d',n);
+    end
       self@FunctionND(int32(n)) ;
       self.exact_solutions = zeros(n,0) ; % unknown solution 
       self.guesses         = 0.5 * ones ( n, 1 ) ;
@@ -45,7 +53,7 @@ classdef PenaltyN2 < FunctionND
       s2 = 0.0;
 
       for j = 1 : self.N
-        t1 = t1 + ( self.N - j + 1 ) * x(j)^2;
+        t1 = t1 + double( self.N - j + 1 ) * x(j)^2;
         s1 = exp ( x(j) / 10.0 );
         if ( 1 < j )
           s3 = s1 + s2 - d2 * ( exp ( 0.1 ) + 1.0 );
@@ -68,18 +76,18 @@ classdef PenaltyN2 < FunctionND
 
       t1 = -1.0;
       for j = 1 : self.N
-        t1 = t1 + ( self.N - j + 1 ) * x(j)^2;
+        t1 = t1 + double( self.N - j + 1 ) * x(j)^2;
       end
 
       d2 = 1.0;
       th = 4.0 * t1;
       s2 = 0.0;
       for j = 1 : self.N
-        g(j) = ( self.N - j + 1 ) * x(j) * th;
-        s1 = exp ( x(j) / 10.0 );
+        g(j) = double( self.N - j + 1 ) * x(j) * th;
+        s1   = exp ( x(j) / 10.0 );
         if ( 1 < j )
-          s3 = s1 + s2 - d2 * ( exp ( 0.1 ) + 1.0 );
-          g(j) = g(j) + ap * s1 * ( s3 + s1 - 1.0 / exp ( 0.1 ) ) / 5.0;
+          s3     = s1 + s2 - d2 * ( exp ( 0.1 ) + 1.0 );
+          g(j)   = g(j) + ap * s1 * ( s3 + s1 - 1.0 / exp ( 0.1 ) ) / 5.0;
           g(j-1) = g(j-1) + ap * s2 * s3 / 5.0;
         end
         s2 = s1;
@@ -108,18 +116,17 @@ classdef PenaltyN2 < FunctionND
 
       for j = 1 : self.N
 
-        h(j,j) = 8.0 * ( ( self.N - j + 1 ) * x(j) )^2 + ( self.N - j + 1 ) * th;
+        h(j,j) = 8.0 * ( double( self.N - j + 1 ) * x(j) )^2 + double( self.N - j + 1 ) * th;
 
-        s1 = exp ( x(j) / 10.0 );
+        s1 = exp( x(j) / 10.0 );
 
         if ( 1 < j )
 
-          s3 = s1 + s2 - d2 * ( d1 + 1.0 );
-          h(j,j) = h(j,j) + ap * s1 * ( s3 + s1 - 1.0 / d1 + 2.0 * s1 ) / 50.0;
+          s3         = s1 + s2 - d2 * ( d1 + 1.0 );
+          h(j,j)     = h(j,j) + ap * s1 * ( s3 + s1 - 1.0 / d1 + 2.0 * s1 ) / 50.0;
           h(j-1,j-1) = h(j-1,j-1) + ap * s2 * ( s2 + s3 ) / 50.0;
           for k = 1 : j - 1
-            t1 = exp ( k / 10.0 );
-            h(j,k) = 8.0 * ( n - j + 1 ) *  ( n - k + 1 ) * x(j) * x(k);
+            h(j,k) = 8.0 * double( n - j + 1 ) * double( n - k + 1 ) * x(j) * x(k);
           end
 
           h(j,j-1) = h(j,j-1) + ap * s1 * s2 / 50.0;

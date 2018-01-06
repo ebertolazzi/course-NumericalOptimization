@@ -28,7 +28,14 @@ classdef Hilbert < FunctionND
 
   methods
 
-    function self = Hilbert(n)
+    function self = Hilbert( varargin )
+      if nargin == 0
+        n = int32(2) ;
+      elseif nargin == 1
+        n = varargin{1} ;          
+      else
+        error('Hilbert: too much argument in constructor') ;
+      end
       if ~isinteger(n)
         error('Hilbert: argument must be an integer, found %s',class(n));
       end
@@ -46,7 +53,7 @@ classdef Hilbert < FunctionND
       f = 0.0;
       for i = 1 : self.N
         for j = 1 : self.N
-          f = f + x(i) * x(j) / ( i + j - 1.0 );
+          f = f + x(i) * x(j) / double( i + j - 1 );
         end
       end
     end
@@ -58,7 +65,7 @@ classdef Hilbert < FunctionND
       for i = 1 : self.N
         g(i) = 0.0;
         for j = 1 : self.N
-          g(i) = g(i) + 2.0 * x(j) / ( i + j - 1.0 );
+          g(i) = g(i) + 2.0 * x(j) / double( i + j - 1 );
         end
       end
     end
@@ -69,7 +76,7 @@ classdef Hilbert < FunctionND
       h = zeros( self.N, self.N );
       for i = 1 : self.N
         for j = 1 : self.N
-          h(i,j) = 2.0 / ( i + j - 1.0 );
+          h(i,j) = 2.0 / double( i + j - 1 );
         end
       end 
     end

@@ -26,8 +26,8 @@ classdef LinesearchWolfe < LinesearchForwardBackward
       [aLO,aHI,fLO,fHI,ierr] = self.ForwardBackward( alpha_guess ) ;
       switch ierr
       case 0 % only alpha0 satisfy Armijo, check if minimum is on [0,aLO]
-        if self.fun1D.eval_D(aLO) > 0
-          [alpha_ott,ok] = self.Zoom( 0, self.f0, aLO, fLO, self.strongWolfe ) ;
+        if self.fun1D.eval_D(aLO) > 0.0
+          [alpha_ott,ok] = self.Zoom( 0.0, self.f0, aLO, fLO, self.strongWolfe ) ;
         else
           [alpha_ott,ok] = self.Zoom( aLO, fLO, aHI, fHI, self.strongWolfe ) ;
         end

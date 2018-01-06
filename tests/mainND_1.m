@@ -5,8 +5,10 @@ clc;
 addpath('../lib');
 addpath('../functions');
 
-r = Rosenbrock();
-%r = BohachevskyN1();
+%r = Rosenbrock();
+%r = SchafferF7();
+
+r = SixHumpCamelBack() ;
 
 disp(r.arity());
 
@@ -42,7 +44,8 @@ minimization_method.no_FD_D();
 
 fprintf('method = %s\n',minimization_method.activeMethod()) ;
 
-[xs,converged] = minimization_method.minimize( [-1;2] ) ;
+guess = r.guess(int32(1)) ;
+[xs,converged] = minimization_method.minimize( guess ) ;
 
 subplot(2,1,1) ;
 [xmin,ymin,xmax,ymax] = minimization_method.iterRange();

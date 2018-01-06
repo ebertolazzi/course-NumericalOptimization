@@ -36,8 +36,8 @@ classdef LinesearchForwardBackward < handle
       self.c2           = 0.2 ;
       self.tau_LS       = 1.5 ;
       self.tau_acc      = 1.2 ;
-      self.alpha_min    = 1e-10 ;
-      self.alpha_max    = 1e10 ;
+      self.alpha_min    = 1e-50 ;
+      self.alpha_max    = 1e50 ;
       self.dumpMin      = 0.05 ;
       self.dumpMax      = 0.95 ;
       self.alpha_epsi   = eps^(1/3);
@@ -171,7 +171,7 @@ classdef LinesearchForwardBackward < handle
           self.plotDebug(alpha_guess);
           error('Linesearch[%s]::ForwardBackward, Df0 = %g must be negative\n',self.name,self.Df0 );
         else
-          ierr = -2 ;
+          ierr   = -2 ;
           alpha0 = 0 ;
           alpha1 = 0 ;
           fa0    = 0 ;
@@ -247,8 +247,8 @@ classdef LinesearchForwardBackward < handle
       f  = @(a) self.fun1D.eval(a) ;
       df = @(a) self.fun1D.eval_D(a) ;
 
-      self.f0  = self.fun1D.eval(0) ;
-      self.Df0 = self.fun1D.eval_D(0) ;
+      self.f0  = self.fun1D.eval(0.0) ;
+      self.Df0 = self.fun1D.eval_D(0.0) ;
 
       c1Df0 = self.c1 * self.Df0 ;
       c2Df0 = self.c2 * self.Df0 ;
@@ -269,10 +269,9 @@ classdef LinesearchForwardBackward < handle
       %
  
       Delta    = aHI - aLO ;
-      minDelta = Delta*self.alpha_epsi ;
+      minDelta = Delta * self.alpha_epsi ;
 
       while abs(Delta) > minDelta
-
         deltaLambda = self.quadratic( fLO, DfLO, fHI, Delta ) ;
         if Delta > 0
           deltaLambda = min( Delta*self.dumpMax, max( Delta*self.dumpMin, deltaLambda )) ;
@@ -298,7 +297,8 @@ classdef LinesearchForwardBackward < handle
         end
         Delta = aHI - aLO ;
       end
-      ok = false ;
+      ok    = false ;
+      alpha = aLO ;
       warning( 'Linesearch[%s] (Zoom): failed aHI=%g aLO=%g DfLO=%g\n', self.name, aHI, aLO, DfLO ) ;
     end 
 
