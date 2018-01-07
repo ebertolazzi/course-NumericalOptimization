@@ -2,7 +2,8 @@ classdef Powell_bsf < FunctionMap
   %
   % Function Powell bad scaled function
   %
-  % ORIGINAL REFERENCE MISSING
+  % Detailed reference missing:
+  % "Powell,M.J.D.","A hybrid method for nonlinear equations" 1970
   %
   % see also in reference test N.3
   %
@@ -31,21 +32,38 @@ classdef Powell_bsf < FunctionMap
     function F = evalMap(self,x)
       % evaluate the entries (not squared) of the 
       % Powell badly scaled function.
-      X = x(1) ;
-      Y = x(2) ;
-      F = [ (1e04*X*Y -1) ; exp(-X) + exp(-Y) - 1.0001 ] ; % vector of [ f_1(x) ... f_n(x) ] values.
+      X1 = x(1) ;
+      X2 = x(2) ;
+      F = [ (1e04*X1*X2 -1) ; exp(-X1) + exp(-X2) - 1.0001 ] ; % vector of [ f_1(x) ... f_n(x) ] values.
     end
 
     function J = jacobian( self, x )
-      % use numeric jacobian
+      % use analytic jacobian
       self.check_x( x );
-      J = self.FD_jacobian( x ); 
+      X1 = x(1) ;
+      X2 = x(2) ;
+      J = [1e04*X2  ,  1e04*X1;   ...
+           -exp(-X1),  -exp(-X2)];
     end
 
     function T = tensor( self, x )
-      % use numeric tensor of second derivative
+      % use analytic tensor
       self.check_x( x );
-      T = self.FD_tensor( x );
+      X1 = x(1) ;
+      X2 = x(2) ;
+      % Create the n-matrices of T
+
+      % D J / D X1
+      T1 = [ 0        , 1e04    ;...
+             exp(-X1) , 0    ];
+
+      % D J / D X2
+      T2 = [ 1e04     , 0      ;...
+             0        , exp(-X2) ];
+      % Concatenate the n-matrices of T
+      % Dimensions= Function map : first D : second D
+      T  = cat(3,T1,T2);
+
     end
 
   end

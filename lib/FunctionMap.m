@@ -1,4 +1,8 @@
 classdef (Abstract) FunctionMap < FunctionND
+% Function of the type "sum of squares" 
+% 
+% Map a sum of squares function from $f_i(x)$ to $\frac{1}{2}\sum_{i=1}^{m}f_i^2(x)$.
+
 
   properties (SetAccess = protected, Hidden = true)
     M % number of components of the Map
