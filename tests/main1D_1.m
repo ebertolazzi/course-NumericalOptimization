@@ -27,7 +27,7 @@ hold on ;
 
 disp('do golden search') ;
 % initialize Golden Search object m
-m = GoldenSearch();
+m = LinesearchGoldenSection();
 % attach function fs to the miminization object
 m.setFunction(fs);
 

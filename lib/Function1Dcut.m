@@ -6,11 +6,11 @@ classdef Function1Dcut < Function1D
   % implemented in the base abstract class Function1D
   
   properties (SetAccess = private, Hidden = true)
-    funND       % Original input function
-    x0          % Initial point (n dimensional array, which express a point on the domain of the function)
-    d           % Search direction (n dimensional array, which express the direction in which we have to search for the minimum)
-    FD_D        % flag true = use finite difference in evaluation of first derivative
-    FD_DD       % flag true = use finite difference in evaluation of second derivative
+    funND  % Original input function
+    x0     % Initial point (n dimensional array, which express a point on the domain of the function)
+    d      % Search direction (n dimensional array, which express the direction in which we have to search for the minimum)
+    FD_D   % flag true = use finite difference in evaluation of first derivative
+    FD_DD  % flag true = use finite difference in evaluation of second derivative
   end
   
   methods
@@ -22,6 +22,10 @@ classdef Function1Dcut < Function1D
       % in the d direction starting from $x_0$.
 
       self.funND = object_function_ND ;
+ 
+      if norm(d,inf) == 0
+        error('Function1Dcut, bad direction d == 0\n') ;
+      end
 
       % check arguments
       self.x0    = x0 ;
@@ -30,19 +34,19 @@ classdef Function1Dcut < Function1D
       self.FD_DD = true ;
     end
 
-    function res = use_FD_D( self )
+    function use_FD_D( self )
       self.FD_D = true ;
     end
 
-    function res = use_FD_DD( self )
+    function use_FD_DD( self )
       self.FD_D = true ;
     end
 
-    function res = no_FD_D( self )
+    function no_FD_D( self )
       self.FD_D = false ;
     end
 
-    function res = no_FD_DD( self )
+    function no_FD_DD( self )
       self.FD_D = false ;
     end
 
@@ -54,17 +58,19 @@ classdef Function1Dcut < Function1D
 
     function res = eval_D( self, alpha )
       if self.FD_D
-        res = eval_D@Function1D( self, alpha ) ;
+        res = self.FD_eval_D( alpha ) ;
       else
-        res = dot( self.funND.grad( self.x0 + alpha * self.d ), self.d ) ;
+        g   = self.funND.grad( self.x0 + alpha * self.d ) ;
+        res = dot( g.', self.d ) ;
       end
     end
 
     function res = eval_DD( self, alpha )
       if self.FD_DD
-        res = eval_DD@Function1D( self, alpha ) ;
+        res = self.FD_eval_DD( alpha ) ;
       else
-        res = dot( self.funND.hessian( self.x0 + alpha * self.d )*self.d', self.d ) ; 
+        H   = self.funND.hessian( self.x0 + alpha * self.d ) ; 
+        res = dot( H * self.d, self.d ) ;
       end
     end
     

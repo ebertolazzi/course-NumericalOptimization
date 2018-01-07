@@ -67,39 +67,69 @@ classdef MinimizationND < handle
       self.FD_D = false ;
     end
 
-    function [x1,alpha] = step1D( self, x0, d, alpha_guess )
+    function [ x1, alpha, ok ] = step1D( self, x0, d, alpha_guess )
+      %
+      % Perform linesearch of ND-function starting from x0 along direction d
+      % grad0 is the gradient of the function at x0
+      % alpha_guess is a guess for the linesearch
+      %
+      if norm(d,inf) == 0
+        error('MinimizationND, bad direction d == 0\n') ;
+      end
       %
       % build the 1D function along the search direction
-      fcut = Function1Dcut( self.funND, x0, d );
+      % use grad0 to scale the function for numerical stability
+      d_nrm = norm(d);
+      fcut  = Function1Dcut( self.funND, x0, d./d_nrm );
       %
       % set analitic gradient if necessary
       if self.FD_D
-        fcut.use_FD_D() ;
+        fcut.use_FD_D();
       else
-        fcut.no_FD_D() ;
+        fcut.no_FD_D();
       end
+
       %
       % do a 1D minimization
-      self.linesearch.setFunction( fcut ) ;
-      %
       % search an interval for minimization
-      [alpha,ok] = self.linesearch.search( alpha_guess ) ;
+      self.linesearch.setFunction( fcut ) ;
+      [alpha,ok] = self.linesearch.search( alpha_guess * d_nrm ) ;
+      alpha = alpha / d_nrm ;
       %
       % check error
       if ~ok
-        error('MinimizationGradientMethod:step1D, linesearch failed\n');
+        self.linesearch.plotDebug(alpha_guess);
+        warning('MinimizationGradientMethod:step1D, linesearch failed\n');
+        x1 = x0 ;
+      else
+        %
+        % advance
+        x1 = x0 + alpha * d ;
+        % only for debug
+        if self.debug_state
+          self.x_history = [ self.x_history reshape( x1, length(x1), 1 ) ] ;
+        end
       end
-      %
-      % advance
-      x1 = x0 + alpha * d ;
-
-      % only for debug
-      if self.debug_state
-        self.x_history = [ self.x_history reshape( x1, length(x1), 1 ) ] ;
-      end 
     end
-    
-    function plotiter( self )
+
+    function [xmin,ymin,xmax,ymax] = iterRange( self )
+      if size(self.x_history,1) == 2
+        xmin = min(self.x_history(1,:)) ;
+        xmax = max(self.x_history(1,:)) ;
+        ymin = min(self.x_history(2,:)) ;
+        ymax = max(self.x_history(2,:)) ;
+        dx   = xmax-xmin ; dy   = ymax-ymin ;
+        xmin = xmin - dx ; ymin = ymin - dy ;
+        xmax = xmax + dx ; ymax = ymax + dy ;
+      else
+        xmin = 0 ;
+        xmax = 0 ;
+        ymin = 0 ;
+        ymax = 0 ;
+      end
+    end
+
+    function plotIter( self )
       if size(self.x_history,1) == 2
         hold on ;
         xo = self.x_history(:,1) ;
@@ -110,6 +140,17 @@ classdef MinimizationND < handle
           plot(xo(1),xo(2),'or');
           xo = xn;
         end
+      end
+    end
+
+    function plotResidual( self, varargin )
+      N = size(self.x_history,2) ;
+      if N > 0
+        r = zeros(N,1);
+        for k=1:N
+          r(k) = norm(self.funND.grad(self.x_history(:,k)),inf);
+        end
+        semilogy( 1:N, r, varargin{:} );
       end
     end
   end

@@ -10,12 +10,14 @@ classdef (Abstract) Function1D < handle
     %
     % Define the abstract function used in eval_D and eval_DDD
     % will be defined in the derived class
-    y = eval( self, x )
+    y   = eval( self, x )
+    Dy  = eval_D( self, x )
+    DDy = eval_DD( self, x )
   end
 
   methods
 
-    function Dy = eval_D( self, x )
+    function Dy = FD_eval_D( self, x )
       % Finite difference approximation of the first derivative
       h  = max(1,abs(x))*eps^(1/3) ; % "eps" is the "machine epsilon precision"
       fp = self.eval(x+h) ;
@@ -23,7 +25,7 @@ classdef (Abstract) Function1D < handle
       Dy = (fp-fm)./(2*h) ;
     end
 
-    function DDy = eval_DD( self, x )
+    function DDy = FD_eval_DD( self, x )
       % Finite difference approximation of the second derivative
       h   = max(1,abs(x))*(eps^(1/3)) ;
       fp  = self.eval(x+h) ;

@@ -2,11 +2,12 @@ clear all;
 addpath('../lib');
 
 c1  = 0.1 ;
+c2  = 0.5 ;
 f1D = testFun() ;
 
-LS  = LinesearchArmijo();
-LS.setC1( c1 );
-LS.setFunction(f1D );
+LS = LinesearchArmijo();
+LS.setC1C2( c1, c2 );
+LS.setFunction( f1D );
 
 x = 0:pi/1000:pi ;
 
