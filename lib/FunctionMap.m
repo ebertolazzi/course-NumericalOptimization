@@ -72,7 +72,8 @@ classdef (Abstract) FunctionMap < FunctionND
 
       % Make T symmetric numerically, this is not mandatory but could help
       for k=1:self.M
-        T(k,:,:) = 0.5*(T(k,:,:)+T(k,:,:).') ;
+        Ttemp    = squeeze(T(k,:,:));     % added this temporary variable to use the .' operator
+        T(k,:,:) = 0.5*(Ttemp + Ttemp.') ;
       end
     end
 
