@@ -5,7 +5,7 @@ clc;
 addpath('../lib');
 addpath('../functions');
 
-fun_name = 'SchafferF6';
+fun_name = 'Rosen';%'SchafferF6';
 fplot    = @(z) log(1+z) ;
 switch fun_name
 case 'Quad'
@@ -35,6 +35,7 @@ end
 disp(r.arity());
 
 ls = 'Wolfe';
+
 switch ls
 case 'GS'
   linesearch_method = LinesearchGoldenSection();
