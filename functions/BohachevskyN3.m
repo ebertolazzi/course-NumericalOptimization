@@ -39,7 +39,7 @@ classdef BohachevskyN3 < FunctionND
       self.check_x(x);
       a1 = 3.0 * pi * x(1) ;
       a2 = 4.0 * pi * x(2) ;
-      f  = x(1)^2 + 2.0 * x(2)^2 - 0.3 * cos ( a1 ) + cos ( a2 ) + 0.3;
+      f  = x(1)^2 + 2.0 * x(2)^2 - 0.3 * cos ( a1 + a2 ) + 0.3;
     end
 
     function g = grad( self, x )
@@ -48,8 +48,8 @@ classdef BohachevskyN3 < FunctionND
       g  = zeros ( 1, 2 );
       a1 = 3.0 * pi * x(1) ;
       a2 = 4.0 * pi * x(2) ;
-      g(1) = 2.0 * x(1) + 0.9 * pi * sin ( a1 );
-      g(2) = 4.0 * x(2) - 4.0 * pi * sin ( a2 );
+      g(1) = 2.0 * x(1) + 0.9 * pi * sin ( a1 + a2 );
+      g(2) = 4.0 * x(2) + 1.2 * pi * sin ( a1 + a2 );
     end
 
     function h = hessian( self, x )
@@ -58,10 +58,10 @@ classdef BohachevskyN3 < FunctionND
       h  = zeros ( 2, 2 );
       a1 = 3.0 * pi * x(1) ;
       a2 = 4.0 * pi * x(2) ;
-      h(1,1) = 2.0 + 2.7 * pi^2 * cos ( a1 );
-      h(1,2) = 0.0;
-      h(2,1) = 0.0;
-      h(2,2) = 4.0 - 16.0 * pi^2 * cos ( a2 );
+      h(1,1) = 2.0 + 2.7 * pi^2 * cos ( a1 + a2 );
+      h(1,2) = 3.6 * pi^2 * cos ( a1 + a2 );
+      h(2,1) = h(1,2);
+      h(2,2) = 4.0 + 16.0*0.3* pi^2 * cos ( a1 + a2 );
     end
   end
 end

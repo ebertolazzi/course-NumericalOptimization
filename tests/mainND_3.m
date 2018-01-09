@@ -5,7 +5,7 @@ clc;
 addpath('../lib');
 addpath('../functions');
 
-fun_name = 'SchafferF6';
+fun_name = 'Boha2';
 
 switch fun_name
 case 'Quad'
@@ -26,13 +26,31 @@ case 'Bro'
   r.contour([0,4000],[-600,600],@(z) log(1+z), 80)
   axis equal ;
   x0 = 0.9*[ 10^6  ; 2*10^(-6) ];
-
 case 'SchafferF6'
   r = SchafferF6();
   disp(r.arity());
   r.contour([-20,20],[-20,20],@(z) z, 80)
   axis equal ;
   x0 = r.guess(int32(1));
+case 'Boha1'
+  r = BohachevskyN1();
+  disp(r.arity());
+  r.contour([-4 4],[-4 4],@(z) log(1+z), 80)
+  axis equal ;
+  x0 = r.guess(int32(1));
+case 'Boha2'
+  r = BohachevskyN2();
+  disp(r.arity());
+  r.contour([-4 4],[-4 4],@(z) log(1+z), 80)
+  axis equal ;
+  x0 = r.guess(int32(1));
+case 'Boha3'
+  r = BohachevskyN3();
+  disp(r.arity());
+  r.contour([-4 4],[-4 4],@(z) log(1+z), 80)
+  axis equal ;
+  x0 = r.guess(int32(1));
+
 end
 
 %%search_method   = LinesearchGoldenSection();

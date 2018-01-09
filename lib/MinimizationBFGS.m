@@ -13,6 +13,7 @@ classdef MinimizationBFGS < MinimizationND
     function [xs,converged] = minimize( self, x0 )
       xs        = x0 ;
       H         = inv(self.funND.hessian( xs ).') ;
+      H         = eye(length(x0));
       g         = self.funND.grad( xs ).' ;      
       alpha     = 1 ;
       converged = false ;
