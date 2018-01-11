@@ -23,9 +23,9 @@ case 'Rosen'
 case 'Bro'
   r = Brown_bsf();
   disp(r.arity());
-  r.contour([0,4000],[-600,600],@(z) log(1+z), 80)
+  r.contour( [10^6 -2000,10^6 + 2000],[-1000,1000],@(z) log(1+z), 80)
   axis equal ;
-  x0 = 0.9*[ 10^6  ; 2*10^(-6) ];
+  x0 = r.guess(int32(1));
 case 'SchafferF6'
   r = SchafferF6();
   disp(r.arity());
@@ -50,17 +50,25 @@ case 'Boha3'
   r.contour([-4 4],[-4 4],@(z) log(1+z), 80)
   axis equal ;
   x0 = r.guess(int32(1));
-
+case 'Hilb'
+  r = Hilbert();
+  disp(r.arity());
+  r.contour([-4 4],[-4 4],@(z) log(1+z), 80)
+  axis equal ;
+  x0 = r.guess(int32(1));
 end
 
-%%search_method   = LinesearchGoldenSection();
+
+%search_method   = LinesearchGoldenSection();
 %search_method = LinesearchArmijo();
 search_method = LinesearchWolfe();
 
 search_method.debug_on();
 
 %dir_method = MinimizationGradientMethod(r,search_method);
-dir_method = MinimizationBFGS(r,search_method);
+%dir_method = MinimizationBFGS_old(r,search_method);
+dir_method = MinimizationQN(r,search_method);
+%dir_method = MinimizationCG(r,search_method);
 
 dir_method.setMaxIteration( int32(1000) );
 dir_method.setTolerance(1e-6);
@@ -69,6 +77,8 @@ dir_method.debug_on();
 [xs,converged] = dir_method.minimize( x0 ) ;
 dir_method.plotIter();
 
-xs
+fprintf('\nThe solution is:\n');
+fprintf('       %d\n',xs)
+
 
 

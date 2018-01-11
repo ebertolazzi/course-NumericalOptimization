@@ -1,19 +1,46 @@
-classdef MinimizationBFGS < MinimizationND
+classdef MinimizationBFGS_old < MinimizationND
+ %
+  % Description
+  % -----------
+  % Minimization of a nonlinear multiuvariate functions using (BFGS) method.
+  % The algorithm is describbed in the references.
   %
-  % ADD comment describing the class what do etc )
+  % References
+  % ----------
   %
+  % @article{2006,
+  %     author   = {},
+  %     journal  = {},
+  %     keywords = {},
+  %     number   = {},
+  %     pages    = {},
+  %     title    = {},
+  %     volume   = {},
+  %     year     = {}
+  % }
+  % @article{2006,
+  %     author  = {},
+  %     title   = {},
+  %     journal = {},
+  %     volume  = {},
+  %     number  = {},
+  %     year    = {},
+  %     pages   = {},
+  %     doi     = {},
+  % }
   %
+  % Authors: Enrico Bertolazzi & Davide Vignotto
   %
 
   methods
-    function self = MinimizationBFGS( fun, ls )
+    function self = MinimizationBFGS_old( fun, ls )
       self@MinimizationND( fun, ls ) ;
     end
     
     function [xs,converged] = minimize( self, x0 )
       xs        = x0 ;
       H         = inv(self.funND.hessian( xs ).') ;
-      H         = eye(length(x0));
+      %H         = eye(length(x0));
       g         = self.funND.grad( xs ).' ;      
       alpha     = 1 ;
       converged = false ;
@@ -23,26 +50,25 @@ classdef MinimizationBFGS < MinimizationND
       end
       
       for iter=1:self.max_iter
-
-        
-        % find search direction
-        d = - H*g;
-        
+		%
         % check if converged
-        nrm = norm(d,inf) ;
-        converged = nrm < self.tol ;
+        nrm_g = norm(g,inf) ;
+        converged = nrm_g < self.tol ;
         if converged
           if self.debug_state
-            fprintf(1,'solution found, ||grad f||_inf = %g < %g\n', nrm, self.tol ) ;
+            fprintf(1,'solution found, ||grad f||_inf = %g < %g\n', nrm_g, self.tol ) ;
           end
           break ;
         end 
         %
         % only for debug
         if self.debug_state
-          fprintf(1,'iter = %5d ||grad f||_inf = %12.6g ...', iter, nrm ) ;
+          fprintf(1,'iter = %5d ||grad f||_inf = %12.6g ...', iter, nrm_g ) ;
         end
         %
+		% find search direction
+        d = - H*g;
+		%
         % minimize along search direction
         [xs,alpha] = self.step1D( xs, d, alpha ) ;
         %
