@@ -1,29 +1,58 @@
 classdef Brown_bsf < FunctionND
+  %
+  % The Brown Badly Scaled Function (unpublished).
+  %
+  % Reference:
+  %	  This function is number 4 in the paper:
+  %
+  %   Morè J., Garbow S. and Hillstrom E. 
+  %   Testing Uncostrained Optimization Software,
+  % 
+  %   , 1981,
+  %   ISBN: 
+  %   LC:
+  %
+  % Author: Davide Vignotto
+  %   
+
   methods
     function self = Brown_bsf()
-      arity = 2;
-      self@FunctionND(int32(arity)) ;
+	  self@FunctionND(int32(2)) ;
+      self.exact_solutions = [ 10^6 ; 2*10^(-6) ]; % one known solution 
+      self.guesses         = [ 1; 1] ;
     end
     
     function f = eval(self,x)
       % Evaluate Brown badly scaled 2D function.
-      % if x is a 2 by m matrix return m values in a row vector.
-      % if x is a 2 by m x n matrix return m x n values in a matrix vector.
-      X = squeeze(x(1,:,:)) ;
-      Y = squeeze(x(2,:,:)) ;
-      f1 = X - 10^6;
-      f2 = Y -2*10^(-6);
-      f3 = X.*Y - 2;
+	    self.check_x(x);
+      f1 = x(1) - 10^6;
+      f2 = x(2) -2*10^(-6);
+      f3 = x(1)*x(2) - 2;
       f = f1^2 + f2^2 + f3^2;
     end
     
-    % Use finite difference for grad and hessian
+
     function g = grad( self, x )
-      g = self.FD_grad( self, x );
+      %g = self.FD_grad(x);
+      %return
+	    % use analitic gradient
+      self.check_x(x);
+      g  = zeros ( 1, 2 );
+	    f1 = x(1) - 10^6;
+      f2 = x(2) -2*10^(-6);
+      f3 = x(1)*x(2) - 2;
+	    g(1) = 2*f1 + 2*f3*x(2);
+	    g(2) = 2*f2 + 2*f3*x(1);
     end
 
     function h = hessian( self, x )
-      h = self.FD_hessian( self, x );
+      % use analitic hessian
+      self.check_x(x);
+      h  = zeros ( 2, 2 );
+      h(1,1) = 2*(1 + x(2)^2);
+      h(1,2) = 4*(x(1)*x(2) - 1);
+      h(2,1) = h(1,2);
+      h(2,2) =2*(1 + x(1)^2);
     end
  
   end

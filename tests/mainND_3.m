@@ -5,7 +5,7 @@ clc;
 addpath('../lib');
 addpath('../functions');
 
-fun_name = 'Boha2';
+fun_name = 'Rosen';
 
 switch fun_name
 case 'Quad'
@@ -19,7 +19,7 @@ case 'Rosen'
   disp(r.arity());
   r.contour([-1.5 1.5],[-0.4 1.5],@(z) log(1+z), 80)
   axis equal ;
-  x0 = [-1; 1 ];
+  x0 = r.guess(int32(1));
 case 'Bro'
   r = Brown_bsf();
   disp(r.arity());
@@ -66,19 +66,25 @@ search_method = LinesearchWolfe();
 search_method.debug_on();
 
 %dir_method = MinimizationGradientMethod(r,search_method);
-%dir_method = MinimizationBFGS_old(r,search_method);
+%dir_method = MinimizationBFGS(r,search_method);
 dir_method = MinimizationQN(r,search_method);
 %dir_method = MinimizationCG(r,search_method);
 
-dir_method.setMaxIteration( int32(1000) );
+dir_method.setMaxIteration( int32(100) );
 dir_method.setTolerance(1e-6);
 dir_method.debug_on();
+%dir_method.selectByName('BFGS');
+%dir_method.selectByName('DFP');
+dir_method.selectByName('PSB');
 
 [xs,converged] = dir_method.minimize( x0 ) ;
 dir_method.plotIter();
 
-fprintf('\nThe solution is:\n');
+fprintf('\nThe solution found by the algorithm is:\n');
 fprintf('       %d\n',xs)
+exact = r.exact_solutions;
+fprintf('\nThe analytical solution is:\n');
+fprintf('       %d\n',exact)
 
 
 

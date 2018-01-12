@@ -2,7 +2,7 @@ classdef MinimizationQN < MinimizationND
  %
   % Description
   % -----------
-  % Minimization of a nonlinear multiuvariate functions using QUASI NEWTON methods.
+  % Minimization of a nonlinear multiuvariate functions using (BFGS) method.
   % The algorithm is describbed in the references.
   %
   % References
@@ -31,78 +31,73 @@ classdef MinimizationQN < MinimizationND
   %
   % Authors: Enrico Bertolazzi & Davide Vignotto
   %
-  
   properties (SetAccess = private, Hidden = true)
-    method          % selected QN method
-    method_names    % list of available methods
+    method
+    method_names
     direction_short %
     angle_too_small %
   end
-  
-   
-  methods (Hidden = true)
-    
-	
-	function d = BFGS( self, g1, g0, H0, d0, s, alpha )
-      % References
-      % (slides lesson 6 pag 61)
-      y = g1 - g0;
-      z = (H0*y) / (d0'*y);
-      b = (alpha + y'*z) / (d0'*y);
-      H1 = H0 - (z*d0' + d0*z') + b*(d0*d0');
-	  d  = H1*g1;
-    end
-	
-	
-	function d = dirEval( self, g1, g0, H0, d0, s, alpha )
-      % Compute the value of `beta` for the selected QUASI NEWTON method
-      switch ( self.method )
-      case 'BFGS'  ; d = self.BFGS( g1, g0, H0, d0, s, alpha )
-      otherwise
-        error('MinimizationCG, dirEval no method selected (this should not be happen)');
-      end
-    end
-	
-  end
-	
-	
-  methods	
+ 
+  methods
     
     function self = MinimizationQN( fun, ls )
-	  %
-      % fun = function to be minimized
-      % ls  = linesearch used, can be LinesearchArmijo, LinesearchWolfe, LinesearchGoldenSection
       self@MinimizationND( fun, ls ) ;
-	  self.method_names    = { ...
-        'BFGS'...
-	  };
-	  self.method          = self.method_names{1} ;
-	  self.direction_short = 1e-3 ;
+	    self.direction_short = 1e-3 ;
       self.angle_too_small = cos(pi/2+pi/180) ; % 90-1 degree
+      self.method_names    = { ...
+        'BFGS' , 'PSB' , 'DFP'
+      } ;
+      self.method = self.method_names{1} ;
     end
-
-	function n = numOfMethods( self )
+    
+    function H = BFGS(self,g0,g1,d,alpha,H)
+      y = g1 - g0;
+      z = (H*y) / (d'*y);
+      b = (alpha + y'*z) / (d'*y);
+      H = H - (z*d' + d*z') + b*(d*d');
+    end
+    
+    function H = PSB(self,g0,g1,d,alpha,H) % Powell Symmetric Broyden
+      w = g1 + (alpha - 1)*g0;
+      B = inv(H)+(d*w'+w*d')/(alpha*d'*d)-(d'*w)/(alpha)*(d*d');
+      H = inv(B);
+    end
+    
+    function H = DFP(self,g0,g1,d,alpha,H) % Davidon Fletcher and Powell rank 2 update
+      y = g1 - g0;
+      z = H*y;
+      H = H + alpha*(d*d')/(d'*y) - (z*z')/(y'*z);  
+    end
+    
+    
+    function H = H_update(self,g0,g1,d,alpha,H)
+      switch ( self.method )
+        case 'BFGS' ; H = self.BFGS( g0,g1,d,alpha,H ) ;
+        case 'PSB'  ;  H = self.PSB( g0,g1,d,alpha,H ) ;
+        case 'DFP'  ; H = self.DFP( g0,g1,d,alpha,H ) ;
+      end
+    end
+    
+    function n = numOfMethods( self )
       % return the number of methods available
       n = length(self.method_names);
-    end 
-	  
-	  
-	function name = activeMethod( self )
-      % return active QN method used in minimization
-      name = self.method;
-    end 
+    end
 
-	
-	function selectByNumber( self, k )
-      % select the QN method by number
+    function name = activeMethod( self )
+      % return active CG method used in minimization
+      name = self.method;
+    end
+
+    function selectByNumber( self, k )
+      % select the CG method by number
       if k < 1 || k > length(self.method_names)
         error('MinimizationCG, selectByNumber, k=%d out of range',k) ;
       end
       self.method = self.method_names{k} ;
-    end	
-	
+    end
+
     function selectByName( self, name )
-      % select the QN method by its name
+      % select the CG method by its name
       if ischar(name)
         for k=1:length(self.method_names)
           if strcmp(name,self.method_names{k})
@@ -114,27 +109,23 @@ classdef MinimizationQN < MinimizationND
       else
         error('MinimizationCG, selectByName, expected string as arument, found %s',class(name)) ;
       end
-    end	
-	 
+    end
+    
     function [xs,converged] = minimize( self, x0 )
-	  xs        = x0 ;
-	  alpha     = 1 ;
+      xs        = x0 ;
+      H         = inv(self.funND.hessian( xs ).') ;
+      g1         = self.funND.grad( xs ).' ;      
+      alpha     = 1 ;
       converged = false ;
+      
       if self.debug_state
         self.x_history = reshape( x0, length(x0), 1 ) ;
       end
       
-	  
       for iter=1:self.max_iter
-        %
-        % gradient of the function
-        g1 = self.funND.grad( xs ).' ;
-		
-		% inverse of the hessian of the function
-		H1 = inv(self.funND.hessian( xs ).') ;
-        %
+		%
         % check if converged
-        nrm_g1    = norm(g1,inf) ;
+        nrm_g1 = norm(g1,inf) ;
         converged = nrm_g1 < self.tol ;
         if converged
           if self.debug_state
@@ -148,58 +139,53 @@ classdef MinimizationQN < MinimizationND
           fprintf(1,'iter = %5d ||grad f||_inf = %12.6g ...', iter, nrm_g1 ) ;
         end
         %
-        % build search direction
+        % find search direction
+        d = - H*g1;
         %
-		if iter == 1
-          H1 = eye(self.funND.N);
-		  d = - H1*g1 ; % first iteration, search direction is -hessian^-1*gradient
-        elseif abs(dot(g0,g1)) >= 0.2 * dot(g1,g1) % check restart criteria of Powell
+		% check direction ---------------------------------------------------------------
+		if iter~=1 && abs(dot(g0,g1)) >= 0.2 * dot(g1,g1) % check restart criteria of Powell
           if self.debug_state
             fprintf(1,'Powell restart criteria, reset direction search, ...' ) ;
           end
-          d = - H1*g1 ; % reset direction    
+          d = -g1 ; % reset direction as if H = eye
         else
-		  d = self.dirEval( g1, g0, H0, d, s, alpha ) ; % s = x1 - x0 last step! -----------------------------------------------------
-          % check if the direction is descending, if direction is >= 89 degree from hessian^(-1)*gradient reset to gradient previous
+          % check if the direction is descending, if direction is >= 89 degree from gradient reset to gradient directions
           % use >= to catch d == 0
           nrm_d  = norm(d) ;
-          nrm_d_old = norm(H1*g1) ;
-          if dot( d, -H1*g1 ) <= nrm_d * nrm_d_old * self.angle_too_small
+          nrm_g1 = norm(g1) ;
+          if dot( d, -g1 ) <= nrm_d * nrm_g1 * self.angle_too_small
             if self.debug_state
               fprintf(1,'direction angle about 90 degree, reset direction search, ...' ) ;
             end
-            d = - H1*g1 ; % reset direction
-          elseif nrm_d <= self.direction_short * nrm_d_old
+            d = -g1 ;  % reset direction as if H = eye
+          elseif nrm_d <= self.direction_short * nrm_g1
             if self.debug_state
               fprintf(1,'direction length too short, reset direction search, ...' ) ;
             end
-            d = - H1*g1 ; % reset direction
+            d = -g1 ; % reset direction as if H = eye
           end
         end
-		%
+        % last check of direction search
+        if norm(d,inf) == 0
+          error('MinimizationCG, bad direction d == 0\n') ;
+        end
+		%--------------------------------------------------------------------------------------
         % minimize along search direction
-        dot(H1*g1,g1)
-        [xs,alpha,ok] = self.step1D( xs, d, alpha ) ;
-        if ~ok
-          % step failed try to use gradient direction ---------------------------------
-          d = - g1;
-          [xs,alpha,ok] = self.step1D( xs, d, alpha ) ;
-          if ~ok
-            % cannot advance see if accept a low precision solution
-            warning('MinimizationCG, step1D failed') ;
-            return ;
-          end
-        end
+        [xs,alpha] = self.step1D( xs, d, alpha ) ;
         %
-	    if self.debug_state
+        % update H (slied lesson 6 pag 61)
+        g0 = g1;
+        g1 = self.funND.grad( xs ).' ;
+        H = self.H_update(g0,g1,d,alpha,H);
+        
+%         y = g1 - g0;
+%         z = (H*y) / (d'*y);
+%         b = (alpha + y'*z) / (d'*y);
+%         H = H - (z*d' + d*z') + b*(d*d');
+        
+        if self.debug_state
           fprintf(1,' alpha = %8.4g\n', alpha) ;
-        end	
-        %
-        % save old gradient  and hessian^(-1) and step
-        g0 = g1 ;
-		H0 = H1 ;
-        s  = alpha*d ;
-		  
+        end
       end
     end
 
