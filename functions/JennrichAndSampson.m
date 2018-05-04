@@ -33,8 +33,7 @@ classdef JennrichAndSampson < FunctionMap
     end
 
     function F = evalMap(self,x)
-      % evaluate the entries (not squared) of the 
-      % Powell badly scaled function.
+      % evaluate the entries (not squared) of the function.
       X1 = x(1) ;
       X2 = x(2) ;
       i  = (1:self.M).'; % column vector required
