@@ -1,11 +1,11 @@
-classdef Powell_bsf < FunctionMap
+classdef JennrichAndSampson < FunctionMap
   %
-  % Function Powell bad scaled function
+  % Jennrich And Sampson function , M as argument
   %
-  % Detailed reference missing:
-  % "Powell,M.J.D.","A hybrid method for nonlinear equations" 1970
+  % JENNRICH, R.I., AND SAMPSON,P.F. Applicatmn of stepwise
+  % regression to nonlinear estimatmn. Technometrtcs 10 (1968), 63-72.
   %
-  % see also in reference test N.3
+  % see also in reference test N.6
   %
   % @article{More:1981,
   %   author  = {Mor{\'e}, Jorge J. and Garbow, Burton S. and Hillstrom, Kenneth E.},
@@ -22,11 +22,14 @@ classdef Powell_bsf < FunctionMap
   % -> final debug required
   methods
 
-    function self = Powell_bsf()
-      self@FunctionMap(int32(2),int32(2)) ; %
+    function self = JennrichAndSampson( M )
+      % JennrichAndSampson( M )...............N = 2 ; M = M;
+      self@FunctionMap(int32(2),int32(M)) ;        % call superclass constructor (initialize M)
       %exact_solutions        = [];                % no exacts solution provided
-      approximated_solutions  = [1.098e-05,9.106]; % Known approximated solution
-      guesses                 = [0;1] ;            % one guess
+      if M == 10
+        approximated_solutions = 0.2578.*[1 1];         % approximated solution provided only if M == 10
+      end
+      guesses                 = [0.3 0.4].' ;            % one guess
     end
 
     function F = evalMap(self,x)
@@ -34,7 +37,8 @@ classdef Powell_bsf < FunctionMap
       % Powell badly scaled function.
       X1 = x(1) ;
       X2 = x(2) ;
-      F = [ (1e04*X1*X2 -1) ; exp(-X1) + exp(-X2) - 1.0001 ] ; % vector of [ f_1(x) ... f_n(x) ] values.
+      i  = (1:self.M).'; % column vector required
+      F  = 2 + 2.*i - ( exp( i.*X1 ) + exp( i.*X2 ) ); % vector of [ f_1(x) ... f_n(x) ] values.
     end
 
     function J = jacobian( self, x )
@@ -42,8 +46,8 @@ classdef Powell_bsf < FunctionMap
       self.check_x( x );
       X1 = x(1) ;
       X2 = x(2) ;
-      J = [1e04*X2  ,  1e04*X1;   ...
-           -exp(-X1),  -exp(-X2)];
+      i  = (1:self.M).'; % column vector required
+      J  = [ -i .* exp(i .* X1) , -i .* exp(i .* X2) ];
     end
 
     function T = tensor( self, x )
@@ -51,24 +55,25 @@ classdef Powell_bsf < FunctionMap
       self.check_x( x );
       X1 = x(1) ;
       X2 = x(2) ;
+      i  = (1:self.M).'; % column vector required
       % Create the n-matrices of T
 
       % D J / D X1
-      T1 = [ 0        , 1e04    ;...
-             exp(-X1) , 0    ];
+      T1 = [ -i .^ 2 .* exp( i .* X1 ) , zeros(self.M,1)        ];
 
       % D J / D X2
-      T2 = [ 1e04     , 0      ;...
-             0        , exp(-X2) ];
+      T2 = [ zeros(self.M,1)           , -i .^ 2 .* exp( i .* X2 ) ];
+
       % Concatenate the n-matrices of T
-      % Dimensions = Function map : first D : second D
+      % Dimensions = MxNxN
       T  = cat(3,T1,T2);
 
     end
 
+    % For tensor and jacobian a maple file is available: ask to the author if needed
+
   end
 end
-
 
 %  #######################################################
 %  #  _______   __  _____ ______ _______ _ ____   _____  #

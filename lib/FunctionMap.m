@@ -16,7 +16,7 @@ classdef (Abstract) FunctionMap < FunctionND
 
     function self = FunctionMap( N, M )
       % Constructor of base (abstract) class
-      self@FunctionND(N);
+      self@FunctionND(N); % call the contructor of the superclass
       if ~isinteger(M)
         error('FunctionND: argument must be an integer, found %s',class(M));
       end
