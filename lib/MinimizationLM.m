@@ -3,7 +3,10 @@ classdef MinimizationLM < MinimizationND
   % Description
   % -----------
   % Minimization of a nonlinear multiuvariate functions using Levenberg-Marquardt method.
-  % The algorithm is describbed in the references.
+  % The algorithm is described in the references.
+  %
+  % The function to minimize has to be of type "functionMAP << FunctionND"
+  %
   % Algorithm is in ref[1]: algorithm 3.16;
   %
   % References
@@ -17,24 +20,31 @@ classdef MinimizationLM < MinimizationND
   % }
   %
   %
-  % Authors: Enrico Bertolazzi & Giammarco Valenti
+  % Author: Giammarco Valenti
   %
   properties (SetAccess = private, Hidden = true)
     % direction_short %
     % angle_too_small %
+    tol2 % the second tolerance
+    tau  % parameter to choose mi
 
   end 
   
   methods
+
     function self = MinimizationLM( fun )
+
+      self@MinimizationND( fun, [] ) ;
+
       self.tol2        = 1e-6;
       self.tol         = 1e-3 ;
       self.max_iter    = 100 ;
       self.debug_state = false ;
       self.FD_D        = true ;
-      self.funND       = fun ;
-      self.linesearch  = [] ;
+      %self.funND       = fun ;
+      %self.linesearch  = [] ;
       self.tau         = 10^-6;
+
     end
 
     function setTau( self , tau )
@@ -44,15 +54,8 @@ classdef MinimizationLM < MinimizationND
 
       self.tau = tau;
 
-      fprintf(1,'set tau to %2.6g\n', self.tau );
-    end
+      fprintf( 1 , 'set tau to %2.6g\n' , self.tau );
 
-    function setGradTol( self , tolerance )
-      % Change tolerance of the gradient:
-
-      self.tol = tolerance;
-
-      fprintf(1,'set tolerance to %2.10g\n', self.tol );
     end
 
     function setEpsilon2( self , tolerance )
@@ -69,62 +72,78 @@ classdef MinimizationLM < MinimizationND
       % Launch the minimization algorithm
 
       % Initial values -> see ref[1] algorithm 3.16
-      x        = x0 ;
-      g         = self.funND.grad( x ).' ;      
+      x         = x0 ;      
       % alpha     = 1 ; No linesearch in Levenberg Marquardt
       converged = false ;
       tau       = self.tau;
       J         = self.funND.jacobian(x); % initial jacobian
+      f         = self.funND.evalMap(x);  % initial values
+      g         = J.' * f;
       A         = J.' * J;
-      mi        = tau * max(diag(A));
+      mi        = 0.01; %tau * max(diag(A));
       ni        = 2; 
       eps2      = self.tol2;
-      
-      % verifica come utilizzare:
-      % if self.debug_state
-      %   self.x_history = reshape( x, length(x), 1 ) ;
-      % end
 
-      for iter = 1:self.max_iter
-        % check convercence and assign the boolean converged.        
-        nrm_g     = norm(g,inf) ;      % infinite norm (max)
-        converged = nrm_g < self.tol ; % Is it converged?
+      % check convercence and assign the boolean converged.        
+      nrm_g     = norm(g,inf) ;      % infinite norm (max)
+      converged = nrm_g < self.tol ; % Is it already converged?
+
+      if converged
+        if self.debug_state
+          fprintf(1,'Already converged!, ||grad f||_inf = %12.6g ... \n', iter, nrm_g ) ;
+        end
+        return;
+      end
+
+      if self.debug_state
+        self.x_history = reshape( x, length(x), 1 ) ;
+      end
+
+      % == START ITERATION ======
+
+      for iter = 1:self.max_iter 
+
 
         % DEBUG ONLY ----
         if self.debug_state
-          fprintf(1,'iter = %5d ||grad f||_inf = %12.6g ...', iter, nrm_g ) ;
+
+          fprintf(1,'iter = %5d ||grad f||_inf = %12.6g ... \n', iter, nrm_g ) ;
+          fprintf(1,'ni = %5d , mi = %12.6g ... \n', ni, mi) ;
+
+          self.x_history(:,iter) = x; % it change size every iteration, but it is not the bottleneck 
+
         end
         % ---------------
 
         % Direction(step) search -----------------
         % Solve( (J'J - uI)h = - grad ) 
 
-        h_lm = -  ( A - mi*I ) \ g  ;
+        h_lm = -  ( A + mi * eye(length(x)) ) \ g  ;
 
         % ----------------------------------------
 
         % Condition on the h_lm
         nrm_h_lm      = norm(h_lm);
-        eps2_x_eps2   = eps2*( norm(x) + eps2 ) ); 
+        eps2_x_eps2   = eps2*( norm(x) + eps2  ); 
 
-        if ( nrm_h_lm <= eps2_x_eps2 ) 
+        if ( nrm_h_lm <= eps2_x_eps2 )
 
-          self.converged = true; % update the boolean converged
+          converged = true; % update the boolean converged
 
           % DEBUG ONLY ----
-          if self.debug_state && self.converged
+          if self.debug_state && converged
 
-              fprintf(1,'solution found, || n_lm || = %g < %g\n', nrm_h_lm , eps2_x_eps2 );
+              fprintf(1,'solution found (epsilon 2 wise), || n_lm || = %g < %g \n', nrm_h_lm , eps2_x_eps2 );
   
           end
           % ---------------
 
           break; % out of the loop ( else then is not needed )
 
-        end
+        else
 
         % Update x
-        x_new = x + h_lm;
+        x_new = x + h_lm; 
 
         % compute L0 - L(h_lm)
         L0_Lh = (1/2) * h_lm.' * ( mi * h_lm - g ); % eq(3.7b) version at page 25 of ref [1]
@@ -132,46 +151,50 @@ classdef MinimizationLM < MinimizationND
         % Gain ratio (rho)
         rho   = ( self.funND.eval(x) - self.funND.eval(x_new) ) / ( L0_Lh );
 
-        if rho > 0
+          if rho > 0
 
-          x = x_new; % x update
+            x = x_new; % x update
 
-          J = self.funND.jacobian(x); 
+            J = self.funND.jacobian(x); 
 
-          A = J.'*J; 
+            A = J.'*J; 
 
-          g = self.funND.grad(x);
+            f         = self.funND.evalMap(x);  % function values
 
-          self.converged = norm(g,inf) <= self.tol;
+            g         = J.' * f;
 
-          if self.converged            % Converged: stop the algorithm
+            converged = norm(g,inf) <= self.tol;
 
-            % DEBUG ONLY ----
-            if self.debug_state && self.converged
+            if converged            % Converged: stop the algorithm
 
-                fprintf(1,'solution found, ||grad f||_inf = %g < %g\n', nrm_g, self.tol );
+              % DEBUG ONLY ----
+              if self.debug_state && converged
 
-            end
-            % ---------------
+                  fprintf(1,'solution found, ||grad f||_inf = %g < %g \n', nrm_g, self.tol );
 
-            break;                % Out of the loop 
+              end
+              % ---------------
 
-          end  
+              break;                % Out of the loop 
 
-          mi = mi * max( 1/3 , 1 - ( 2*rho - 1 )^3 );
+            end  
 
-          ni = 2;
+            mi = mi * max( 1/3 , ( 1 - ( 2*rho - 1 ).^3 ) );
 
-        else
+            ni = 2;
 
-          mi = mi*ni;
-          
-          ni = 2*ni;
+          else
+
+            mi = mi*ni;
+            
+            ni = 2*ni;
+
+          end
 
         end
       
       end
-
+      % == END ITERATION ========
     end
 
   end
@@ -179,16 +202,37 @@ classdef MinimizationLM < MinimizationND
 end
 
 
-% TO DO
-%
-% - check the steps
-% - check variables
-% - check initial values
-% - check gradient/jacobian issues
-% - check algorithm (save redundant computations)
-% - initialize parameters
-% - add nick
-%
-%
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

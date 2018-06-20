@@ -10,7 +10,7 @@ classdef MinimizationBFGS < MinimizationND
       self@MinimizationND( fun, ls ) ;
     end
     
-    function [xs,converged] = minimize( self, x0 )
+    function [ xs , converged ] = minimize( self, x0 )
       xs        = x0 ;
       H         = inv(self.funND.hessian( xs ).') ;
       g         = self.funND.grad( xs ).' ;      

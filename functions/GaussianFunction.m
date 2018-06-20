@@ -19,11 +19,11 @@ classdef GaussianFunction < FunctionMap
   % }
   %
   % Author: Giammarco Valenti - University of Trento
-  % -> final debug required
 
   properties( SetAccess = private ,  Hidden = true )
     yi_i % table for y_i given i ....... see main reference: More, Jorge J. and Garbow, Burton S. and Hillstrom, Kenneth E.,
          % Testing Unconstrained Optimization Software. (function number 9)
+    yi_half
   end
 
   methods

@@ -19,7 +19,7 @@ classdef Powell_bsf < FunctionMap
   % }
   %
   % Author: Giammarco Valenti - University of Trento
-  % -> final debug required
+  
   methods
 
     function self = Powell_bsf()
