@@ -21,7 +21,6 @@ classdef BoxThreeDimensionalFunction < FunctionMap
   % }
   %
   % Author: Giammarco Valenti - University of Trento
-  % -> final debug required
 
   properties( SetAccess = private ,  Hidden = true )
 
