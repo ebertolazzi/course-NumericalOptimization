@@ -131,7 +131,6 @@ movegui(h,'northeast')
 
 testPassedDisplay( x_star , funTest2 , 10^-4 );
 
-
 function testPassedDisplay( x_star , funTest , passed_test_sol )
 	if ( norm( x_star - funTest.exact_solutions() ) < abs( passed_test_sol ) )
 		fprintf(1,'test passed and the minimum is in [ %3.3g %3.3g ] \n' , x_star(1) , x_star(2) );
