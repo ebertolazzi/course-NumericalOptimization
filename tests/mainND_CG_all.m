@@ -35,6 +35,7 @@ end
 disp(r.arity());
 
 ls = 'Wolfe';
+
 switch ls
 case 'GS'
   linesearch_method = LinesearchGoldenSection();
@@ -49,7 +50,9 @@ end
 linesearch_method.debug_on();
 
 %min_method = MinimizationGradientMethod(r,search_method);
+%min_method = MinimizationBFGS( r, linesearch_method );
 min_method = MinimizationCG( r, linesearch_method );
+%min_method = MinimizationBFGS( r, linesearch_method );
 min_method.setMaxIteration( int32(1000) );
 min_method.setTolerance(1e-8);
 min_method.debug_on();

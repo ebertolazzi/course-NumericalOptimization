@@ -1,6 +1,6 @@
 classdef Rosenbrock < FunctionMap
   %
-  % Function Rosenbrock
+  % The Rosenbrock Function
   %
   % An Automatic Method for Finding the Greatest or Least Value of a Function
   % H. H. Rosenbrock
@@ -25,9 +25,9 @@ classdef Rosenbrock < FunctionMap
   methods
 
     function self = Rosenbrock()
-      self@FunctionMap(int32(2),int32(2));
-      self.exact_solutions = [1;1];    % one known solution
-      self.guesses         = [-1.2;1]; % one guess
+      self@FunctionMap(int32(2),int32(2)) ;
+      self.exact_solutions = [1;1];   % one known solution 
+      self.guesses         = [-1.2;1] ; % one guess
     end
 
     function F = evalMap(self,x)
