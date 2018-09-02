@@ -22,15 +22,15 @@ classdef DeJongF4 < FunctionND
   methods
 
     function self = DeJongF4()
-      self@FunctionND(int32(30)) ;
-      self.exact_solutions = zeros( 30, 1 ) ;     % one known solution 
-      self.guesses         = ( linspace ( -1.28, +1.28, 30 ) )' ;
+      self@FunctionND(int32(30));
+      self.exact_solutions = zeros( 30, 1 );     % one known solution
+      self.guesses         = ( linspace ( -1.28, +1.28, 30 ) )';
     end
 
     function f = eval(self,x)
       % evaluate function
       self.check_x(x);
-      f = 0 ;
+      f = 0;
       for i = 1:30
         f = f + i * x(i)^4;
       end
@@ -39,7 +39,7 @@ classdef DeJongF4 < FunctionND
     function g = grad( self, x )
       % use analitic gradient
       self.check_x(x);
-      g = zeros ( 1, 30 ) ;
+      g = zeros( 1, 30 );
       for i = 1 : 30
         g(i) = i * 4.0 * x(i)^3;
       end
@@ -48,7 +48,7 @@ classdef DeJongF4 < FunctionND
     function h = hessian( self, x )
       % use analitic hessian
       self.check_x(x);
-      h = zeros ( 30, 30 ) ;
+      h = zeros( 30, 30 );
       for i = 1 : 30
         h(i,i) = i * 12.0 * x(i)^2;
       end

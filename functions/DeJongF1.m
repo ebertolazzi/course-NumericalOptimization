@@ -22,21 +22,21 @@ classdef DeJongF1 < FunctionND
   methods
 
     function self = DeJongF1()
-      self@FunctionND(int32(3)) ;
-      self.exact_solutions = [ 0 ; 0 ; 0 ];     % one known solution 
+      self@FunctionND(int32(3));
+      self.exact_solutions = [ 0; 0; 0 ];     % one known solution
       self.guesses         = [ -5.12; 0; 5.12 ];
     end
 
     function f = eval(self,x)
       % evaluate function
       self.check_x(x);
-      f = dot ( x, x ) ;
+      f = dot ( x, x );
     end
 
     function g = grad( self, x )
       % use analitic gradient
       self.check_x(x);
-      g = 2*x' ;
+      g = 2*x';
     end
 
     function h = hessian( self, x )

@@ -31,8 +31,8 @@ classdef GoldsteinPrice < FunctionND
   methods
 
     function self = GoldsteinPrice()
-      self@FunctionND(int32(2)) ;
-      self.exact_solutions = [ 0 ; -1 ];     % one known solution 
+      self@FunctionND(int32(2));
+      self.exact_solutions = [ 0; -1 ];     % one known solution
       self.guesses         = [ -0.5; +0.25];
     end
 
@@ -71,13 +71,13 @@ classdef GoldsteinPrice < FunctionND
     function h = hessian( self, x )
       % use analitic hessian
       self.check_x(x);
-      h = zeros ( 2, 2 ) ;
+      h = zeros ( 2, 2 );
 
       a = x(1) + x(2) + 1.0;
 
       b = 19.0 - 14.0 * x(1) + 3.0 * x(1)^2 - 14.0 * x(2) + 6.0 * x(1) * x(2) + 3.0 * x(2)^2;
-      e = - 14.0 + 6.0 * x(1) + 6.0 * x(2) ;
-      c = 2.0 * x(1) - 3.0 * x(2) ;
+      e = - 14.0 + 6.0 * x(1) + 6.0 * x(2);
+      c = 2.0 * x(1) - 3.0 * x(2);
       d = 18.0 - 32.0 * x(1) + 12.0 * x(1)^2 + 48.0 * x(2) - 36.0 * x(1) * x(2) + 27.0 * x(2)^2;
       r = - 32.0 + 24.0 * x(1) - 36.0 * x(2);
       s = 48.0 - 36.0 * x(1) + 54.0 * x(2);

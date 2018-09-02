@@ -22,9 +22,9 @@ classdef DeJongF2 < FunctionND
   methods
 
     function self = DeJongF2()
-      self@FunctionND(int32(2)) ;
-      self.exact_solutions = [ 1 ; 1 ];     % one known solution 
-      self.guesses         = [ -2.048 ; 2.048 ];
+      self@FunctionND(int32(2));
+      self.exact_solutions = [ 1; 1 ];     % one known solution
+      self.guesses         = [ -2.048; 2.048 ];
     end
 
     function f = eval(self,x)

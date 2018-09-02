@@ -30,11 +30,11 @@ classdef Hilbert < FunctionND
 
     function self = Hilbert( varargin )
       if nargin == 0
-        n = int32(2) ;
+        n = int32(2);
       elseif nargin == 1
-        n = varargin{1} ;          
+        n = varargin{1};
       else
-        error('Hilbert: too much argument in constructor') ;
+        error('Hilbert: too much argument in constructor');
       end
       if ~isinteger(n)
         error('Hilbert: argument must be an integer, found %s',class(n));
@@ -42,7 +42,7 @@ classdef Hilbert < FunctionND
       if n <= 0
         error('Hilbert: argument must be an integer > 0, found %d',n);
       end
-      self@FunctionND(int32(n)) ;
+      self@FunctionND(int32(n));
       self.exact_solutions = zeros( n, 1 );
       self.guesses = ones( n, 1 );
     end
@@ -78,7 +78,7 @@ classdef Hilbert < FunctionND
         for j = 1 : self.N
           h(i,j) = 2.0 / double( i + j - 1 );
         end
-      end 
+      end
     end
   end
 end

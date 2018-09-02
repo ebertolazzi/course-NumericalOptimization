@@ -27,8 +27,8 @@ classdef ShekelSQRN7 < FunctionND
   methods
 
     function self = ShekelSQRN7()
-      self@FunctionND(int32(4)) ;
-      self.exact_solutions = 4.0 * ones ( 4, 1 ); % one known solution 
+      self@FunctionND(int32(4));
+      self.exact_solutions = 4.0 * ones ( 4, 1 ); % one known solution
       self.guesses         = [ 1.0; 3.0; 5.0; 6.0];
       self.a = [ 4.0, 4.0, 4.0, 4.0; ...
                  1.0, 1.0, 1.0, 1.0; ...
@@ -43,7 +43,7 @@ classdef ShekelSQRN7 < FunctionND
     function f = eval(self,x)
       % evaluate function
       self.check_x(x);
-      n = 4 ;
+      n = 4;
       m = 7;
       f = 0.0;
       for j = 1 : m
@@ -55,7 +55,7 @@ classdef ShekelSQRN7 < FunctionND
       % use analitic gradient
       self.check_x(x);
       g = zeros ( 1, 4 );
-      n = 4 ;
+      n = 4;
       m = 7;
       for k = 1 : n
         for j = 1 : m
@@ -68,9 +68,9 @@ classdef ShekelSQRN7 < FunctionND
     function h = hessian( self, x )
       % use analitic hessian
       self.check_x(x);
-      h = zeros ( 4, 4 ) ;
-      n = 4 ;
-      m = 7 ;
+      h = zeros ( 4, 4 );
+      n = 4;
+      m = 7;
       for ii = 1 : n
         for jj = 1 : n
           for j = 1 : m

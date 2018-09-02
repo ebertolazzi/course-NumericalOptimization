@@ -24,11 +24,11 @@ classdef PenaltyN2 < FunctionND
 
   function self = PenaltyN2( varargin )
     if nargin == 0
-      n = int32(2) ;
+      n = int32(2);
     elseif nargin == 1
-      n = varargin{1} ;          
+      n = varargin{1};
     else
-      error('PenaltyN2: too much argument in constructor') ;
+      error('PenaltyN2: too much argument in constructor');
     end
     if ~isinteger(n)
       error('PenaltyN2: argument must be an integer, found %s',class(n));
@@ -36,9 +36,9 @@ classdef PenaltyN2 < FunctionND
     if n <= 1
       error('PenaltyN2: argument must be an integer > 1, found %d',n);
     end
-      self@FunctionND(int32(n)) ;
-      self.exact_solutions = zeros(n,0) ; % unknown solution 
-      self.guesses         = 0.5 * ones ( n, 1 ) ;
+      self@FunctionND(int32(n));
+      self.exact_solutions = zeros(n,0); % unknown solution
+      self.guesses         = 0.5 * ones( n, 1 );
     end
 
     function f = eval(self,x)
@@ -111,8 +111,8 @@ classdef PenaltyN2 < FunctionND
       d2 = 1.0;
       s2 = 0.0;
       th = 4.0 * t1;
-      
-      h = zeros(self.N,self.N) ;
+
+      h = zeros(self.N,self.N);
 
       for j = 1 : self.N
 

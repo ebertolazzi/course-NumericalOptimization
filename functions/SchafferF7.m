@@ -26,16 +26,16 @@ classdef SchafferF7 < FunctionND
   methods
 
     function self = SchafferF7()
-      self@FunctionND(int32(2)) ;
-      self.exact_solutions = [ 0 ; 0 ];       % one known solution 
-      self.guesses         = [ -5.0 ; +10.0 ] ; % one guess
+      self@FunctionND(int32(2));
+      self.exact_solutions = [ 0; 0 ];       % one known solution
+      self.guesses         = [ -5.0; +10.0 ]; % one guess
     end
 
     function f = eval(self,x)
       % evaluate Rosenbrock (2D) function.
       self.check_x(x);
-      X = x(1) ;
-      Y = x(2) ;
+      X = x(1);
+      Y = x(2);
       r = hypot( X, Y );
       f = sqrt ( r ) * ( 1.0 + ( sin ( 50.0 * r^0.2 ) )^2 );
     end
@@ -43,12 +43,12 @@ classdef SchafferF7 < FunctionND
     function g = grad( self, x )
       % use analitic gradient
       self.check_x(x);
-      X = x(1) ;
-      Y = x(2) ;
+      X = x(1);
+      Y = x(2);
       r = hypot( X, Y );
       g = zeros(1,2);
 
-      if r > 0 
+      if r > 0
         a  = sqrt ( r );
         ar = 0.5 / sqrt ( r );
 
@@ -67,16 +67,16 @@ classdef SchafferF7 < FunctionND
       % use analitic hessian
       % use analitic gradient
       self.check_x(x);
-      X = x(1) ;
-      Y = x(2) ;
+      X = x(1);
+      Y = x(2);
 
-      h = zeros ( 2, 2 ) ;
+      h = zeros ( 2, 2 );
       r = hypot( X, Y );
 
       rx1 = X / r;
       rx2 = Y / r;
-      
-      r3    = r^3 ;
+
+      r3    = r^3;
       rx1x1 = Y^2 / r3;
       rx1x2 = - X*Y / r3;
       rx2x2 = X^2 / r3;
@@ -87,22 +87,22 @@ classdef SchafferF7 < FunctionND
       %  etc
       %
       a   = sqrt ( r );
-      ar  = 0.5 / a ;
-      arr = - 0.25 / (r*a) ;
-      
-      S50  = sin( 50.0 * r^0.2 )  ;
-      S100 = sin( 100.0 * r^0.2 )  ;
+      ar  = 0.5 / a;
+      arr = - 0.25 / (r*a);
+
+      S50  = sin( 50.0 * r^0.2 );
+      S100 = sin( 100.0 * r^0.2 );
 
       b   = 1 + S50^2;
       br  = 10 * S100 * r^(-0.8);
       brr = 200 * cos ( 100 * r^0.2 ) * r^(-1.6) - 8.0 * S100 * r^(-1.8);
 
-      t1 = arr * b + 2 * ar * br + a * brr ;
+      t1 = arr * b + 2 * ar * br + a * brr;
       t2 = ar * b + a * br;
 
       h(1,1) = t1 * rx1 * rx1 + t2 * rx1x1;
       h(1,2) = t1 * rx1 * rx2 + t2 * rx1x2;
-      h(2,1) = h(1,2) ;
+      h(2,1) = h(1,2);
       h(2,2) = t1 * rx2 * rx2 + t2 * rx2x2;
     end
   end

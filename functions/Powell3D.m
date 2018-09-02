@@ -24,54 +24,54 @@ classdef Powell3D < FunctionND
   methods
 
     function self = Powell3D()
-      self@FunctionND(int32(3)) ;
-      self.exact_solutions = ones(3,1) ; % one known solution 
+      self@FunctionND(int32(3));
+      self.exact_solutions = ones(3,1); % one known solution
       self.guesses         = [ 0.0; 1.0; 2.0 ];
     end
 
     function f = eval(self,X)
       % evaluate function
       self.check_x(X);
-      
-      x = X(1) ;
-      y = X(2) ;
-      z = X(3) ;
-      
+
+      x = X(1);
+      y = X(2);
+      z = X(3);
+
       if ( y == 0.0 )
         term = 0.0;
       else
-        %arg  = ( x + 2.0 * y + z ) / y ;
-        arg  = 2.0 + ( x + z ) / y ;
+        %arg  = ( x + 2.0 * y + z ) / y;
+        arg  = 2.0 + ( x + z ) / y;
         term = exp( - arg^2 );
       end
 
       f = 3.0 ...
         - 1.0 / ( 1.0 + ( x - y )^2 ) ...
         - sin ( 0.5 * pi * y * z ) ...
-        - term ;
+        - term;
     end
 
     function g = grad( self, X )
       % use analitic gradient
       self.check_x(X);
-      g = zeros ( 1, 3 );
-      x = X(1) ;
-      y = X(2) ;
-      z = X(3) ;
-      
-      tmp1 = 2*(x-y) / (1+(x-y)^2)^2 ;
-      tmp2 = (pi/2)*cos( (pi/2)*y*z ) ;
+      g = zeros( 1, 3 );
+      x = X(1);
+      y = X(2);
+      z = X(3);
 
-      g(1) = tmp1 ;
-      g(2) = -tmp1 - tmp2 * z ;
-      g(3) =       - tmp2 * y ;
+      tmp1 = 2*(x-y) / (1+(x-y)^2)^2;
+      tmp2 = (pi/2)*cos( (pi/2)*y*z );
+
+      g(1) = tmp1;
+      g(2) = -tmp1 - tmp2 * z;
+      g(3) =       - tmp2 * y;
 
       if ( y ~= 0.0 )
-        tmp1 = (2*y+x+z)/y ;
-        tmp2 = 2*(2*y+x+z)*exp(-tmp1^2)/y^2 ;
-        g(1) = g(1) - tmp2 ;
-        g(2) = g(2) + tmp2*(x+z)/y ;
-        g(3) = g(3) - tmp2 ;
+        tmp1 = (2*y+x+z)/y;
+        tmp2 = 2*(2*y+x+z)*exp(-tmp1^2)/y^2;
+        g(1) = g(1) - tmp2;
+        g(2) = g(2) + tmp2*(x+z)/y;
+        g(3) = g(3) - tmp2;
       end
     end
 
@@ -79,23 +79,23 @@ classdef Powell3D < FunctionND
       % use analitic hessian
       self.check_x(X);
       h = zeros ( 3, 3 );
-      x = X(1) ;
-      y = X(2) ;
-      z = X(3) ;
-      xy2  = (x-y)^2 ;
-      tmp1 = 2-6*xy2 ;
-      tmp2 = (1+xy2)^3 ;
-      S    = sin((pi/2)*y*z) ;
-      C    = cos((pi/2)*y*z) ;
-      
-      h(1,1) = tmp1/tmp2 ;
-      h(1,2) = -h(1,1) ;
-      h(1,3) = 0 ;
-      
-      h(2,2) = z^2*(pi/2)^2*S+(2-6*xy2)/tmp2 ;
-      h(2,3) = (pi/4)*(pi*y*z*S-2*C) ;
+      x = X(1);
+      y = X(2);
+      z = X(3);
+      xy2  = (x-y)^2;
+      tmp1 = 2-6*xy2;
+      tmp2 = (1+xy2)^3;
+      S    = sin((pi/2)*y*z);
+      C    = cos((pi/2)*y*z);
 
-      h(3,3) = (pi*y/2)^2*S ;
+      h(1,1) = tmp1/tmp2;
+      h(1,2) = -h(1,1);
+      h(1,3) = 0;
+
+      h(2,2) = z^2*(pi/2)^2*S+(2-6*xy2)/tmp2;
+      h(2,3) = (pi/4)*(pi*y*z*S-2*C);
+
+      h(3,3) = (pi*y/2)^2*S;
 
       if ( y ~= 0.0 )
         t1  = (x + z);
@@ -123,9 +123,9 @@ classdef Powell3D < FunctionND
         h(2,3) = h(2,3) + tmp(5);
         h(3,3) = h(3,3) + tmp(6);
       end
-      h(2,1) = h(1,2) ;
-      h(3,1) = h(1,3) ;
-      h(3,2) = h(2,3) ;      
+      h(2,1) = h(1,2);
+      h(3,1) = h(1,3);
+      h(3,2) = h(2,3);
     end
   end
 end

@@ -22,8 +22,8 @@ classdef Shubert < FunctionND
   methods
 
     function self = Shubert()
-      self@FunctionND(int32(2)) ;
-      self.exact_solutions = [ 0 ; 0 ];     % one known solution 
+      self@FunctionND(int32(2));
+      self.exact_solutions = [ 0; 0 ];     % one known solution 
       self.guesses         = [ 0.5; 1.0];
     end
 

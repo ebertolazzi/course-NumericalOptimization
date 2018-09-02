@@ -24,11 +24,11 @@ classdef GregoryAndKarney < FunctionND
 
     function self = GregoryAndKarney( varargin )
       if nargin == 0
-        n = int32(2) ;
+        n = int32(2);
       elseif nargin == 1
-        n = varargin{1} ;          
+        n = varargin{1};
       else
-        error('GregoryAndKarney: too much argument in constructor') ;
+        error('GregoryAndKarney: too much argument in constructor');
       end
       if ~isinteger(n)
         error('GregoryAndKarney: argument must be an integer, found %s',class(n));
@@ -36,14 +36,14 @@ classdef GregoryAndKarney < FunctionND
       if n <= 0
         error('GregoryAndKarney: argument must be an integer > 0, found %d',n);
       end
-      self@FunctionND(int32(n)) ;
+      self@FunctionND(int32(n));
 
       self.exact_solutions = zeros( n, 1 );
       for i = 1:n
         self.exact_solutions(i) = n + 1 - i;
       end
       self.guesses = zeros( n, 1 );
-      
+
     end
 
     function f = eval(self,x)

@@ -28,7 +28,7 @@ classdef mckinnon < FunctionND
   %   algorithm to "converge" to a point which is not the minimizer
   %   of the function F.
   %
-  %   Sample parameter values which cause problems for Nelder-Mead 
+  %   Sample parameter values which cause problems for Nelder-Mead
   %   include:
   %
   %     TAU = 1, THETA = 15, PHI =  10;
@@ -39,9 +39,9 @@ classdef mckinnon < FunctionND
   %
   %     X1 = (0,0),
   %     X2 = (1,1),
-  %     X3 = (A,B), 
+  %     X3 = (A,B),
   %
-  %   where 
+  %   where
   %
   %     A = (1+sqrt(33))/8 =  0.84307...
   %     B = (1-sqrt(33))/8 = -0.59307...
@@ -65,8 +65,8 @@ classdef mckinnon < FunctionND
   methods
 
     function self = mckinnon()
-      self@FunctionND(int32(2)) ;
-      self.exact_solutions = [ 0 ; -1];     % one known solution 
+      self@FunctionND(int32(2));
+      self.exact_solutions = [ 0; -1];     % one known solution 
       self.guesses         = [ 1; 1];
       self.tau   = 2.0;
       self.theta = 6.0;
@@ -126,4 +126,3 @@ classdef mckinnon < FunctionND
     end
   end
 end
-

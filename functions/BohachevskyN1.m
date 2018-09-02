@@ -29,16 +29,16 @@ classdef BohachevskyN1 < FunctionND
   methods
 
     function self = BohachevskyN1()
-      self@FunctionND(int32(2)) ;
-      self.exact_solutions = [ 0 ; 0 ];     % one known solution 
+      self@FunctionND(int32(2));
+      self.exact_solutions = [ 0; 0 ];     % one known solution
       self.guesses         = [ 0.5; 1.0];
     end
 
     function f = eval(self,x)
       % evaluate function
       self.check_x(x);
-      a1 = 3.0 * pi * x(1) ;
-      a2 = 4.0 * pi * x(2) ;
+      a1 = 3.0 * pi * x(1);
+      a2 = 4.0 * pi * x(2);
       f  = x(1)^2 + 2.0 * x(2)^2 - 0.3 * cos(a1) - 0.4 * cos(a2) + 0.7;
     end
 
@@ -46,8 +46,8 @@ classdef BohachevskyN1 < FunctionND
       % use analitic gradient
       self.check_x(x);
       g    = zeros ( 1, 2 );
-      a1   = 3.0 * pi * x(1) ;
-      a2   = 4.0 * pi * x(2) ;
+      a1   = 3.0 * pi * x(1);
+      a2   = 4.0 * pi * x(2);
       g(1) = 2.0 * x(1) + 0.9 * pi * sin ( a1 );
       g(2) = 4.0 * x(2) + 1.6 * pi * sin ( a2 );
     end
@@ -56,8 +56,8 @@ classdef BohachevskyN1 < FunctionND
       % use analitic hessian
       self.check_x(x);
       h  = zeros ( 2, 2 );
-      a1 = 3.0 * pi * x(1) ;
-      a2 = 4.0 * pi * x(2) ;
+      a1 = 3.0 * pi * x(1);
+      a2 = 4.0 * pi * x(2);
       h(1,1) = 2.0 + 2.7 * pi^2 * cos ( a1 );
       h(1,2) = 0.0;
       h(2,1) = 0.0;

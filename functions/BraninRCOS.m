@@ -23,10 +23,10 @@ classdef BraninRCOS < FunctionND
   methods
 
     function self = BraninRCOS()
-      self@FunctionND(int32(2)) ;
-      self.exact_solutions = [ -pi, 12.275 ;
-                                pi,  2.275 ;
-                                9.42478, 2.475 ].' ; % 3 known solutions
+      self@FunctionND(int32(2));
+      self.exact_solutions = [ -pi, 12.275;
+                                pi,  2.275;
+                                9.42478, 2.475 ].'; % 3 known solutions
       self.guesses = [ -1.0; 1.0 ];
     end
 
@@ -56,11 +56,11 @@ classdef BraninRCOS < FunctionND
       b = 5.1 / ( 4.0 * pi^2 );;
       c = 5.0 / pi;
       ff = 1.0 / ( 8.0 * pi );
-      
-      tmp = 2.0 * a * ( x(2) - b * x(1)^2 + c * x(1) - d ) ;
+
+      tmp = 2.0 * a * ( x(2) - b * x(1)^2 + c * x(1) - d );
 
       g(1) = tmp * ( c - 2 * b * x(1) ) - e * ( 1.0 - ff ) * sin ( x(1) );
-      g(2) = tmp ;
+      g(2) = tmp;
     end
 
     function h = hessian( self, x )
@@ -74,13 +74,13 @@ classdef BraninRCOS < FunctionND
       b  = 5.1 / ( 4.0 * pi^2 );
       c  = 5.0 / pi;
       ff = 1.0 / ( 8.0 * pi );
-      
-      tmp = c - 2.0 * b * x(1) ;
+
+      tmp = c - 2.0 * b * x(1);
 
       h(1,1) = 2.0 * a * tmp^2 - 4.0 * a * b * ( x(2) - b * x(1)^2 + c * x(1) - d ) - e * ( 1.0 - ff ) * cos ( x(1) );
       h(1,2) = 2.0 * a * tmp;
-      h(2,1) = h(1,2) ;
-      h(2,2) = 2.0 * a ;
+      h(2,1) = h(1,2);
+      h(2,2) = 2.0 * a;
     end
   end
 end

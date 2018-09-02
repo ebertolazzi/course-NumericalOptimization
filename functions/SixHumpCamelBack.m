@@ -23,10 +23,10 @@ classdef SixHumpCamelBack < FunctionND
   methods
 
     function self = SixHumpCamelBack()
-      self@FunctionND(int32(2)) ;
-      self.exact_solutions = [ -0.0898,  0.7126 ;
-                                0.0898, -0.7126 ].'; 
-      self.guesses = [ -1.5; 0.5 ] ; % one guess
+      self@FunctionND(int32(2));
+      self.exact_solutions = [ -0.0898,  0.7126;
+                                0.0898, -0.7126 ].';
+      self.guesses = [ -1.5; 0.5 ]; % one guess
     end
 
     function f = eval(self,x)

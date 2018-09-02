@@ -23,11 +23,11 @@ classdef PenaltyN1 < FunctionND
 
     function self = PenaltyN1( varargin )
       if nargin == 0
-        n = int32(2) ;
+        n = int32(2);
       elseif nargin == 1
-        n = varargin{1} ;          
+        n = varargin{1};
       else
-        error('PenaltyN1: too much argument in constructor') ;
+        error('PenaltyN1: too much argument in constructor');
       end
       if ~isinteger(n)
         error('PenaltyN1: argument must be an integer, found %s',class(n));
@@ -35,8 +35,8 @@ classdef PenaltyN1 < FunctionND
       if n <= 1
         error('PenaltyN1: argument must be an integer > 1, found %d',n);
       end
-      self@FunctionND(int32(n)) ;
-      self.exact_solutions = zeros(n,0) ; % unknown solution 
+      self@FunctionND(int32(n));
+      self.exact_solutions = zeros(n,0); % unknown solution
       self.guesses         = (1:n).';
     end
 
@@ -44,7 +44,7 @@ classdef PenaltyN1 < FunctionND
       % evaluate function
       self.check_x(x);
       ap = 0.00001;
-      t1 = dot( x, x ) - 0.25 ;
+      t1 = dot( x, x ) - 0.25;
       t2 = sum ( ( x - 1.0 ).^2 );
       f  = ap * t2 + t1^2;
     end
@@ -53,8 +53,8 @@ classdef PenaltyN1 < FunctionND
       % use analitic gradient
       self.check_x(x);
       ap = 0.00001;
-      t1 = dot( x, x ) - 0.25 ;
-      g  = (2.0 * ap) * ( x' - 1.0 ) + (4.0 * t1) * x' ;
+      t1 = dot( x, x ) - 0.25;
+      g  = (2.0 * ap) * ( x' - 1.0 ) + (4.0 * t1) * x';
     end
 
     function h = hessian( self, x )

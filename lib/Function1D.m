@@ -5,7 +5,7 @@ classdef (Abstract) Function1D < handle
   % analytical but is an approximation.
   % The method here proposed is not the classical one direction incremental
   % ratio, but is the bi-directional one (more accurate)
-  
+
   methods (Abstract)
     %
     % Define the abstract function used in eval_D and eval_DDD
@@ -16,23 +16,21 @@ classdef (Abstract) Function1D < handle
   end
 
   methods
-
     function Dy = FD_eval_D( self, x )
       % Finite difference approximation of the first derivative
-      h  = max(1,abs(x))*eps^(1/3) ; % "eps" is the "machine epsilon precision"
-      fp = self.eval(x+h) ;
-      fm = self.eval(x-h) ;
-      Dy = (fp-fm)./(2*h) ;
+      h  = max(1,abs(x))*eps^(1/3); % "eps" is the "machine epsilon precision"
+      fp = self.eval(x+h);
+      fm = self.eval(x-h);
+      Dy = (fp-fm)./(2*h);
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function DDy = FD_eval_DD( self, x )
       % Finite difference approximation of the second derivative
-      h   = max(1,abs(x))*(eps^(1/3)) ;
-      fp  = self.eval(x+h) ;
-      fm  = self.eval(x-h) ;
-      fc  = self.eval(x) ;
-      DDy = (fp+fm-2*fc)./(h.^2) ;
+      h   = max(1,abs(x))*(eps^(1/3));
+      fp  = self.eval(x+h);
+      fm  = self.eval(x-h);
+      fc  = self.eval(x);
+      DDy = (fp+fm-2*fc)./(h.^2);
     end
-
   end
 end

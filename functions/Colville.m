@@ -22,8 +22,8 @@ classdef Colville < FunctionND
   methods
 
     function self = Colville()
-      self@FunctionND(int32(4)) ;
-      self.exact_solutions = [ 1; 1; 1; 1 ];     % one known solution 
+      self@FunctionND(int32(4));
+      self.exact_solutions = [ 1; 1; 1; 1 ];     % one known solution
       self.guesses         = [ 0.5; 1.0; -0.5; -1.0 ];
     end
 

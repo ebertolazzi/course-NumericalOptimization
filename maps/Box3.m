@@ -23,8 +23,8 @@ classdef Box3 < FunctionMap
   methods
 
     function self = Box3()
-      self@FunctionMap(int32(3),int32(10)) ;
-      self.exact_solutions = [ 1.0; 10.0; 1.0];     % one known solution 
+      self@FunctionMap(int32(3),int32(10));
+      self.exact_solutions = [ 1.0; 10.0; 1.0];     % one known solution
       self.guesses         = [ 0.0; 10.0; 5.0 ];
     end
 
@@ -44,7 +44,7 @@ classdef Box3 < FunctionMap
       J = zeros(10,3);
       for i = 1:10
         c      = - i / 10.0;
-        J(i,:) = [ c * exp( c * x(1) ), - c * exp( c * x(2) ),  exp( 10.0 * c )  - exp( c ) ] ;
+        J(i,:) = [ c * exp( c * x(1) ), - c * exp( c * x(2) ),  exp( 10.0 * c )  - exp( c ) ];
       end
     end
 
@@ -53,9 +53,9 @@ classdef Box3 < FunctionMap
       T = zeros(10,3,3);
       for i = 1:10
         c        = - i / 10.0;
-        T(i,:,:) = c^2 * [ exp( c * x(1) ), 0, 0 ;  ...
-                           0, -exp( c * x(2) ), 0 ; ...
-                           0, 0, 0 ] ;
+        T(i,:,:) = c^2 * [ exp( c * x(1) ), 0, 0;  ...
+                           0, -exp( c * x(2) ), 0; ...
+                           0, 0, 0 ];
       end
     end
 
