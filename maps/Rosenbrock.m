@@ -26,7 +26,7 @@ classdef Rosenbrock < FunctionMap
 
     function self = Rosenbrock()
       self@FunctionMap(int32(2),int32(2));
-      self.exact_solutions = [1;1];   % one known solution
+      self.exact_solutions = [1;1];    % one known solution
       self.guesses         = [-1.2;1]; % one guess
     end
 

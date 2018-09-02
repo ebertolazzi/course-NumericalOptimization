@@ -1,9 +1,10 @@
 classdef (Abstract) FunctionND < handle
 
   properties (SetAccess = protected, Hidden = true)
-    N               % arity of the function
-    exact_solutions % matrix N x dim with all the known solutions. dim can be 0 if no known solution arer available
-    guesses         % matrix N x dim with suggested inital guess used for testing.
+    N                      % arity of the function
+    exact_solutions        % matrix N x dim with all the known solutions. dim can be 0 if no known solution arer available 
+    guesses                % matrix N x dim with suggested inital guess used for testing.
+    approximated_solutions % matrix N x dim with the know solutions approximated
   end
 
   methods (Abstract)

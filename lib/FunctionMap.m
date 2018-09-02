@@ -1,4 +1,8 @@
 classdef (Abstract) FunctionMap < FunctionND
+% Function of the type "sum of squares"
+%
+% Map a sum of squares function from $f_i(x)$ to $\frac{1}{2}\sum_{i=1}^{m}f_i^2(x)$.
+
 
   properties (SetAccess = protected, Hidden = true)
     M % number of components of the Map
@@ -12,7 +16,7 @@ classdef (Abstract) FunctionMap < FunctionND
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = FunctionMap( N, M )
       % Constructor of base (abstract) class
-      self@FunctionND(N);
+      self@FunctionND(N); % call the contructor of the superclass
       if ~isinteger(M)
         error('FunctionND: argument must be an integer, found %s',class(M));
       end
@@ -72,7 +76,8 @@ classdef (Abstract) FunctionMap < FunctionND
 
       % Make T symmetric numerically, this is not mandatory but could help
       for k=1:self.M
-        T(k,:,:) = 0.5*(T(k,:,:)+T(k,:,:).');
+        Ttemp    = squeeze(T(k,:,:));     % added this temporary variable to use the .' operator
+        T(k,:,:) = 0.5*(Ttemp + Ttemp.');
       end
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
