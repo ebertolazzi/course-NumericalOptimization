@@ -25,7 +25,7 @@ classdef ShekelSQRN10 < FunctionND
   end
 
   methods
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = ShekelSQRN10()
       self@FunctionND(int32(4));
       self.exact_solutions = 4.0 * ones ( 4, 1 ); % one known solution
@@ -43,7 +43,7 @@ classdef ShekelSQRN10 < FunctionND
 
       self.c = [ 0.1, 0.2, 0.2, 0.4, 0.6, 0.6, 0.3, 0.7, 0.5, 0.5 ].';
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function f = eval(self,x)
       % evaluate function
       self.check_x(x);
@@ -54,7 +54,7 @@ classdef ShekelSQRN10 < FunctionND
         f = f - 1.0 / ( self.c(j) + sum ( ( x - self.a(1:n,j) ).^2 ) );
       end
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function g = grad( self, x )
       % use analitic gradient
       self.check_x(x);
@@ -68,7 +68,7 @@ classdef ShekelSQRN10 < FunctionND
         end
       end
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function h = hessian( self, x )
       % use analitic hessian
       self.check_x(x);
@@ -87,5 +87,17 @@ classdef ShekelSQRN10 < FunctionND
         end
       end
     end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function [f,g] = eval_FG( self, x )
+      f = self.eval(x);
+      g = self.grad(x);
+    end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function [f,g,H] = eval_FGH( self, x )
+      f = self.eval(x);
+      g = self.grad(x);
+      H = self.hessian(x);
+    end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
 end

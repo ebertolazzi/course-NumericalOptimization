@@ -20,7 +20,7 @@ classdef PenaltyN1 < FunctionND
   %
 
   methods
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = PenaltyN1( varargin )
       if nargin == 0
         n = int32(2);
@@ -39,7 +39,7 @@ classdef PenaltyN1 < FunctionND
       self.exact_solutions = zeros(n,0); % unknown solution
       self.guesses         = (1:n).';
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function f = eval(self,x)
       % evaluate function
       self.check_x(x);
@@ -48,7 +48,7 @@ classdef PenaltyN1 < FunctionND
       t2 = sum ( ( x - 1.0 ).^2 );
       f  = ap * t2 + t1^2;
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function g = grad( self, x )
       % use analitic gradient
       self.check_x(x);
@@ -56,7 +56,7 @@ classdef PenaltyN1 < FunctionND
       t1 = dot( x, x ) - 0.25;
       g  = (2.0 * ap) * ( x' - 1.0 ) + (4.0 * t1) * x';
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function h = hessian( self, x )
       % use analitic hessian
       self.check_x(x);
@@ -80,5 +80,17 @@ classdef PenaltyN1 < FunctionND
         end
       end
     end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function [f,g] = eval_FG( self, x )
+      f = self.eval(x);
+      g = self.grad(x);
+    end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function [f,g,H] = eval_FGH( self, x )
+      f = self.eval(x);
+      g = self.grad(x);
+      H = self.hessian(x);
+    end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
 end

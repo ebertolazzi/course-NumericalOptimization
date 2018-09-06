@@ -64,7 +64,7 @@ classdef GaussianFunction < FunctionMap
                  -X1 .* (ti_i - X3) .^ 2  .* exp( -X2 .* (ti_i - X3) .^ 2 ./ 2) ./ 2, ...
                   X1 .* X2 .* (ti_i - X3) .* exp( -X2 .* (ti_i - X3) .^ 2 ./ 2)];
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function T = tensor( self, x )
       % use analytic tensor
       self.check_x( x );
@@ -91,9 +91,18 @@ classdef GaussianFunction < FunctionMap
       T  = cat(3,T1,T2,T3);
 
     end
-
-    % For tensor and jacobian a maple file is available: ask to the author if needed
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function [f,g] = eval_FG( self, x )
+      f = self.eval(x);
+      g = self.grad(x);
+    end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function [f,g,H] = eval_FGH( self, x )
+      f = self.eval(x);
+      g = self.grad(x);
+      H = self.hessian(x);
+    end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
 end
 

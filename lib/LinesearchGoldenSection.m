@@ -12,23 +12,23 @@ classdef LinesearchGoldenSection < LinesearchForwardBackward
       % PASSA al costruttore della super-classe
       self@LinesearchForwardBackward('GoldenSection');
       self.tau      = (sqrt(5)-1)/2;
-      self.tol      = 1e-3;
-      self.max_iter = 10;
+      self.tol      = 1e-8;
+      self.max_iter = 50;
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function setMaxIteration( self, max_iter )
       if length(max_iter) > 1 || ~isinteger(max_iter)
-        error('LinesearchGoldenSection, expected a scalar  integer\n');
+        error('LinesearchGoldenSection:setMaxIteration, expected a scalar  integer\n');
       end
       if max_iter < 0 || max_iter > 10000
-        error('LinesearchGoldenSection, bad number of iterator %d\n',max_iter);
+        error('LinesearchGoldenSection:setMaxIteration, bad number of iterator %d\n',max_iter);
       end
       self.max_iter = max_iter;
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function setTolerance( self, tol )
       if tol <= 0
-        error('LinesearchGoldenSection, bad tolerance %g\n',tol);
+        error('LinesearchGoldenSection:setTolerance, bad tolerance %g\n',tol);
       end
       self.tol = tol;
     end
@@ -66,10 +66,10 @@ classdef LinesearchGoldenSection < LinesearchForwardBackward
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function [alpha,ok] = search( self, alpha_guess )
-      [aLO,aHI,fLO,fHI,ierr] = self.ForwardBackward( alpha_guess );
+      [ LO, HI, ierr ] = self.ForwardBackward( alpha_guess );
       ok = ierr >= 0;
       if ok
-        [a,b] = self.minimize( aLO, aHI );
+        [a,b] = self.minimize( LO.alpha, HI.alpha );
         alpha = (a+b)/2;
       else
         alpha = alpha_guess/100;

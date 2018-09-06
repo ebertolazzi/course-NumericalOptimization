@@ -24,13 +24,13 @@ classdef SchafferF7 < FunctionND
   %
 
   methods
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = SchafferF7()
       self@FunctionND(int32(2));
       self.exact_solutions = [ 0; 0 ];       % one known solution
       self.guesses         = [ -5.0; +10.0 ]; % one guess
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function f = eval(self,x)
       % evaluate Rosenbrock (2D) function.
       self.check_x(x);
@@ -39,7 +39,7 @@ classdef SchafferF7 < FunctionND
       r = hypot( X, Y );
       f = sqrt ( r ) * ( 1.0 + ( sin ( 50.0 * r^0.2 ) )^2 );
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function g = grad( self, x )
       % use analitic gradient
       self.check_x(x);
@@ -62,7 +62,7 @@ classdef SchafferF7 < FunctionND
         g(2) = ( ar * b + a * br ) * rx2;
       end
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function h = hessian( self, x )
       % use analitic hessian
       % use analitic gradient
@@ -105,5 +105,17 @@ classdef SchafferF7 < FunctionND
       h(2,1) = h(1,2);
       h(2,2) = t1 * rx2 * rx2 + t2 * rx2x2;
     end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function [f,g] = eval_FG( self, x )
+      f = self.eval(x);
+      g = self.grad(x);
+    end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function [f,g,H] = eval_FGH( self, x )
+      f = self.eval(x);
+      g = self.grad(x);
+      H = self.hessian(x);
+    end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
 end

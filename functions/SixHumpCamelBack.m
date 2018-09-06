@@ -21,20 +21,20 @@ classdef SixHumpCamelBack < FunctionND
   %
 
   methods
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = SixHumpCamelBack()
       self@FunctionND(int32(2));
       self.exact_solutions = [ -0.0898,  0.7126;
                                 0.0898, -0.7126 ].';
       self.guesses = [ -1.5; 0.5 ]; % one guess
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function f = eval(self,x)
       % evaluate Rosenbrock (2D) function.
       self.check_x(x);
       f = ( 4.0 - 2.1 * x(1)^2 + x(1)^4 / 3.0 ) * x(1)^2 + x(1) * x(2) + 4.0 * ( x(2)^2 - 1.0 ) * x(2)^2;
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function g = grad( self, x )
       % use analitic gradient
       self.check_x(x);
@@ -42,7 +42,7 @@ classdef SixHumpCamelBack < FunctionND
       g(1) = 8.0 * x(1) - 8.4 * x(1)^3 + 2.0 * x(1)^5 + x(2);
       g(2) = x(1) - 8.0 * x(2) + 16.0 * x(2)^3;
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function h = hessian( self, x )
       % use analitic hessian
       h = zeros ( 2, 2 );
@@ -51,5 +51,17 @@ classdef SixHumpCamelBack < FunctionND
       h(2,1) = 1.0;
       h(2,2) = -8.0 + 48.0 * x(2)^2;
     end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function [f,g] = eval_FG( self, x )
+      f = self.eval(x);
+      g = self.grad(x);
+    end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function [f,g,H] = eval_FGH( self, x )
+      f = self.eval(x);
+      g = self.grad(x);
+      H = self.hessian(x);
+    end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
 end

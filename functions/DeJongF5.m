@@ -20,13 +20,13 @@ classdef DeJongF5 < FunctionND
   %
 
   methods
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = DeJongF5()
       self@FunctionND(int32(2));
       self.exact_solutions = [ -32.0; -32.0 ];  % one known solution
       self.guesses         = [ -32.01; -32.02 ];
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function f = eval(self,x)
       % evaluate function
       self.check_x(x);
@@ -51,15 +51,25 @@ classdef DeJongF5 < FunctionND
 
       f = 1.0 / fi;
     end
-
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function g = grad( self, x )
       g = self.FD_grad( x );
     end
-
-    function h = hessian( self, x )
-      g = self.FD_hessianj( x );
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function H = hessian( self, x )
+      H = self.FD_hessianj( x );
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function [f,g] = eval_FG( self, x )
+      f = self.eval(x);
+      g = self.grad(x);
+    end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function [f,g,H] = eval_FGH( self, x )
+      f = self.eval(x);
+      g = self.grad(x);
+      H = self.hessian(x);
+    end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
 end

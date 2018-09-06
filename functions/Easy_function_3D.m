@@ -1,10 +1,11 @@
 classdef Easy_function_3D < FunctionND
   methods
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = Easy_function_3D()
       arity = 2;
       self@FunctionND(int32(arity));
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function f = eval(self,x)
       % evaluate a simple (2D) function.
       % if x is a 2 by m matrix return m values in a row vector.
@@ -13,15 +14,26 @@ classdef Easy_function_3D < FunctionND
       Y = squeeze(x(2,:,:));
       f = (X.^2)+ abs(Y);
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     % Use finite difference for grad and hessian
     function g = grad( self, x )
       g = self.FD_grad( self, x );
     end
-
-    function h = hessian( self, x )
-      h = self.FD_hessian( self, x );
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function H = hessian( self, x )
+      H = self.FD_hessian( self, x );
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function [f,g] = eval_FG( self, x )
+      f = self.eval(x);
+      g = self.grad(x);
+    end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function [f,g,H] = eval_FGH( self, x )
+      f = self.eval(x);
+      g = self.grad(x);
+      H = self.hessian(x);
+    end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
 end

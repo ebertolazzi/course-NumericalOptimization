@@ -75,13 +75,13 @@ classdef MinimizationND < handle
       %
       if norm(d,inf) == 0
         error('MinimizationND, bad direction d == 0\n');
+      else
+        d = d ./ norm(d);
       end
       %
       % build the 1D function along the search direction
-      % use grad0 to scale the function for numerical stability
-      norm_2_d = norm(d);
-      fcut     = Function1Dcut( self.funND, x0, d./norm_2_d );
-      %
+      fcut = Function1Dcut( self.funND, x0, d );
+
       % set analitic gradient if necessary
       if self.FD_D
         fcut.use_FD_D();
@@ -93,8 +93,7 @@ classdef MinimizationND < handle
       % do a 1D minimization
       % search an interval for minimization
       self.linesearch.setFunction( fcut );
-      [alpha,ok] = self.linesearch.search( alpha_guess * norm_2_d );
-      alpha = alpha / norm_2_d;
+      [ alpha, ok ] = self.linesearch.search( alpha_guess );
       %
       % check error
       if ~ok
@@ -107,7 +106,7 @@ classdef MinimizationND < handle
         x1 = x0 + alpha * d;
         % only for debug
         if self.debug_state
-          self.x_history = [ self.x_history reshape( x1, length(x1), 1 ) ];
+          self.x_history = [ self.x_history x1(:) ];
         end
       end
     end

@@ -63,16 +63,16 @@ classdef mckinnon < FunctionND
   end
 
   methods
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = mckinnon()
       self@FunctionND(int32(2));
-      self.exact_solutions = [ 0; -1];     % one known solution 
+      self.exact_solutions = [ 0; -1];     % one known solution
       self.guesses         = [ 1; 1];
       self.tau   = 2.0;
       self.theta = 6.0;
       self.phi   = 60.0;
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function f = eval(self,x)
       % evaluate function
       self.check_x(x);
@@ -84,7 +84,7 @@ classdef mckinnon < FunctionND
         f  = self.theta * t1 + x(2) * (1 + x(2));
       end
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function g = grad( self, x )
       % use analitic gradient
       self.check_x(x);
@@ -99,7 +99,7 @@ classdef mckinnon < FunctionND
        g(2) = 1 + (2 * x(2));
       end
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function h = hessian( self, x )
       % use analitic hessian
       self.check_x(x);
@@ -124,5 +124,17 @@ classdef mckinnon < FunctionND
         h(2,2) = 2;
       end
     end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function [f,g] = eval_FG( self, x )
+      f = self.eval(x);
+      g = self.grad(x);
+    end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function [f,g,H] = eval_FGH( self, x )
+      f = self.eval(x);
+      g = self.grad(x);
+      H = self.hessian(x);
+    end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
 end

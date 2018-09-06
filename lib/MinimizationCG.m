@@ -35,7 +35,6 @@ classdef MinimizationCG < MinimizationND
   properties (SetAccess = private, Hidden = true)
     method          % selected nonliner CG method
     method_names    % list of available methods
-    direction_short %
     angle_too_small %
   end
 
@@ -358,7 +357,6 @@ classdef MinimizationCG < MinimizationND
         'aPRP', 'PRP','PRP+' ...
       };
       self.method          = self.method_names{1};
-      self.direction_short = 1e-3;
       self.angle_too_small = cos(pi/2+pi/180); % 90-1 degree
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -395,38 +393,37 @@ classdef MinimizationCG < MinimizationND
       end
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    function [xs,converged] = minimize( self, x0 )
+    function [x,converged] = minimize( self, x0 )
       % generic onjugate gradient minimization algorithm
       % x0 = initial point
       %
-      xs        = x0;
+      x         = x0;
       alpha     = 1;
       converged = false;
       if self.debug_state
-        self.x_history = [];
+        self.x_history = x(:);
       end
       %
       for iter=1:self.max_iter
-        if self.debug_state
-          self.x_history = [self.x_history, x0(:)];
-        end
         %
         % gradient of the function
-        g1 = self.funND.grad( xs ).';
+        g1 = self.funND.grad( x ).';
         %
         % check if converged
-        nrm_g1    = norm(g1,inf);
-        converged = nrm_g1 < self.tol;
+        norm_inf_g1 = norm(g1,inf);
+        converged = norm_inf_g1 < self.tol;
         if converged
           if self.debug_state
-            fprintf(1,'solution found, ||grad f||_inf = %g < %g\n', nrm_g1, self.tol );
+            fprintf('solution found, ||grad f||_inf = %g < %g (tolerance)\n', ...
+                     norm_inf_g1, self.tol );
           end
           break;
         end
         %
         % only for debug
         if self.debug_state
-          fprintf(1,'iter = %5d ||grad f||_inf = %12.6g ...', iter, nrm_g1 );
+          fprintf('[%s] iter = %5d ||grad f||_inf = %12.6g ...', ...
+                  self.method, iter, norm_inf_g1 );
         end
         %
         % build search direction
@@ -435,23 +432,19 @@ classdef MinimizationCG < MinimizationND
           d = -g1; % first iteration, search direction is -gradient
         elseif abs(dot(g0,g1)) >= 0.2 * dot(g1,g1) % check restart criteria of Powell
           if self.debug_state
-            fprintf(1,'Powell restart criteria, reset direction search, ...' );
+            fprintf(' [Powell restart] ' );
           end
           d = -g1; % reset direction
         else
           d = self.dirEval( g1, g0, d, s ); % s = x1 - x0 last step!
-          % check if the direction is descending, if direction is >= 89 degree from gradient reset to gradient directions
+          % check if the direction is descending,
+          % if direction is >= 89 degree from gradient reset to gradient directions
           % use >= to catch d == 0
-          nrm_d  = norm(d);
-          nrm_g1 = norm(g1);
-          if dot( d, -g1 ) <= nrm_d * nrm_g1 * self.angle_too_small
+          norm_2_d  = norm(d);
+          norm_2_g1 = norm(g1);
+          if dot( d, -g1 ) <= norm_2_d * norm_2_g1 * self.angle_too_small
             if self.debug_state
-              fprintf(1,'direction angle about 90 degree, reset direction search, ...' );
-            end
-            d = -g1; % reset direction
-          elseif nrm_d <= self.direction_short * nrm_g1
-            if self.debug_state
-              fprintf(1,'direction length too short, reset direction search, ...' );
+              fprintf(1,' [angle ~90, reset] ' );
             end
             d = -g1; % reset direction
           end
@@ -462,11 +455,11 @@ classdef MinimizationCG < MinimizationND
         end
         %
         % minimize along search direction
-        [xs,alpha,ok] = self.step1D( xs, d, alpha );
+        [ x, alpha, ok ] = self.step1D( x, d, 10*alpha );
         if ~ok
           % step failed try to use gradient direction
           d = -g1;
-          [xs,alpha,ok] = self.step1D( xs, d, alpha );
+          [x,alpha,ok] = self.step1D( x, d, alpha );
           if ~ok
             % cannot advance see if accept a low precision solution
             warning('MinimizationCG, step1D failed');
@@ -478,7 +471,7 @@ classdef MinimizationCG < MinimizationND
           fprintf(1,' alpha = %8.4g\n', alpha);
         end
         %
-        % save old gradient and step
+        % save old gradient and old step
         g0 = g1;
         s  = alpha*d;
       end

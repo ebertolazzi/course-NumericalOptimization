@@ -2,7 +2,7 @@ include("../libj/FunctionND.jl")
 N = 2
 M = 1
 #exact_solutions = zeros(2,1)
-#guesses         = [ 5 ; 3 ]
+#guesses         = [ 5; 3 ]
 function Han()
       return x -> x
 end

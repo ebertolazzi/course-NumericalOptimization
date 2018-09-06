@@ -19,11 +19,11 @@ end
     #   %
     #   % fun = function to be minimized
     #   % ls  = linesearch used, can be LinesearchArmijo, LinesearchWolfe, LinesearchGoldenSection
-    #   self@MinimizationND( fun, ls ) ;
-    #   self.method_names    = {'GRAD','HS','HS+','FR','PRP','PRP+','CD','LS','DY','N','HyTAS','HyHS','HyNG','HyDY'} ;
-    #   self.method          = self.method_names{1} ;
-    #   self.direction_short = 1e-3 ;
-    #   self.angle_too_small = pi/180 ; % 1 degree
+    #   self@MinimizationND( fun, ls );
+    #   self.method_names    = {'GRAD','HS','HS+','FR','PRP','PRP+','CD','LS','DY','N','HyTAS','HyHS','HyNG','HyDY'};
+    #   self.method          = self.method_names{1};
+    #   self.direction_short = 1e-3;
+    #   self.angle_too_small = pi/180; % 1 degree
     # end
 direction_short = 1e-3
 angle_too_small = pi/180

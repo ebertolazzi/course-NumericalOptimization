@@ -33,7 +33,7 @@ method = "GRAD"
 #method = "PRP"
 #debug_state = true
 debug_state = false
-#minimization_method = MinimizationCG( r, search_method ) ;
+#minimization_method = MinimizationCG( r, search_method );
 #minimization_method.selectByName(method);
 #minimization_method.setMaxIteration( int32(1000) );
 #minimization_method.setTolerance(1e-6);

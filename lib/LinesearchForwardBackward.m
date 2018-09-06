@@ -6,7 +6,7 @@
 classdef LinesearchForwardBackward < handle
   % This class is the base class for a generic linesearch
 
-  properties (SetAccess = private, Hidden = true)
+  properties (SetAccess = protected, Hidden = true)
     fun1D        % Object used in the linesearch that contains the methods
                  % f(alpha)   = fun1D.eval(alpha)
                  % f'(alpha)  = fun1D.eval_D(alpha)
@@ -17,12 +17,14 @@ classdef LinesearchForwardBackward < handle
     tau_acc      % modify tau to accelerate exploration for large or very small interval
     alpha_min    % minimum accepted step
     alpha_max    % maximum accepted step
+    barrier_reduce
     dumpMin      % minimum dumping factor
     dumpMax      % maximum dumping factor
     alpha_epsi   % minimum interval lenght for Wolfe linesearch
     debug_status % if true activate debug messages
     f0           % stored value f(0)
     Df0          % stored value f'(0)
+    c1Df0        % stored value max(c1*f'(0),slopemax)
     name         % name of linesearch, set by the serived classed
   end
 
@@ -32,17 +34,18 @@ classdef LinesearchForwardBackward < handle
       %
       % constructor
       %
-      self.c1           = 0.05;
-      self.c2           = 0.2;
-      self.tau_LS       = 1.5;
-      self.tau_acc      = 1.2;
-      self.alpha_min    = 1e-50;
-      self.alpha_max    = 1e50;
-      self.dumpMin      = 0.05;
-      self.dumpMax      = 0.95;
-      self.alpha_epsi   = eps^(1/3);
-      self.debug_status = false;
-      self.name         = name;
+      self.c1             = 0.1;
+      self.c2             = 0.2;
+      self.tau_LS         = 1.1;
+      self.tau_acc        = 1.2;
+      self.alpha_min      = 1e-50;
+      self.alpha_max      = 1e50;
+      self.barrier_reduce = 1e-3;
+      self.dumpMin        = 0.05;
+      self.dumpMax        = 0.95;
+      self.alpha_epsi     = eps^(1/3);
+      self.debug_status   = false;
+      self.name           = name;
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function setFunction( self, fun1D )
@@ -103,6 +106,10 @@ classdef LinesearchForwardBackward < handle
       end
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function y = ArmijoSlope( self, x )
+      y = self.f0+self.c1Df0*x;
+    end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function setDump( self, d1, d2 )
       % set dumping coefficients for Zoom
       if d1 > 0.4
@@ -137,171 +144,157 @@ classdef LinesearchForwardBackward < handle
       self.plot(alpha_guess/10);
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    %                         _           _   _
-    %    __ _ _   _  __ _  __| |_ __ __ _| |_(_) ___
-    %   / _` | | | |/ _` |/ _` | '__/ _` | __| |/ __|
-    %  | (_| | |_| | (_| | (_| | | | (_| | |_| | (__
-    %   \__, |\__,_|\__,_|\__,_|_|  \__,_|\__|_|\___|
-    %      |_|
+    %                     _          _   _
+    %   __ _ _  _ __ _ __| |_ _ __ _| |_(_)__
+    %  / _` | || / _` / _` | '_/ _` |  _| / _|
+    %  \__, |\_,_\__,_\__,_|_| \__,_|\__|_\__|
+    %     |_|
     %
     function alpha = quadratic( ~, f0, Df0, fp, p )
       alpha = Df0 * p^2 / ( 2*(f0+Df0*p-fp) );
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    function [alpha0,alpha1,fa0,fa1,ierr] = ForwardBackward( self, alpha_guess )
+    %   ___                           _ ___          _                       _
+    %  | __|__ _ ___ __ ____ _ _ _ __| | _ ) __ _ __| |____ __ ____ _ _ _ __| |
+    %  | _/ _ \ '_\ V  V / _` | '_/ _` | _ \/ _` / _| / /\ V  V / _` | '_/ _` |
+    %  |_|\___/_|  \_/\_/\__,_|_| \__,_|___/\__,_\__|_\_\ \_/\_/\__,_|_| \__,_|
+    %
+    function [LO,HI,ierr] = ForwardBackward( self, alpha_guess )
       % find alpha_min <= alpha0 < alpha1 <= alpha_max such that
       % alpha0 satify Armijo and alpha1 DO NOT satisfy Armijo
-      % ierr = 0  interval found
-      % ierr = 1  both alpha0, alpha1 satisfy Armijo f(alpha0) <  f(alpha1)
-      % ierr = 2  both alpha0, alpha1 satisfy Armijo f(alpha0) >= f(alpha1)
+      % ierr =  0 interval found
+      % ierr =  1 both alpha0, alpha1 satisfy Armijo f(alpha0) <  f(alpha1)
+      % ierr =  2 both alpha0, alpha1 satisfy Armijo f(alpha0) >= f(alpha1)
       % ierr = -1 both alpha0, alpha1 DO NOTY satisfy Armijo
       % ierr = -2 Df0 >= 0
+      % ierr = -3 f0 infinite or NaN
+      % ierr = -4 step too small <= alpha_min
 
-      % correct alpha_guess into the required interval
-      alpha0   = max(self.alpha_min,min(self.alpha_max,alpha_guess));
+      sname = sprintf( 'Linesearch[%s]::ForwardBackward: ', self.name );
+
       % compute initial value and derivative
-      f        = @(a) self.fun1D.eval(a);
-      df       = @(a) self.fun1D.eval_D(a);
-      self.f0  = f(0);
-      self.Df0 = df(0);
-      % if not decreasing issue an error (if in debug also plot the function)
-      if (self.Df0 >= 0)
-        if self.debug_status
-          self.plotDebug(alpha_guess);
-          error('Linesearch[%s]::ForwardBackward, Df0 = %g must be negative\n',self.name,self.Df0 );
-        else
-          ierr   = -2;
-          alpha0 = 0;
-          alpha1 = 0;
-          fa0    = 0;
-          fa1    = 0;
-          warning('Linesearch[%s]::ForwardBackward, Df0 = %g must be negative\n',self.name,self.Df0 );
-        end
-        return;
-      end
-      % if Df0 too big cut it
-      self.Df0 = max( self.Df0, -1e10 );
+      f          = @(a) self.fun1D.eval(a);
+      df         = @(a) self.fun1D.eval_D(a);
+      self.f0    = f(0);
+      self.Df0   = df(0);
+      self.c1Df0 = 0;
 
-      % initialize search parameters
-      c1Df0 = self.c1*self.Df0;
-      tauf  = self.tau_LS;
-      ierr  = 0;
-      % decide if do forward or backward search
-      fa0 = f(alpha0);
-      if (fa0-self.f0) <= alpha0 * c1Df0
-        % satisfy Armijo --> forward search
-
-        % if increasing minima in [0,alpha0]
-        if df(alpha0) >= 0
-          alpha1 = alpha0; fa1 = fa0;
-          alpha0 = 0;      fa0 = self.f0;
-          ierr = 1;
-          return;
-        end
-
-        % not increasing search next interval
-        alpha1 = tauf * alpha0; fa1 = f(alpha1);
-        % continue to loop until satify Armijo and is non increasing
-        while true
-          % check if found point that violates Armijo
-          if (fa1-self.f0) > alpha1 * c1Df0; return; end
-          % if increasing break
-          if fa1 > fa0;       ierr = 1; return; end
-          if df(alpha1) >= 0; ierr = 2; return; end
-
-          % check if interval become too large
-          if tauf * alpha0 >= self.alpha_max
-            % last interval to check
-            alpha0 = alpha1;         fa0 = fa1;
-            alpha1 = self.alpha_max; fa1 = f(alpha1);
-            if fa1 > self.f0 + alpha1 * c1Df0; return; end % found!
-            if fa1 > fa0; ierr = 1; else ierr = 2; end
-            return;
-          end
-          % prepare for next interval
-          alpha0 = alpha1;        fa0 = fa1;
-          alpha1 = tauf * alpha0; fa1 = f(alpha1);
-          tauf   = tauf * self.tau_acc; % update tau factor
-        end
-        % never pass here
-      else
-        % DO NOT satisfy Armijo --> backward search
-        alpha1 = alpha_guess; fa1 = fa0;
-        alpha0 = alpha1/tauf; fa0 = f(alpha0);
-        while (fa0-self.f0) > alpha0 * c1Df0 % DO NOT satisfy Armijo
-          alpha1 = alpha0; fa1 = fa0;
-          if alpha1 <= self.alpha_min * tauf
-            % force termination, last check
-            alpha0 = self.alpha_min; fa0 = f(alpha0);
-            if (fa0-self.f0) > alpha0 * c1Df0; ierr = -1; end
-            return;
-          end
-          alpha0 = alpha1/tauf; fa0 = f(alpha0);
-          tauf   = tauf * self.tau_acc; % update tau factor
-        end
-        % exiting from loop satisfying Armijo
-      end
-    end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    function [alpha,ok] = Zoom( self, aLO, fLO, aHI, fHI, strongWolfe )
-      % refine approximate minimum until it satisfy Wolfe condition
-
-      f  = @(a) self.fun1D.eval(a);
-      df = @(a) self.fun1D.eval_D(a);
-
-      self.f0  = self.fun1D.eval(0.0);
-      self.Df0 = self.fun1D.eval_D(0.0);
-
-      c1Df0 = self.c1 * self.Df0;
-      c2Df0 = self.c2 * self.Df0;
-
-      % check if aLo satisfy wolfe condition
-      DfLO = df(aLO);
-      if DfLO >= c2Df0 && ( ~strongWolfe || DfLO <= -c2Df0 )
-        alpha = aLO;
-        ok    = true;
+      % check initial point
+      if ~isfinite(self.f0)
+        ierr     = -3;
+        LO.alpha = 0;
+        LO.f     = 0;
+        LO.Df    = 0;
+        HI       = LO;
+        warning('%sf(0) = %g and f''(0) = %g must be a regular number\n', ...
+                 sname, self.f0, self.Df0 );
         return;
       end
 
-      %   ____  _____ _____ ___ _   _ _____
-      %  |  _ \| ____|  ___|_ _| \ | | ____|
-      %  | |_) |  _| | |_   | ||  \| |  _|
-      %  |  _ <| |___|  _|  | || |\  | |___
-      %  |_| \_\_____|_|   |___|_| \_|_____|
+      % if not decreasing return an error
+      if self.Df0 >= 0
+        ierr     = -2;
+        LO.alpha = 0;
+        LO.f     = 0;
+        LO.Df    = 0;
+        HI       = LO;
+        warning( '%sDf0 = %g must be negative\n', sname, LO.Df );
+        return;
+      end
+
+      ierr = 0;
+
+      % if fa1 DO NOT satisfy Armijo --> backward search
+      self.c1Df0 = self.c1*self.Df0;
+      HI.alpha   = 0;
+      HI.f       = self.f0;
+      HI.Df      = self.Df0;
+      LO.alpha   = max(self.alpha_min,min(self.alpha_max,alpha_guess));
+      LO.f       = f(LO.alpha);
+      LO.Df      = df(LO.alpha);
+      tauf       = self.tau_LS;
+      armijo_ok  = false;
+      while LO.alpha > self.alpha_min
+        if isfinite(LO.f)
+          armijo_ok = LO.f <= self.f0 + LO.alpha * self.c1Df0;
+          if armijo_ok; break; end % satisfy Armijo condition
+          if LO.f < self.f0 && LO.Df > 0
+            break; % the interval contains a minimum
+          end
+        end
+        % next point
+        HI       = LO;
+        LO.alpha = max(LO.alpha/tauf,self.alpha_min);
+        LO.f     = f(LO.alpha);
+        LO.Df    = df(LO.alpha);
+        tauf     = tauf * self.tau_acc; % update tau factor
+      end
       %
-
-      Delta    = aHI - aLO;
-      minDelta = Delta * self.alpha_epsi;
-
-      while abs(Delta) > minDelta
-        deltaLambda = self.quadratic( fLO, DfLO, fHI, Delta );
-        if Delta > 0
-          deltaLambda = min( Delta*self.dumpMax, max( Delta*self.dumpMin, deltaLambda ));
-        else
-          deltaLambda = max( Delta*self.dumpMax, min( Delta*self.dumpMin, deltaLambda ));
-        end
-
-        alpha = aLO + deltaLambda; fa = f(alpha);
-
-        if fa > self.f0 + alpha*c1Df0 || fa > fLO
-          aHI = alpha; fHI = fa;
-        else
-          Dfa = df(alpha);
-          if Dfa >= c2Df0 && ( ~strongWolfe || Dfa <= -c2Df0 )
-            ok = true;
-            return; % found Wolfe point
-          end
-          % choose left or right interval
-          if Dfa*(aLO-alpha) < 0
-            aHI = aLO; fHI = fLO;
-          end
-          aLO = alpha; fLO = fa; DfLO = Dfa;
-        end
-        Delta = aHI - aLO;
+      if LO.alpha <= self.alpha_min
+        ierr = -4;
+        warning( '%sstep too small\n', sname );
+        return;
       end
-      ok    = false;
-      alpha = aLO;
-      warning( 'Linesearch[%s] (Zoom): failed aHI=%g aLO=%g DfLO=%g\n', self.name, aHI, aLO, DfLO );
+      %
+      if armijo_ok
+        if HI.alpha < LO.alpha
+          % satisfy armijo at first step, try to enlarge interval
+          HI       = LO;
+          LO.alpha = 0;
+          LO.f     = self.f0;
+          LO.Df    = self.Df0;
+          tauf     = self.tau_LS;
+          %
+          N = HI;
+          while N.alpha < self.alpha_max && ...
+                (N.f <= self.f0 + N.alpha * self.c1Df0) && ...
+                (N.Df+self.c1Df0 < 0)
+            LO       = HI;
+            HI       = N;
+            N.alpha  = tauf * N.alpha;
+            N.f      = f(N.alpha);
+            N.Df     = df(N.alpha);
+            tauf     = tauf * self.tau_acc; % update tau factor
+          end
+          %
+          return;
+        elseif LO.Df >= 0
+          % minimum in [0,LO.alpha]
+          HI       = LO;
+          LO.alpha = 0;
+          LO.f     = self.f0;
+          LO.Df    = self.Df0;
+          return;
+        elseif ~isfinite(HI.f)
+          % minimum in [LO.alpha,HI.alpha] but interval must be reduced
+          dAlphaMin = max( self.barrier_reduce * (HI.alpha-LO.alpha), self.alpha_min );
+          % search for a finite value
+          while ~isfinite(HI.f) && HI.alpha-LO.alpha > dAlphaMin
+            tmp.alpha = (LO.alpha+HI.alpha)/2;
+            tmp.f     = f(tmp.alpha);
+            tmp.Df    = df(tmp.alpha);
+            if isfinite(tmp.f) && ...
+               tmp.f <= self.f0 + tmp.alpha * self.c1Df0 && ...
+               tmp.Df < 0
+              LO = tmp;
+            else
+              HI = tmp;
+            end
+          end
+        else
+          % HI.f is finite and LO.Df < 0 minimum in [LO.alpha,HI.alpha]
+        end
+        return;
+      end
+      %
+      % at this point
+      % LO.f < self.f0 && LO.Df > 0;
+      % minimum in [0,LO.alpha]
+      HI       = LO;
+      LO.alpha = 0;
+      LO.f     = self.f0;
+      LO.Df    = self.Df0;
+
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function plot( self, alpha_max )

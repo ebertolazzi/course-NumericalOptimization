@@ -22,13 +22,13 @@ classdef Powell3D < FunctionND
   %
 
   methods
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = Powell3D()
       self@FunctionND(int32(3));
       self.exact_solutions = ones(3,1); % one known solution
       self.guesses         = [ 0.0; 1.0; 2.0 ];
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function f = eval(self,X)
       % evaluate function
       self.check_x(X);
@@ -50,7 +50,7 @@ classdef Powell3D < FunctionND
         - sin ( 0.5 * pi * y * z ) ...
         - term;
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function g = grad( self, X )
       % use analitic gradient
       self.check_x(X);
@@ -74,7 +74,7 @@ classdef Powell3D < FunctionND
         g(3) = g(3) - tmp2;
       end
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function h = hessian( self, X )
       % use analitic hessian
       self.check_x(X);
@@ -127,5 +127,17 @@ classdef Powell3D < FunctionND
       h(3,1) = h(1,3);
       h(3,2) = h(2,3);
     end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function [f,g] = eval_FG( self, x )
+      f = self.eval(x);
+      g = self.grad(x);
+    end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function [f,g,H] = eval_FGH( self, x )
+      f = self.eval(x);
+      g = self.grad(x);
+      H = self.hessian(x);
+    end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
 end

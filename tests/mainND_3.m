@@ -18,13 +18,13 @@ case 'Rosen'
   r = Rosenbrock();
   disp(r.arity());
   r.contour([-1.5 1.5],[-0.4 1.5],@(z) log(1+z), 80)
-  axis equal ;
+  axis equal;
   x0 = r.guess(int32(1));
 case 'Bro'
   r = Brown_bsf();
   disp(r.arity());
   r.contour( [10^6 -2000,10^6 + 2000],[-1000,1000],@(z) log(1+z), 80)
-  axis equal ;
+  axis equal;
   x0 = r.guess(int32(1));
 case 'SchafferF6'
   r = SchafferF6();
@@ -36,25 +36,25 @@ case 'Boha1'
   r = BohachevskyN1();
   disp(r.arity());
   r.contour([-4 4],[-4 4],@(z) log(1+z), 80)
-  axis equal ;
+  axis equal;
   x0 = r.guess(int32(1));
 case 'Boha2'
   r = BohachevskyN2();
   disp(r.arity());
   r.contour([-4 4],[-4 4],@(z) log(1+z), 80)
-  axis equal ;
+  axis equal;
   x0 = r.guess(int32(1));
 case 'Boha3'
   r = BohachevskyN3();
   disp(r.arity());
   r.contour([-4 4],[-4 4],@(z) log(1+z), 80)
-  axis equal ;
+  axis equal;
   x0 = r.guess(int32(1));
 case 'Hilb'
   r = Hilbert();
   disp(r.arity());
   r.contour([-4 4],[-4 4],@(z) log(1+z), 80)
-  axis equal ;
+  axis equal;
   x0 = r.guess(int32(1));
 end
 
@@ -85,6 +85,3 @@ fprintf('       %d\n',xs)
 exact = r.exact_solutions;
 fprintf('\nThe analytical solution is:\n');
 fprintf('       %d\n',exact)
-
-
-

@@ -2,19 +2,21 @@ classdef (Abstract) FunctionND < handle
 
   properties (SetAccess = protected, Hidden = true)
     N                      % arity of the function
-    exact_solutions        % matrix N x dim with all the known solutions. dim can be 0 if no known solution arer available 
+    exact_solutions        % matrix N x dim with all the known solutions. dim can be 0 if no known solution arer available
     guesses                % matrix N x dim with suggested inital guess used for testing.
     approximated_solutions % matrix N x dim with the know solutions approximated
   end
 
   methods (Abstract)
-    y = eval( self, x )
-    J = grad( self, x )
-    H = hessian( self, x )
+    f       = eval( self, x )     % function value
+    g       = grad( self, x )     % function gradient
+    H       = hessian( self, x )  % function Hessian
+    [f,g]   = eval_FG( self, x )  % function value and gradient
+    [f,g,H] = eval_FGH( self, x ) % function value, gradient and Hessian
   end
 
   methods
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = FunctionND( N )
       % Constructor of base (abstract) class
       if ~isinteger(N)
@@ -23,7 +25,7 @@ classdef (Abstract) FunctionND < handle
       if N <= 0
         error('FunctionND: argument must be a positive integer, found %d',N);
       end
-      self.N = N;
+      self.N               = int32(N);
       self.guesses         = zeros(N,0); % no inital guess
       self.exact_solutions = zeros(N,0); % no exact solutions
     end
@@ -33,14 +35,11 @@ classdef (Abstract) FunctionND < handle
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function g = guess( self, idx )
-      if ~isscalar(idx)
-        error('FunctionND:guess, argument must be a scalar, found %s',class(idx));
-      end
-      if floor(idx) ~= idx
-        error('FunctionND:guess, argument must be an integer, found %g',idx);
+      if ~isinteger(idx)
+        error('FunctionND:guess argument must be an integer, found %s',class(idx));
       end
       if idx < 1 || idx > size(self.guesses,2)
-        error('FunctionND:guess, argument must be an integer in [1,%d] found %s',size(self.guesses,2),idx);
+        error('FunctionND:guess, argument must be a positive integer <= %d found %d',size(self.guesses,2),idx);
       end
       g = double(self.guesses(:,idx));
     end
@@ -50,11 +49,8 @@ classdef (Abstract) FunctionND < handle
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function e = exact( self, idx )
-      if ~isscalar(idx)
-        error('FunctionND:exact, argument must be a scalar, found %s',class(idx));
-      end
-      if floor(idx) ~= idx
-        error('FunctionND:exact, argument must be an integer, found %g',idx);
+      if ~isinteger(idx)
+        error('FunctionND:exact argument must be an integer, found %s',class(idx));
       end
       if idx < 1 || idx > size(self.exact_solutions,2)
         error('FunctionND:exact, argument must be an integer in [1,%d] found %s',size(self.exact_solutions,2),idx);
@@ -125,7 +121,7 @@ classdef (Abstract) FunctionND < handle
       H = 0.5*(H+H.');
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    function contour( self, xmm, ymm, fz, nc )
+    function contour( self, xmm, ymm, nc )
       % plot 2D contour of the function
       if self.N ~= 2
         error('FunctionND:contour can be used only for 2D functions');
@@ -141,11 +137,15 @@ classdef (Abstract) FunctionND < handle
       Z = zeros(NX,NY);
       for i=1:NX
         for j=1:NY
-         XY = [ X(i,j); Y(i,j) ];
+         XY     = [ X(i,j); Y(i,j) ];
          Z(i,j) = self.eval(XY);
         end
       end
-      contour(X,Y,feval(fz,Z-min(min(Z))),nc);
+      idx = find(isfinite(Z));
+      miZ = min(min(Z(idx)));
+      maZ = max(max(Z(idx)));
+      Z   = (Z-miZ)/(maZ-miZ);
+      contour(X,Y,log(1+Z),nc);
     end
   end
 end

@@ -21,7 +21,7 @@ classdef BraninRCOS < FunctionND
   %
 
   methods
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = BraninRCOS()
       self@FunctionND(int32(2));
       self.exact_solutions = [ -pi, 12.275;
@@ -29,7 +29,7 @@ classdef BraninRCOS < FunctionND
                                 9.42478, 2.475 ].'; % 3 known solutions
       self.guesses = [ -1.0; 1.0 ];
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function f = eval(self,x)
       % evaluate function
       self.check_x(x);
@@ -41,9 +41,11 @@ classdef BraninRCOS < FunctionND
       c = 5.0 / pi;
       ff = 1.0 / ( 8.0 * pi );
 
-      f = a * ( x(2) - b * x(1)^2 + c * x(1) - d )^2 + e * ( 1.0 - ff ) * cos ( x(1) ) + e;
+      f = a * ( x(2) - b * x(1)^2 + ...
+          c * x(1) - d )^2 + ...
+          e * ( 1.0 - ff ) * cos ( x(1) ) + e;
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function g = grad( self, x )
       % use analitic gradient
       self.check_x(x);
@@ -62,7 +64,7 @@ classdef BraninRCOS < FunctionND
       g(1) = tmp * ( c - 2 * b * x(1) ) - e * ( 1.0 - ff ) * sin ( x(1) );
       g(2) = tmp;
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function h = hessian( self, x )
       % use analitic hessian
       self.check_x(x);
@@ -77,10 +79,24 @@ classdef BraninRCOS < FunctionND
 
       tmp = c - 2.0 * b * x(1);
 
-      h(1,1) = 2.0 * a * tmp^2 - 4.0 * a * b * ( x(2) - b * x(1)^2 + c * x(1) - d ) - e * ( 1.0 - ff ) * cos ( x(1) );
+      h(1,1) = 2.0 * a * tmp^2 ...
+             - 4.0 * a * b * ( x(2) - b * x(1)^2 + c * x(1) - d ) ...
+             - e * ( 1.0 - ff ) * cos ( x(1) );
       h(1,2) = 2.0 * a * tmp;
       h(2,1) = h(1,2);
       h(2,2) = 2.0 * a;
     end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function [f,g] = eval_FG( self, x )
+      f = self.eval(x);
+      g = self.grad(x);
+    end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function [f,g,H] = eval_FGH( self, x )
+      f = self.eval(x);
+      g = self.grad(x);
+      H = self.hessian(x);
+    end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
 end

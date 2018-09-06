@@ -29,13 +29,13 @@ classdef GoldsteinPrice < FunctionND
   %
 
   methods
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = GoldsteinPrice()
       self@FunctionND(int32(2));
       self.exact_solutions = [ 0; -1 ];     % one known solution
       self.guesses         = [ -0.5; +0.25];
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function f = eval(self,x)
       % evaluate function
       self.check_x(x);
@@ -45,7 +45,7 @@ classdef GoldsteinPrice < FunctionND
       d = 18.0 - 32.0 * x(1) + 12.0 * x(1) * x(1) + 48.0 * x(2) - 36.0 * x(1) * x(2) + 27.0 * x(2) * x(2);
       f = ( 1.0 + a * a * b ) * ( 30.0 + c * c * d );
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function g = grad( self, x )
       % use analitic gradient
       self.check_x(x);
@@ -67,7 +67,7 @@ classdef GoldsteinPrice < FunctionND
       g(1) = ( 1.0 + a^2 * b ) * ( 4.0 * c * d + c^2 * dddx1 ) + ( 2.0 * a * b + a^2 * dbdx1 ) * ( 30.0 + c^2 * d );
       g(2) = ( 1.0 + a^2 * b ) * ( -6.0 * c * d + c^2 * dddx2 ) + ( 2.0 * a * b + a^2 * dbdx2 ) * ( 30.0 + c^2 * d );
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function h = hessian( self, x )
       % use analitic hessian
       self.check_x(x);
@@ -104,5 +104,17 @@ classdef GoldsteinPrice < FunctionND
         + ( 2.0 * b + 2.0 * a * e + 2.0 * a * e + 6.0 * a^2 ) ...
         * ( 30.0 + c^2 * d );
     end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function [f,g] = eval_FG( self, x )
+      f = self.eval(x);
+      g = self.grad(x);
+    end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function [f,g,H] = eval_FGH( self, x )
+      f = self.eval(x);
+      g = self.grad(x);
+      H = self.hessian(x);
+    end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
 end

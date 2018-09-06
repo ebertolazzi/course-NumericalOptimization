@@ -38,12 +38,12 @@ classdef Function1Dcut < Function1D
       self.FD_D = true;
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    function use_FD_DD( self )
-      self.FD_D = true;
-    end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function no_FD_D( self )
       self.FD_D = false;
+    end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function use_FD_DD( self )
+      self.FD_D = true;
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function no_FD_DD( self )
@@ -72,6 +72,17 @@ classdef Function1Dcut < Function1D
         H   = self.funND.hessian( self.x0 + alpha * self.d );
         res = dot( H * self.d, self.d );
       end
+    end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function [f,g] = eval_FG( self, x )
+      f = self.eval(x);
+      g = self.eval_D(x);
+    end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function [f,g,H] = eval_FGH( self, x )
+      f = self.eval(x);
+      g = self.eval_D(x);
+      H = self.eval_DD(x);
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end

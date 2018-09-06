@@ -20,13 +20,13 @@ classdef DeJongF4 < FunctionND
   %
 
   methods
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = DeJongF4()
       self@FunctionND(int32(30));
       self.exact_solutions = zeros( 30, 1 );     % one known solution
       self.guesses         = ( linspace ( -1.28, +1.28, 30 ) )';
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function f = eval(self,x)
       % evaluate function
       self.check_x(x);
@@ -35,7 +35,7 @@ classdef DeJongF4 < FunctionND
         f = f + i * x(i)^4;
       end
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function g = grad( self, x )
       % use analitic gradient
       self.check_x(x);
@@ -44,7 +44,7 @@ classdef DeJongF4 < FunctionND
         g(i) = i * 4.0 * x(i)^3;
       end
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function h = hessian( self, x )
       % use analitic hessian
       self.check_x(x);
@@ -53,5 +53,17 @@ classdef DeJongF4 < FunctionND
         h(i,i) = i * 12.0 * x(i)^2;
       end
     end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function [f,g] = eval_FG( self, x )
+      f = self.eval(x);
+      g = self.grad(x);
+    end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function [f,g,H] = eval_FGH( self, x )
+      f = self.eval(x);
+      g = self.grad(x);
+      H = self.hessian(x);
+    end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
 end

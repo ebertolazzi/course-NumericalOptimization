@@ -21,8 +21,8 @@ function ForwardBackward( funct, x0, d, alpha_guess )
       # correct alpha_guess into the required interval
       alpha0 = max(alpha_min,min(alpha_max,alpha_guess))
       # compute initial value and derivative
-      #f        = @(a) self.fun1D.eval(a) ;
-      #df       = @(a) self.fun1D.eval_D(a) ;
+      #f        = @(a) self.fun1D.eval(a);
+      #df       = @(a) self.fun1D.eval_D(a);
       f0  = eval_1Dcut( funct, x0, d, 0.0 )
       Df0 = eval_D( funct, x0, d, 0.0)
       #println("f(0) = ", f0)
@@ -143,8 +143,8 @@ function Zoom( funct, x0, d, aLO, fLO, aHI, fHI, strongWolfe )
  # Df0 = self.fun1D.eval_D(0)
   f0  = eval_1Dcut( funct, x0, d, 0.0 )
   Df0 = eval_D( funct, x0, d, 0.0)
-  c1Df0 = c1 * Df0 ;
-  c2Df0 = c2 * Df0 ;
+  c1Df0 = c1 * Df0;
+  c2Df0 = c2 * Df0;
 
   # check if aLo satisfy wolfe condition
   DfLO = eval_D( funct, x0, d, aLO)
@@ -167,9 +167,9 @@ function Zoom( funct, x0, d, aLO, fLO, aHI, fHI, strongWolfe )
 
     deltaLambda = quadratic( fLO, DfLO, fHI, Delta )
     if Delta > 0
-      deltaLambda = min( Delta*dumpMax, max( Delta*dumpMin, deltaLambda )) ;
+      deltaLambda = min( Delta*dumpMax, max( Delta*dumpMin, deltaLambda ));
     else
-      deltaLambda = max( Delta*dumpMax, min( Delta*dumpMin, deltaLambda )) ;
+      deltaLambda = max( Delta*dumpMax, min( Delta*dumpMin, deltaLambda ));
     end
 
     alpha = aLO + deltaLambda

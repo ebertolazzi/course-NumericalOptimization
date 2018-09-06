@@ -21,8 +21,8 @@ function ForwardBackward( f, alpha_guess )
       # correct alpha_guess into the required interval
       alpha0 = max(alpha_min,min(alpha_max,alpha_guess))
       # compute initial value and derivative
-      #f        = @(a) self.fun1D.eval(a) ;
-      #df       = @(a) self.fun1D.eval_D(a) ;
+      #f        = @(a) self.fun1D.eval(a);
+      #df       = @(a) self.fun1D.eval_D(a);
       f0  = y(f, 0)
       Df0 = Dy(f, 0)
       #println("f(0) = ", f0)

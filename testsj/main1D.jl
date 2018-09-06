@@ -15,7 +15,7 @@ f = FunMia()
 
 #a,b = minimize(minfunct, [π,2*π])
 a,b = minimize(f, [2,6])
-fa = f(a) ;
+fa = f(a);
 print("function evaluated in ",a , " = ", fa, "\n")
-fb = f(b) ;
+fb = f(b);
 print("function evaluated in ",b , " = ", fb, "\n")
