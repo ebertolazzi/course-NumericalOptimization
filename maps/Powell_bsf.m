@@ -21,14 +21,14 @@ classdef Powell_bsf < FunctionMap
   % Author: Giammarco Valenti - University of Trento
 
   methods
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = Powell_bsf()
       self@FunctionMap(int32(2),int32(2)); %
       %exact_solutions        = [];                % no exacts solution provided
       approximated_solutions  = [1.098e-05,9.106]; % Known approximated solution
       guesses                 = [0;1];            % one guess
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function F = evalMap(self,x)
       % evaluate the entries (not squared) of the
       % Powell badly scaled function.
@@ -36,7 +36,7 @@ classdef Powell_bsf < FunctionMap
       X2 = x(2);
       F = [ (1e04*X1*X2 -1); exp(-X1) + exp(-X2) - 1.0001 ]; % vector of [ f_1(x) ... f_n(x) ] values.
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function J = jacobian( self, x )
       % use analytic jacobian
       self.check_x( x );
@@ -45,7 +45,7 @@ classdef Powell_bsf < FunctionMap
       J = [1e04*X2  ,  1e04*X1;   ...
            -exp(-X1),  -exp(-X2)];
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function T = tensor( self, x )
       % use analytic tensor
       self.check_x( x );
@@ -63,12 +63,10 @@ classdef Powell_bsf < FunctionMap
       % Concatenate the n-matrices of T
       % Dimensions = Function map : first D : second D
       T  = cat(3,T1,T2);
-
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
 end
-
 
 %  #######################################################
 %  #  _______   __  _____ ______ _______ _ ____   _____  #

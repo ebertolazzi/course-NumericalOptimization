@@ -78,7 +78,7 @@ classdef LinesearchWolfe < LinesearchForwardBackward
       end
       ok    = false;
       alpha = aLO;
-      warning( 'Linesearch[%s] (Zoom): failed aHI=%g aLO=%g DfLO=%g\n', self.name, aHI, aLO, DfLO );
+      fprintf(2,'Linesearch[%s] (Zoom): failed aHI=%g aLO=%g DfLO=%g\n', self.name, aHI, aLO, DfLO );
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function [alpha_ott,ok] = search( self, alpha_guess )

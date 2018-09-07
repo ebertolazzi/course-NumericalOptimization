@@ -2,8 +2,8 @@ clear all;
 addpath('../lib');
 addpath('../functions1D');
 
-%FUN = testFun2();
-FUN = testFun3();
+FUN = testFun2();
+%FUN = testFun3();
 %FUN = testFun4();
 
 % initialize Golden Search object m
@@ -22,7 +22,7 @@ hold on;
 
 disp('do golden search');
 %%
-[ LO, HI, ierr ] = m.ForwardBackward( bb/2 );
+[ LO, HI, ierr ] = m.ForwardBackward( bb/3 );
 fprintf('ierr = %d\n',ierr);
 disp(struct2table([LO,HI]));
 

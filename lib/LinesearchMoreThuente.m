@@ -15,7 +15,7 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
   %  function and the gradient.
   %
   %  At each stage the method `search` updates an interval of
-  %  uncertainty with endpoints stx and sty.
+  %  uncertainty with enM.Dfoints LO.alpha and HI.alpha.
   %  The interval of uncertainty is initially chosen so that it
   %  contains a minimizer of the modified function
   %
@@ -70,207 +70,211 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
   end
 
   methods (Hidden = true)
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    function [stx,fx,Dfx,sty,fy,Dfy,stp,fp,Dfp,brackt,info] ...
-      = safeguardedStep(self,stx,fx,Dfx,sty,fy,Dfy,stp,fp,Dfp,brackt,stpmin,stpmax)
-      %%
+
+    function [LO, HI, alphaf, bracketed, info] = safeguardedStep( self, LO, HI, M, bracketed )
+      %
       % The purpose of cstep is to compute a safeguarded step for
       % a linesearch and to update an interval of uncertainty for
       % a minimizer of the function.
       %
-      % The parameter stx contains the step with the least function value.
-      % The parameter stp contains the current step.
-      % It is assumed that the derivative at stx is negative in the
-      % direction of the step. If brackt is set true then a minimizer has been
-      % bracketed in an interval of uncertainty with endpoints stx and sty.
+      % The struct LO contains the step with the least function value.
+      % The struct M contains the current step.
+      % It is assumed that the derivative at LO is negative in the direction
+      % of the step.
+      % If bracketed is set true then a minimizer has been bracketed in an
+      % interval of uncertainty with endpoints LO.alpha and HI.alpha.
       %
-      % stx, fx, and Dfx are variables which specify the step, the function,
-      % and the derivative at the best step obtained so far.
+      % LO specify the step at the best step obtained so far.
       % The derivative must be negative in the direction of the step, that is,
-      % Dfx and stp-stx must have opposite signs.
+      % LO.Df and (M.alpha-LO.alpha) must have opposite signs.
       % On output these parameters are updated appropriately.
       %
-      % sty, fy, and Dfy are variables which specify the step, the function,
-      % and the derivative at the other endpoint of the interval of uncertainty.
-      % On output these parameters are updated appropriately.
+      % HI specify the step at the other endpoint of the interval of uncertainty.
+      % output these parameters are updated appropriately.
       %
-      % stp, fp, and Dfp are variables which specify the step, the function,
-      % and the derivative at the current step.
-      % If brackt is set true then on input stp must be between stx and sty.
-      % On output stp is set to the new step.
+      % struct M specify the current step.
+      % If bracketed is set true then on input M.alpha must be between
+      % LO.alpha and HI.alpha. On output M.alpha is set to the new step.
       %
-      % brackt is a logical variable which specifies if a minimizer
+      % bracketed is a logical variable which specifies if a minimizer
       % has been bracketed. If the minimizer has not been bracketed
-      % then on input brackt must be set false. If the minimizer
-      % is bracketed then on output brackt is set true.
-      %
-      % stpmin and stpmax are input variables which specify lower
-      % and upper bounds for the step.
+      % then on input bracketed must be set false.
+      % If the minimizer is bracketed then on output bracketed is set true.
       %
       % info is an integer output variable set as follows:
-      % If info = 1,2,3,4,5, then the step has been computed
-      % according to one of the five cases below. Otherwise
-      % info = 0, and this indicates improper input parameters.
+      % If info = 1,2,3,4,5, then the step has been computed according to one
+      % of the five cases below.
+      % Otherwise info = 0, and this indicates improper input parameters.
       %
-      info = 0;
-      %
-      %  Check the input parameters for errors.
-      %
-      if (brackt && (stp <= min(stx,sty) || stp >= max(stx,sty))) ...
-        || Dfx*(stp-stx) >= 0.0 || stpmax < stpmin
+      % Check the input parameters for errors.
+      aL = min(LO.alpha,HI.alpha);
+      aR = max(LO.alpha,HI.alpha);
+      if bracketed
+        if M.alpha <= aL || M.alpha >= aR
+          info = 0;
+          return;
+        end
+      end
+      if LO.Df*(M.alpha-LO.alpha) >= 0
+        info = 0;
         return;
       end
       %
       % Determine if the derivatives have opposite sign.
       %
-      sgnd = Dfp*sign(Dfx);
+      sgnd = M.Df*sign(LO.Df);
       %
-      % First case. A higher function value. The minimum is bracketed.
-      % If the cubic step is closer to stx than the quadratic step,
+      % First case.
+      % A higher function value. The minimum is bracketed.
+      % If the cubic step is closer to LO.alpha than the quadratic step,
       % the cubic step is taken, else the average of the cubic and
       % quadratic steps is taken.
       %
-      if fp > fx
+      if M.f > LO.f
         info  = 1;
-        bound = 1;
-        theta = 3*(fx - fp)/(stp - stx) + Dfx + Dfp;
-        s     = norm([theta,Dfx,Dfp],inf);
-        gamma = s*sqrt((theta/s)^2 - (Dfx/s)*(Dfp/s));
-        if (stp < stx); gamma = -gamma; end
-        p = (gamma - Dfx) + theta;
-        q = ((gamma - Dfx) + gamma) + Dfp;
-        r = p/q;
-        stpc = stx + r*(stp - stx);
-        stpq = stx + ((Dfx/((fx-fp)/(stp-stx)+Dfx))/2)*(stp - stx);
-        if abs(stpc-stx) < abs(stpq-stx)
-          stpf = stpc;
-        else
-          stpf = stpc + (stpq - stpc)/2;
+        bound = true;
+        theta = 3*(LO.f - M.f)/(M.alpha - LO.alpha) + LO.Df + M.Df;
+        s     = max(abs([theta,LO.Df,M.Df]));
+        gamma = s*sqrt((theta/s)^2 - (LO.Df/s)*(M.Df/s));
+        if M.alpha < LO.alpha
+          gamma = -gamma;
         end
-        brackt = true;
+        p = (gamma - LO.Df) + theta;
+        q = ((gamma - LO.Df) + gamma) + M.Df;
+        r = p/q;
+        alphac = LO.alpha + r*(M.alpha - LO.alpha);
+        alphaq = LO.alpha + ((LO.Df/((LO.f-M.f)/(M.alpha-LO.alpha)+LO.Df))/2)*(M.alpha - LO.alpha);
+        if abs(M.alphac-LO.alpha) < abs(M.alphaq-LO.alpha)
+          alphaf = alphac
+        else
+          alphaf = alphac + (alphaq - alphac)/2;
+        end
+        bracketed = true;
+      elseif sgnd < 0
         %
-        % Second case. A lower function value and derivatives of opposite sign.
-        % The minimum is bracketed. If the cubic step is closer to stx than
-        % the quadratic (secant) step, the cubic step is taken,
+        % Second case.
+        % A lower function value and derivatives of opposite sign.
+        % The minimum is bracketed. If the cubic step is closer to LO.alpha
+        % than the quadratic (secant) step, the cubic step is taken,
         % else the quadratic step is taken.
         %
-      elseif sgnd < 0
         info  = 2;
         bound = false;
-        theta = 3*(fx - fp)/(stp - stx) + Dfx + Dfp;
-        s     = norm([theta,Dfx,Dfp],inf);
-        gamma = s*sqrt((theta/s)^2 - (Dfx/s)*(Dfp/s));
-        if stp > stx; gamma = -gamma; end
-        p    = (gamma - Dfp) + theta;
-        q    = ((gamma - Dfp) + gamma) + Dfx;
-        r    = p/q;
-        stpc = stp + r*(stx - stp);
-        stpq = stp + (Dfp/(Dfp-Dfx))*(stx - stp);
-        if abs(stpc-stp) > abs(stpq-stp)
-          stpf = stpc;
-        else
-          stpf = stpq;
+        theta = 3*(LO.f - M.f)/(M.alpha - LO.alpha) + LO.Df + M.Df;
+        s     = max(abs([theta,LO.Df,M.Df]));
+        gamma = s*sqrt((theta/s)^2 - (LO.Df/s)*(M.Df/s));
+        if M.alpha > LO.alpha
+          gamma = -gamma;
         end
-        brackt = true;
-        %
-        % Third case. A lower function value, derivatives of the same sign,
-        % and the magnitude of the derivative decreases.
-        % The cubic step is only used if the cubic tends to infinity in the
-        % direction of the step or if the minimum of the cubic is beyond stp.
-        % Otherwise the cubic step is defined to be either stpmin or stpmax.
-        % The quadratic (secant) step is also computed and if the minimum is
-        % bracketed then the the step closest to stx is taken, else the step
-        % farthest away is taken.
-        %
-      elseif abs(Dfp) < abs(Dfx)
-        info  = 3;
-        bound = 1;
-        theta = 3*(fx - fp)/(stp - stx) + Dfx + Dfp;
-        s     = norm([theta,Dfx,Dfp],inf);
-        %
-        % The case gamma = 0 only arises if the cubic does not tend to
-        % infinity in the direction of the step.
-        %
-        gamma = s*sqrt(max(0.,(theta/s)^2 - (Dfx/s)*(Dfp/s)));
-        if stp > stx; gamma = -gamma; end
-        p = (gamma - Dfp) + theta;
-        q = (gamma + (Dfx - Dfp)) + gamma;
+        p = (gamma - M.Df) + theta;
+        q = ((gamma - M.Df) + gamma) + LO.Df;
         r = p/q;
-        if r < 0.0 && gamma ~= 0
-          stpc = stp + r*(stx - stp);
-        elseif stp > stx
-          stpc = stpmax;
+        alphac = M.alpha + r*(LO.alpha - M.alpha);
+        alphaq = M.alpha + (M.Df/(M.Df-LO.Df))*(LO.alpha - M.alpha);
+        if abs(alphac-M.alpha) >  abs(alphaq-M.alpha)
+          alphaf = alphac;
         else
-          stpc = stpmin;
+          alphaf = alphaq;
         end
-        stpq = stp + (Dfp/(Dfp-Dfx))*(stx - stp);
-        if brackt
-          if abs(stp-stpc) < abs(stp-stpq)
-            stpf = stpc;
+        bracketed = true;
+      elseif abs(M.Df) < abs(LO.Df)
+        %
+        % Third case.
+        % A lower function value, derivatives of the same sign, and the
+        % magnitude of the derivative decreases.
+        % The cubic step is only used if the cubic tends to infinity in the
+        % direction of the step or if the minimum of the cubic is beyond M.alpha.
+        % Otherwise the cubic step is defined to be either alphamin or alphamax.
+        % The quadratic (secant) step is also computed and if the minimum is
+        % bracketed then the the step closest to LO.alpha is taken,
+        % else the step farthest away is taken.
+        %
+        info  = 3;
+        bound = true;
+        theta = 3*(LO.f - M.f)/(M.alpha - LO.alpha) + LO.Df + M.Df;
+        s     = max(abs([theta,LO.Df,M.Df]));
+        %
+        % The case gamma = 0 only arises if the cubic does not tend
+        % to infinity in the direction of the step.
+        %
+        gamma = s*sqrt(max(0,(theta/s)^2- (LO.Df/s)*(M.Df/s)));
+        if M.alpha > LO.alpha
+          gamma = -gamma;
+        end
+        p = (gamma - M.Df) + theta;
+        q = (gamma + (LO.Df - M.Df)) + gamma;
+        r = p/q
+        if r < 0 && gamma ~= 0
+          alphac = M.alpha + r*(LO.alpha - M.alpha);
+        elseif M.alpha > LO.alpha
+          alphac = alphamax;
+        else
+          alphac = alphamin;
+        end
+        alphaq = M.alpha + (M.Df/(M.Df-LO.Df))*(LO.alpha - M.alpha);
+        if bracketed
+          if abs(M.alpha-alphac) < abs(M.alpha-alphaq)
+            alphaf = alphac;
           else
-            stpf = stpq;
+            alphaf = alphaq;
           end
         else
-          if abs(stp-stpc) > abs(stp-stpq)
-            stpf = stpc;
+          if abs(M.alpha-alphac) > abs(M.alpha-alphaq)
+            alphaf = alphac;
           else
-            stpf = stpq;
+            alphaf = alphaq;
           end
         end
-        %
-        % Fourth case. A lower function value, derivatives of the same sign,
-        % and the magnitude of the derivative does not decrease.
-        % If the minimum is not bracketed, the step is either stpmin or stpmax,
-        % else the cubic step is taken.
-        %
       else
+        %
+        % Fourth case.
+        % A lower function value, derivatives of the same sign, and the
+        % magnitude of the derivative does not decrease.
+        % If the minimum is not bracketed, the step is either alphamin or
+        % alphamax, else the cubic step is taken.
+        %
         info  = 4;
         bound = false;
-        if brackt
-          theta = 3*(fp - fy)/(sty - stp) + Dfy + Dfp;
-          s     = norm([theta,Dfy,Dfp],inf);
-          gamma = s*sqrt((theta/s)^2 - (Dfy/s)*(Dfp/s));
-          if stp > sty; gamma = -gamma; end
-          p    = (gamma - Dfp) + theta;
-          q    = ((gamma - Dfp) + gamma) + Dfy;
-          r    = p/q;
-          stpc = stp + r*(sty - stp);
-          stpf = stpc;
-        elseif stp > stx
-          stpf = stpmax;
+        if bracketed
+          theta = 3*(M.f - HI.f)/(HI.alpha - M.alpha) + HI.Df + M.Df;
+          s     = max(abs([theta,HI.Df,M.Df]));
+          gamma = s*sqrt((theta/s)**2 - (HI.Df/s)*(M.Df/s));
+          if M.alpha > HI.alpha
+            gamma = -gamma;
+          end
+          p = (gamma - M.Df) + theta;
+          q = ((gamma - M.Df) + gamma) + HI.Df;
+          r = p/q;
+          alphac = M.alpha + r*(HI.alpha - M.alpha);
+          alphaf = alphac;
+        elseif M.alpha > LO.alpha
+          alphaf = alphamax;
         else
-          stpf = stpmin;
+          alphaf = alphamin;
         end
       end
       %
       % Update the interval of uncertainty.
       % This update does not depend on the new step or the case analysis above.
       %
-      if fp > fx
-        sty = stp;
-        fy  = fp;
-        Dfy = Dfp;
+      if M.f > LO.f
+        HI = M;
       else
-        if sgnd < 0.0
-          sty = stx;
-          fy  = fx;
-          Dfy = Dfx;
+        if sgnd < 0
+           HI = LO;
         end
-        stx = stp;
-        fx  = fp;
-        Dfx = Dfp;
+        LO = M;
       end
       %
       % Compute the new step and safeguard it.
       %
-      stpf = min(stpmax,stpf);
-      stpf = max(stpmin,stpf);
-      stp  = stpf;
-      if brackt && bound
-        if sty > stx
-          stp = min(stx+0.66*(sty-stx),stp);
+      alphaf = min(alphamax,max(alphamin,alphaf);
+      if bracketed && bound
+        atmp = LO.alpha+0.66*(HI.alpha-LO.alpha)
+        if HI.alpha > LO.alpha
+          alphaf = min(atmp,alphaf);
         else
-          stp = max(stx+0.66*(sty-stx),stp);
+          alphaf = max(atmp,alphaf);
         end
       end
     end
@@ -297,22 +301,268 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
     function printInfo( self )
       switch (self.info)
       case 0
-        fprintf('Improper input parameters.\n');
+        M.frintf('Improper input parameters.\n');
       case 1
-        fprintf('The sufficient decrease condition and the directional derivative condition hold.\n');
+        M.frintf('The sufficient decrease condition and the directional derivative condition hold.\n');
       case 2
-        fprintf('Relative width of the interval of uncertainty is at most xtol.\n');
+        M.frintf('Relative width of the interval of uncertainty is at most xtol.\n');
       case 3
-        fprintf('Number of calls to fcn has reached max_fun_eval.\n');
+        M.frintf('Number of calls to fcn has reached max_fun_eval.\n');
       case 4
-        fprintf('The step is at the lower bound alpha_min.\n');
+        M.frintf('The step is at the lower bound alpha_min.\n');
       case 5
-        fprintf('The step is at the upper bound alpha_max.\n');
+        M.frintf('The step is at the upper bound alpha_max.\n');
       case 6
-        fprintf('Rounding errors prevent further progress.\n');
-        fprintf('There may not be a step which satisfies the\n');
-        fprintf('sufficient decrease and curvature conditions.\n');
-        fprintf('Tolerances may be too small..\n');
+        M.frintf('Rounding errors prevent further progress.\n');
+        M.frintf('There may not be a step which satisfies the\n');
+        M.frintf('sufficient decrease and curvature conditions.\n');
+        M.frintf('Tolerances may be too small..\n');
+      end
+    end
+    %
+    % ----------------------------------------------------------------------
+    % Line Search Routine
+    % ----------------------------------------------------------------------
+    %
+      subroutine cvsrch(n,x,f,g,s,stp,ftol,gtol,xtol,
+     *                  stpmin,stpmax,maxfev,info,nfev,wa)
+      integer n,maxfev,info,nfev
+      double precision f,stp,ftol,gtol,xtol,stpmin,stpmax
+      double precision x(n),g(n),s(n),wa(n)
+
+      % The purpose of ******** is to find a step which satisfies
+      % a sufficient decrease condition and a curvature condition.
+      %
+      % At each stage the subroutine updates an interval of uncertainty with
+      % endpoints LO.alpha and HI.alpha. The interval of uncertainty is initially chosen
+      % so that it contains a minimizer of the modified function
+      %
+      %     f(stp) - f(0) - ftol*stp*f'(0).
+      %
+      % If a step is obtained for which the modified function has a nonpositive
+      % function value and nonnegative derivative, then the interval of
+      % uncertainty is chosen so that it contains a minimizer of f(stp).
+      %
+      % The algorithm is designed to find a step which satisfies the sufficient
+      % decrease condition
+      %
+      %     f(stp) <= f(0) + ftol*stp*f'(0),
+      %
+      % and the curvature condition
+      %
+      %     abs(f'(stp)) <=  gtol*abs(f'(0)).
+      %
+      % If ftol is less than gtol and if, for example, the function
+      % is bounded below, then there is always a step which satisfies both
+      % conditions. If no step can be found which satisfies both conditions,
+      % then the algorithm usually stops when rounding errors prevent further
+      % progress.
+      % In this case stp only satisfies the sufficient decrease condition.
+      %
+      %	stp is a nonnegative variable.
+      %     On input stp contains an initial estimate of a satisfactory step.
+      %     On output stp contains the final estimate.
+      %
+      % ftol and gtol are nonnegative input variables.
+      %      Termination occurs when the sufficient decrease condition and the
+      %      directional derivative condition are satisfied.
+      %
+      %	xtol is a nonnegative input variable.
+      %      Termination occurs  when the relative width of the interval
+      %      of uncertainty is at most xtol.
+      %
+      %	stpmin and stpmax are nonnegative input variables which
+      %	  specify lower and upper bounds for the step.
+      %
+      %	maxfev is a positive integer input variable.
+      %        Termination occurs when the number of calls to fcn is at least
+      %        maxfev by the end of an iteration.
+      %
+      %	info is an integer output variable set as follows:
+      %
+      %	  info = 0  Improper input parameters.
+      %
+      %	  info = 1  The sufficient decrease condition and the
+      %             directional derivative condition hold.
+      %
+      %	  info = 2  Relative width of the interval of uncertainty
+      %		        is at most xtol.
+      %
+      %	  info = 3  Number of calls to fcn has reached maxfev.
+      %
+      %	  info = 4  The step is at the lower bound stpmin.
+      %
+      %	  info = 5  The step is at the upper bound stpmax.
+      %
+      %	  info = 6  Rounding errors prevent further progress.
+      %             There may not be a step which satisfies the
+      %             sufficient decrease and curvature conditions.
+      %             Tolerances may be too small.
+      %
+      % nfev is an integer output variable set to the number of calls to fcn.
+      %
+      xtrapf = 4;
+      info   = 0;
+      infoc  = 1;
+      %
+      % Check the input parameters for errors.
+      %
+      if stp <= 0 || ftol < 0 || gtol < 0 || xtol < 0 || stpmin < 0 || ...
+         stpmax < stpmin || maxfev <= 0
+        return;
+      end
+      %
+      % Compute the initial gradient in the search direction
+      % and check that s is a descent direction.
+      %
+      Df0 = dot(g,s);
+      if Df0 <= 0
+        return;
+      end
+      %
+      % Initialize local variables.
+      %
+      bracketed = false;
+      stage1    = true;
+      nfev      = 0;
+      f0        = f;
+      c1Df0     = ftol*Df0;
+      width     = stpmax - stpmin;
+      width1    = width/0.5;
+      %%      do 20 j = 1, n
+      %%         wa(j) = x(j)
+      %%  20    continue
+      %
+      % The variables LO.alpha, LO.f, LO.Df contain the values of the step,
+      % function, and directional derivative at the best step.
+      % The variables HI.alpha, HI.f, HI.Df contain the value of the step,
+      % function, and derivative at the other endpoint of
+      % the interval of uncertainty.
+      % The variables stp, f, dg contain the values of the step,
+      % function, and derivative at the current step.
+      %
+      LO.alpha = 0;
+      LO.f     = f0;
+      LO.Df    = Df0;
+      HI       = LO;
+      %
+      % Start of iteration.
+      %
+      while true
+        %
+        % Set the minimum and maximum steps to correspond
+        % to the present interval of uncertainty.
+        %
+        if bracketed
+          stmin = min(LO.alpha,HI.alpha);
+          stmax = max(LO.alpha,HI.alpha);
+        else
+          stmin = LO.alpha;
+          stmax = stp + xtrapf*(stp - LO.alpha);
+        end
+        %
+        % Force the step to be within the bounds stpmax and stpmin.
+        %
+        stp = max(stp,min(stp,stpmax));
+        %
+        % If an unusual termination is to occur then let
+        % stp be the lowest point obtained so far.
+        %
+        if ((bracketed .and. (stp .le. stmin .or. stp .ge. stmax))
+     *      .or. nfev .ge. maxfev-1 .or. infoc .eq. 0
+     *      .or. (bracketed .and. stmax-stmin .le. xtol*stmax)) stp = LO.alpha
+        %
+        % Evaluate the function and gradient at stp
+        % and compute the directional derivative.
+        %
+        [f,dg] = eval_FG(stp);
+        ftest1 = f0 + stp*c1Df0;
+        %
+        % Test for convergence.
+        %
+        if (bracketed && (stp <= stmin || stp >= stmax) ) || infoc == 0
+          info = 6;
+        elseif stp == stpmax && f <= ftest1 && dg <= c1Df0
+          info = 5;
+        elseif stp == stpmin && (f > ftest1 || dg >= c1Df0)
+          info = 4;
+        elseif nfev >= maxfev
+          info = 3;
+        elseif bracketed && stmax-stmin <= xtol*stmax
+          info = 2;
+        elseif f <= ftest1 && abs(dg) <= gtol*(-Df0)
+          info = 1;
+        end
+        %
+        % Check for termination.
+        %
+        if info ~= 0
+          return;
+        end
+        %
+        % In the first stage we seek a step for which the modified
+        % function has a nonpositive value and nonnegative derivative.
+        %
+        if stage1
+          if f <= ftest1 && dg >= min(ftol,gtol)*Df0
+            stage1 = false;
+          end
+        end
+        %
+        % A modified function is used to predict the step only if we have not
+        % obtained a step for which the modified function has a nonpositive
+        % function value and nonnegative derivative, and if a lower function
+        % value has been obtained but the decrease is not sufficient.
+        %
+        if stage1 && f <= LO.f && f > ftest1
+          %
+          % Define the modified function and derivative values.
+          %
+          M.alpha = stp;
+          M.f     = f - stp*c1Df0;
+          M.Df    = dg - c1Df0;;
+
+          LO.f  = LO.f - LO.alpha*c1Df0;
+          LO.Df = LO.Df - c1Df0;
+
+          HI.f  = HI.f - HI.alpha*c1Df0;
+          HI.Df = HI.Df - c1Df0;
+          %
+          % Call cstep to update the interval of uncertainty
+          % and to compute the new step.
+          %
+          [LO, HI, stp, bracketed, infoc] = self.safeguardedStep( LO, HI, M, bracketed );
+          %
+          % Reset the function and gradient values for f.
+          %
+          LO.f  = LO.f + LO.alpha*c1Df0
+          LO.Df = LO.Df + c1Df0
+
+          HI.f  = HI.f + HI.alpha*c1Df0
+          HI.Df = HI.Df + c1Df0
+        else
+          %
+          % Call cstep to update the interval of uncertainty
+          % and to compute the new step.
+          %
+          M.alpha = stp;
+          M.f     = f;
+          M.Df    = dg;
+          [LO, HI, stp, bracketed, infoc] = self.safeguardedStep( LO, HI, M, bracketed );
+        end
+        %
+        % Force a sufficient decrease in the size of the interval of uncertainty.
+        %
+        if bracketed
+          if abs(HI.alpha-LO.alpha) >= 0.66*width1
+            stp = LO.alpha + 0.5*(HI.alpha - LO.alpha);
+          end
+          width1 = width;
+          width  = abs(HI.alpha-LO.alpha);
+        end
+        %
+        % End of iteration.
+        %
       end
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -340,7 +590,7 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
       %
       % Initialize local variables.
       %
-      brackt     = false;
+      bracketed     = false;
       stage1     = true;
       n_fun_eval = 0;
       f0         = fun(0);
@@ -348,20 +598,20 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
       width      = self.alpha_max - self.alpha_min;
       width1     = 2*width;
       %
-      % The variables stx, fx, Dfx contain the values of the step,
+      % The variables LO.alpha, LO.f, DLO.f contain the values of the step,
       % function, and directional derivative at the best step.
-      % The variables sty, fy, Dfy contain the value of the step,
-      % function, and derivative at the other endpoint of
+      % The variables HI.alpha, HI.f, DHI.f contain the value of the step,
+      % function, and derivative at the other enM.Dfoint of
       % the interval of uncertainty.
       % The variables alpha, f, Df contain the values of the step,
       % function, and derivative at the current step.
       %
-      stx = 0.0;
-      fx  = f0;
-      Dfx = Df0;
-      sty = 0.0;
-      fy  = f0;
-      Dfy = Df0;
+      LO.alpha = 0.0;
+      LO.f  = f0;
+      DLO.f = Df0;
+      HI.alpha = 0.0;
+      HI.f  = f0;
+      DHI.f = Df0;
       %
       % Start of iteration.
       %
@@ -370,12 +620,12 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
         % Set the minimum and maximum steps to correspond
         % to the present interval of uncertainty.
         %
-        if brackt
-          stmin = min(stx,sty);
-          stmax = max(stx,sty);
+        if bracketed
+          stmin = min(LO.alpha,HI.alpha);
+          stmax = max(LO.alpha,HI.alpha);
         else
-          stmin = stx;
-          stmax = alpha + self.xtrapf*(alpha - stx);
+          stmin = LO.alpha;
+          stmax = alpha + self.xtrapf*(alpha - LO.alpha);
         end
         %
         % Force the step to be within the bounds alpha_max and alpha_min.
@@ -385,11 +635,11 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
         % If an unusual termination is to occur then let
         % alpha be the lowest point obtained so far.
         %
-        if ( brackt && ( alpha <= stmin || ...
+        if ( bracketed && ( alpha <= stmin || ...
                          alpha >= stmax || ...
                          stmax-stmin <= self.xtol*stmax ) ) ...
            || n_fun_eval >= self.max_fun_eval || infoc == 0
-          alpha = stx;
+          alpha = LO.alpha;
         end
         %
         % Evaluate the function and gradient at alpha
@@ -402,7 +652,7 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
         %
         % Test for convergence.
         %
-        if (brackt && (alpha <= stmin || alpha >= stmax)) || infoc == 0
+        if (bracketed && (alpha <= stmin || alpha >= stmax)) || infoc == 0
           self.info = 6;
         elseif alpha == self.alpha_max && f <= ftest1 && Df <= c1Df0
           self.info = 5;
@@ -410,7 +660,7 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
           self.info = 4;
         elseif n_fun_eval >= self.max_fun_eval
           self.info = 3;
-        elseif brackt && stmax-stmin <= self.xtol*stmax
+        elseif bracketed && stmax-stmin <= self.xtol*stmax
           self.info = 2;
         elseif f <= ftest1 && abs(Df) <= self.c2*(-Df0)
           self.info = 1;
@@ -435,47 +685,47 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
         % function value and nonnegative derivative, and if a lower function
         % value has been obtained but the decrease is not sufficient.
         %
-        if stage1 && f <= fx && f > ftest1
+        if stage1 && f <= LO.f && f > ftest1
           %
           % Define the modified function and derivative values.
           %
           fm   = f - alpha*c1Df0;
-          fxm  = fx - stx*c1Df0;
-          fym  = fy - sty*c1Df0;
+          LO.fm  = LO.f - LO.alpha*c1Df0;
+          HI.fm  = HI.f - HI.alpha*c1Df0;
           Dfm  = Df - c1Df0;
-          Dfxm = Dfx - c1Df0;
-          Dfym = Dfy - c1Df0;
+          DLO.fm = DLO.f - c1Df0;
+          DHI.fm = DHI.f - c1Df0;
           %
           % Call cstep to update the interval of uncertainty
           % and to compute the new step.
           %
-          [stx,fxm,Dfxm,sty,fym,Dfym,alpha,fm,Dfm,brackt,infoc] ...
-            = self.safeguardedStep(stx,fxm,Dfxm,sty,fym,Dfym,alpha,fm,Dfm,brackt,stmin,stmax);
+          [LO.alpha,LO.fm,DLO.fm,HI.alpha,HI.fm,DHI.fm,alpha,fm,Dfm,bracketed,infoc] ...
+            = self.safeguardedStep(LO.alpha,LO.fm,DLO.fm,HI.alpha,HI.fm,DHI.fm,alpha,fm,Dfm,bracketed,stmin,stmax);
           %
           % Reset the function and gradient values for f.
           %
-          fx  = fxm + stx*c1Df0;
-          fy  = fym + sty*c1Df0;
-          Dfx = Dfxm + c1Df0;
-          Dfy = Dfym + c1Df0;
+          LO.f  = LO.fm + LO.alpha*c1Df0;
+          HI.f  = HI.fm + HI.alpha*c1Df0;
+          DLO.f = DLO.fm + c1Df0;
+          DHI.f = DHI.fm + c1Df0;
         else
           %
           % Call cstep to update the interval of uncertainty
           % and to compute the new step.
           %
-          [stx,fx,Dfx,sty,fy,Dfy,alpha,f,Df,brackt,infoc] ...
-            = self.safeguardedStep(stx,fx,Dfx,sty,fy,Dfy,alpha,f,Df,brackt,stmin,stmax);
+          [LO.alpha,LO.f,DLO.f,HI.alpha,HI.f,DHI.f,alpha,f,Df,bracketed,infoc] ...
+            = self.safeguardedStep(LO.alpha,LO.f,DLO.f,HI.alpha,HI.f,DHI.f,alpha,f,Df,bracketed,stmin,stmax);
         end
         %
         % Force a sufficient decrease in the size of the
         % interval of uncertainty.
         %
-        if brackt
-          if abs(sty-stx) >= 0.66*width1
-            alpha = stx + 0.5*(sty - stx);
+        if bracketed
+          if abs(HI.alpha-LO.alpha) >= 0.66*width1
+            alpha = LO.alpha + 0.5*(HI.alpha - LO.alpha);
           end
           width1 = width;
-          width  = abs(sty-stx);
+          width  = abs(HI.alpha-LO.alpha);
         end
         % End of iteration.
       end

@@ -68,7 +68,7 @@ classdef Gauss < FunctionMap
         J(i,:) = tmp2 * [ 1, -0.5 * tmp1^2 * X, - X * Y * tmp1 ];
       end
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function T = tensor( self, x )
       % use analitic tensor of second derivative
       T = zeros(15,3,3);
@@ -86,6 +86,6 @@ classdef Gauss < FunctionMap
                             T31,       T23, (X*Y/4)*(Y*tmp1^2-4) ];
       end
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
 end

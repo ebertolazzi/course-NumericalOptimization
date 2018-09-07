@@ -92,17 +92,6 @@ classdef GaussianFunction < FunctionMap
 
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    function [f,g] = eval_FG( self, x )
-      f = self.eval(x);
-      g = self.grad(x);
-    end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    function [f,g,H] = eval_FGH( self, x )
-      f = self.eval(x);
-      g = self.grad(x);
-      H = self.hessian(x);
-    end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
 end
 

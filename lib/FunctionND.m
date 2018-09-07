@@ -145,7 +145,8 @@ classdef (Abstract) FunctionND < handle
       miZ = min(min(Z(idx)));
       maZ = max(max(Z(idx)));
       Z   = (Z-miZ)/(maZ-miZ);
-      contour(X,Y,log(1+Z),nc);
+      %contour(X,Y,log(1+Z),nc);
+      contour(X,Y,sqrt(Z),nc);
     end
   end
 end
