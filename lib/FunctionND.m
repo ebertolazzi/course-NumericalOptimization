@@ -30,6 +30,10 @@ classdef (Abstract) FunctionND < handle
       self.exact_solutions = zeros(N,0); % no exact solutions
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function ok = is_a_map( self )
+      ok = false;
+    end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function n = num_guess( self )
       n = size(self.guesses,2);
     end
@@ -121,7 +125,7 @@ classdef (Abstract) FunctionND < handle
       H = 0.5*(H+H.');
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    function contour( self, xmm, ymm, nc )
+    function contour( self, xmm, ymm, nc, linear )
       % plot 2D contour of the function
       if self.N ~= 2
         error('FunctionND:contour can be used only for 2D functions');
@@ -145,7 +149,11 @@ classdef (Abstract) FunctionND < handle
       miZ = min(min(Z(idx)));
       maZ = max(max(Z(idx)));
       Z   = (Z-miZ)/(maZ-miZ);
-      contour(X,Y,log(1+Z),nc);
+      if nargin > 4 && linear
+        contour(X,Y,Z,nc);
+      else
+        contour(X,Y,sqrt(Z),nc);
+      end
     end
   end
 end

@@ -26,6 +26,10 @@ classdef (Abstract) FunctionMap < FunctionND
       self.M = M;
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function ok = is_a_map( self )
+      ok = true;
+    end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function m = dimension( self )
       % return the number of components of the map
       m = self.M;
@@ -109,5 +113,17 @@ classdef (Abstract) FunctionMap < FunctionND
         H = H + F(k) * squeeze(T(k,:,:));
       end
     end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function [f,g] = eval_FG( self, x )
+      f = self.eval(x);
+      g = self.grad(x);
+    end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function [f,g,H] = eval_FGH( self, x )
+      f = self.eval(x);
+      g = self.grad(x);
+      H = self.hessian(x);
+    end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
 end

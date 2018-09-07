@@ -24,13 +24,13 @@ classdef PowellSingular < FunctionMap
   %
 
   methods
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = PowellSingular()
       self@FunctionMap(int32(4),int32(4));
       self.exact_solutions = [ 101; 10; 0; 0 ]; % one known solution
       self.guesses         = [ 0.0; 0.0; 0.0; 0.0 ];
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function F = evalMap(self,x)
       % evaluate function
       self.check_x(x);
@@ -39,7 +39,7 @@ classdef PowellSingular < FunctionMap
             (x(2)-2*x(3))^2; ...
             sqrt(10)*(x(1)-x(4))^2 ];
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function J = jacobian( self, x )
       % use analitic jacobian
       self.check_x(x);
@@ -50,7 +50,7 @@ classdef PowellSingular < FunctionMap
             0,    2*t1, -4*t1,   0; ...
             2*t2, 0,    0,       -2*t2 ];
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function T = tensor( self, x )
       % use analitic tensor of second derivative
       T        = zeros(4,4,4);
@@ -63,6 +63,6 @@ classdef PowellSingular < FunctionMap
                               0, 0, 0, 0; ...
                              -1, 0, 0, 1 ];
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
 end

@@ -12,18 +12,20 @@ classdef MinimizationND < handle
     max_iter    % massimo numero iterate ammesse
     FD_D        % use finite 1D difference or gradient for directional derivative computation
     x_history   % list of iteration
-    debug_state % if true do some additional printing and store iterations
+    verbose     % if true do some additional printing and store iterations
+    save_iterate
   end
 
   methods
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = MinimizationND( fun, ls )
-      self.tol         = 1e-3;
-      self.max_iter    = 100;
-      self.debug_state = false;
-      self.FD_D        = true;
-      self.funND       = fun;
-      self.linesearch  = ls;
+      self.tol          = 1e-3;
+      self.max_iter     = 100;
+      self.verbose      = true;
+      self.save_iterate = false;
+      self.FD_D         = false;
+      self.funND        = fun;
+      self.linesearch   = ls;
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function setFunction( self, f )
@@ -51,12 +53,20 @@ classdef MinimizationND < handle
       self.max_iter = max_iter;
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    function debug_on( self )
-      self.debug_state = true;
+    function verbose_on( self )
+      self.verbose = true;
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    function debug_off( self )
-      self.debug_state = false;
+    function verbose_off( self )
+      self.verbose = false;
+    end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function save_iterate_on( self )
+      self.save_iterate = true;
+    end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function save_iterate_off( self )
+      self.save_iterate = false;
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function use_FD_D( self )
@@ -97,15 +107,13 @@ classdef MinimizationND < handle
       %
       % check error
       if ~ok
-        self.linesearch.plotDebug(alpha_guess);
-        warning('MinimizationGradientMethod:step1D, linesearch failed\n');
         x1 = x0;
       else
         %
         % advance
         x1 = x0 + alpha * d;
         % only for debug
-        if self.debug_state
+        if self.save_iterate
           self.x_history = [ self.x_history x1(:) ];
         end
       end
@@ -128,7 +136,7 @@ classdef MinimizationND < handle
       end
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    function plotIter( self )
+    function plotIter( self, last )
       if size(self.x_history,1) == 2
         hold on;
         xo = self.x_history(:,1);
@@ -139,6 +147,11 @@ classdef MinimizationND < handle
           plot(xo(1),xo(2),'or');
           xo = xn;
         end
+        xo = self.x_history(:,end);
+        plot( xo(1),xo(2),'o', ...
+              'MarkerSize',10,...
+              'MarkerEdgeColor','b',...
+              'MarkerFaceColor','black');
       end
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

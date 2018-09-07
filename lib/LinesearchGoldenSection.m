@@ -12,8 +12,8 @@ classdef LinesearchGoldenSection < LinesearchForwardBackward
       % PASSA al costruttore della super-classe
       self@LinesearchForwardBackward('GoldenSection');
       self.tau      = (sqrt(5)-1)/2;
-      self.tol      = 1e-8;
-      self.max_iter = 50;
+      self.tol      = 1e-4;
+      self.max_iter = 8;
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function setMaxIteration( self, max_iter )
@@ -35,8 +35,8 @@ classdef LinesearchGoldenSection < LinesearchForwardBackward
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function [a,b] = minimize( self, a_in, b_in )
       % check that b > al
-      a      = a_in;
-      b      = b_in;
+      a      = min(a_in,b_in);
+      b      = max(a_in,b_in);
       dlen   = self.tau*(b-a);
       lambda = b-dlen;
       mu     = a+dlen;

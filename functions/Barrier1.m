@@ -20,7 +20,7 @@ classdef Barrier1 < FunctionND
       self@FunctionND(int32(2));
       self.exact_solutions = []; % no known solution
       self.guesses         = [ 0.9999; 0];
-      self.epsi            = 1e-10;
+      self.epsi            = 1e-7;
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function f = eval(self,xx)
@@ -32,7 +32,7 @@ classdef Barrier1 < FunctionND
       if c <= 0
         f = inf;
       else
-        f = x+2*y+self.epsi/c;
+        f = x+self.epsi/c;
       end
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -42,7 +42,7 @@ classdef Barrier1 < FunctionND
       x = xx(1);
       y = xx(2);
       c = 1-x^2-y^2;
-      g = [1,2];
+      g = [1,0];
       if c > 0
         g = g + (2*self.epsi/c^2)*[x,y];
       end
@@ -57,7 +57,7 @@ classdef Barrier1 < FunctionND
       H = zeros( 2, 2 );
       if c > 0
         H = (2*self.epsi/c^3)*[ y^2-3*x^2-1, -4*x*y;...
-                           -4*x*y,       x^2-3*y^2-1 ];
+                                -4*x*y,       x^2-3*y^2-1 ];
       end
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

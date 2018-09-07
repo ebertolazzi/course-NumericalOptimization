@@ -21,13 +21,13 @@ classdef Box3 < FunctionMap
   %
 
   methods
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = Box3()
       self@FunctionMap(int32(3),int32(10));
       self.exact_solutions = [ 1.0; 10.0; 1.0];     % one known solution
       self.guesses         = [ 0.0; 10.0; 5.0 ];
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function F = evalMap(self,x)
       % evaluate function
       self.check_x(x);
@@ -37,7 +37,7 @@ classdef Box3 < FunctionMap
         F(i) = exp( c * x(1) ) - exp( c * x(2) ) - x(3) * ( exp( c ) - exp( 10.0 * c ) );
       end
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function J = jacobian( self, x )
       % use analitic jacobian
       self.check_x(x);
@@ -47,7 +47,7 @@ classdef Box3 < FunctionMap
         J(i,:) = [ c * exp( c * x(1) ), - c * exp( c * x(2) ),  exp( 10.0 * c )  - exp( c ) ];
       end
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function T = tensor( self, x )
       % use analitic tensor of second derivative
       T = zeros(10,3,3);
@@ -58,6 +58,6 @@ classdef Box3 < FunctionMap
                            0, 0, 0 ];
       end
     end
-
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
 end
