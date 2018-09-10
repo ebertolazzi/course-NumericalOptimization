@@ -15,7 +15,7 @@ search_method   = LinesearchMoreThuente();
 %search_method = LinesearchWolfe();
 
 %search_method.debug_on();
-dir_method = MinimizationConjugateGradient( r, search_method );
+dir_method = MinimizationQuasiNewton( r, search_method );
 dir_method.setMaxIteration( int32(400) );
 dir_method.setTolerance(1e-6);
 dir_method.save_iterate_on();
@@ -36,20 +36,14 @@ plot(cos(t),sin(t),'-b','Linewidth',2);
 axis equal;
 title('CG x0 = [0,0.8]');
 
-for kkk=12:12 % 24
-  fprintf('\n\n\n\n\n\n\nmethod N.%d\n\n\n\n\n\n\n',kkk);
-  dir_method.selectByNumber(kkk);
-  %x0 = r.guess(int32(1));
-  x0 = [0; 0.999993944545];
-  [xs,converged] = dir_method.minimize( x0 );
-  xs
-  subplot(1,2,1);
-  dir_method.plotIter();
-  hold on;
-  x0 = [0; 0.8];
-  [xs,converged] = dir_method.minimize( x0 );
-  xs
-  subplot(1,2,2);
-  dir_method.plotIter();
-  hold on;
-end
+%x0 = r.guess(int32(1));
+x0 = [0; 0.999993944545];
+[xs,converged] = dir_method.minimize( x0 );
+subplot(1,2,1);
+dir_method.plotIter();
+xs
+x0 = [0; 0.8];
+[xs,converged] = dir_method.minimize( x0 );
+subplot(1,2,2);
+dir_method.plotIter();
+xs
