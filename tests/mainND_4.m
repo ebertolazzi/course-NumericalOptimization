@@ -41,7 +41,11 @@ title('CG x0 = [0,0.8]');
 
 if true
   for kkk=24:24
+<<<<<<< HEAD
     fprintf('\n\n\n\n\n\n\nmethod N.%d\n\n\n\n\n\n\n',kkk);
+=======
+    fprintf('\n\n\n\n\n\n\n%d\n\n\n\n\n\n\n',kkk);
+>>>>>>> 777dc57db9fd3e478fd721447f3381155df7b8c5
     dir_method.selectByNumber(kkk);
     %x0 = r.guess(int32(1));
     x0 = [0; 0.999993944545];

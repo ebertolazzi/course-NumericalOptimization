@@ -221,11 +221,20 @@ classdef LinesearchForwardBackward < handle
 
       %
       % in case f(alpha) is infinite try to detect the barrier
+<<<<<<< HEAD
       L.alpha       = 0;
       L.f           = self.f0;
       L.Df          = self.Df0;
       R.alpha       = alpha_guess;
       [ R.f, R.Df ] = self.fDf(alpha_guess);
+=======
+      L.alpha = 0;
+      L.f     = self.f0;
+      L.Df    = self.Df0;
+      R.alpha = alpha_guess;
+      R.f     = self.fun1D.eval(alpha_guess);
+      R.Df    = self.fun1D.eval_D(alpha_guess);
+>>>>>>> 777dc57db9fd3e478fd721447f3381155df7b8c5
       %
       % check if f(alpha) is infinite
       if ~isfinite(R.f)
@@ -246,22 +255,40 @@ classdef LinesearchForwardBackward < handle
       if (R.f - self.f0) > R.alpha*self.c1Df0
         % Armijo NOT satified
         % reduce the step until f(R) <= f(L) < f(0)
+<<<<<<< HEAD
         tauf          = self.tau_LS;
         L.alpha       = max(R.alpha/tauf,self.alpha_min);
         [ L.f, L.Df ] = self.fDf( L.alpha );
         S             = R;
         Llesscnt      = 0;
+=======
+        tauf     = self.tau_LS;
+        L.alpha  = max(R.alpha/tauf,self.alpha_min);
+        L.f      = self.fun1D.eval(L.alpha);
+        L.Df     = self.fun1D.eval_D(L.alpha);
+        S        = R;
+        Llesscnt = 0;
+>>>>>>> 777dc57db9fd3e478fd721447f3381155df7b8c5
         while R.alpha > self.alpha_min
           if L.f < self.f0
             if L.f >= R.f; break; end
             Llesscnt = Llesscnt+1;
             if Llesscnt > 10; break; end
           end
+<<<<<<< HEAD
           S             = R;
           R             = L;
           L.alpha       = max(R.alpha/tauf,self.alpha_min);
           [ L.f, L.Df ] = self.fDf( L.alpha );
           tauf          = tauf * self.tau_acc; % update tau factor
+=======
+          S       = R;
+          R       = L;
+          L.alpha = max(R.alpha/tauf,self.alpha_min);
+          L.f     = self.fun1D.eval(L.alpha);
+          L.Df    = self.fun1D.eval_D(L.alpha);
+          tauf    = tauf * self.tau_acc; % update tau factor
+>>>>>>> 777dc57db9fd3e478fd721447f3381155df7b8c5
         end
         if L.f < self.f0
           R = S;

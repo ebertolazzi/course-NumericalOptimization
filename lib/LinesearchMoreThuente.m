@@ -269,8 +269,12 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
       %
       % Compute the new step and safeguard it.
       %
+<<<<<<< HEAD
       alphaf = min( alphaf, step_maxmax );
       alphaf = max( alphaf, self.alpha_min );
+=======
+      alphaf = min(self.alpha_max,max(self.alpha_min,alphaf));
+>>>>>>> 777dc57db9fd3e478fd721447f3381155df7b8c5
       if bracketed && bound
         atmp = LO.alpha+0.66*(HI.alpha-LO.alpha);
         if HI.alpha > LO.alpha
@@ -314,10 +318,17 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
       case 5
         fprintf('The step is at the upper bound alpha_max.\n');
       case 6
+<<<<<<< HEAD
         fprintf('Rounding errors prevent further progress.\n');
         fprintf('There may not be a step which satisfies the\n');
         fprintf('sufficient decrease and curvature conditions.\n');
         fprintf('Tolerances may be too small..\n');
+=======
+        M.frintf('Rounding errors prevent further progress.\n');
+        M.frintf('There may not be a step which satisfies the\n');
+        M.frintf('sufficient decrease and curvature conditions.\n');
+        M.frintf('Tolerances may be too small..\n');
+>>>>>>> 777dc57db9fd3e478fd721447f3381155df7b8c5
       end
     end
     %
@@ -325,7 +336,11 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
     % Line Search Routine
     % ----------------------------------------------------------------------
     %
+<<<<<<< HEAD
     function [ stp, info ] = MTsearch( self, stp )
+=======
+    function [stp,info] = MTsearch( self, stp )
+>>>>>>> 777dc57db9fd3e478fd721447f3381155df7b8c5
       % The purpose of ******** is to find a step which satisfies
       % a sufficient decrease condition and a curvature condition.
       %
@@ -448,8 +463,13 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
           self.step_min = min( LO.alpha, HI.alpha );
           self.step_max = max( LO.alpha, HI.alpha );
         else
+<<<<<<< HEAD
           self.step_min = LO.alpha;
           self.step_max = stp + self.xtrapf*(stp - LO.alpha);
+=======
+          stmin = LO.alpha;
+          stmax = stp + self.xtrapf*(stp - LO.alpha);
+>>>>>>> 777dc57db9fd3e478fd721447f3381155df7b8c5
         end
         %
         % Force the step to be within the bounds self.step_max and self.step_min.
@@ -460,9 +480,17 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
         % If an unusual termination is to occur then let
         % stp be the lowest point obtained so far.
         %
+<<<<<<< HEAD
         if (bracketed && (stp <= self.step_min || stp >= self.step_max)) || ...
             infoc == 0 || self.n_fun_eval >= self.max_fun_eval || ...
            (bracketed && self.step_max-self.step_min <= self.xtol*self.step_max)
+=======
+        %nfev >= maxfev || 
+        %
+        if (bracketed && (stp <= stmin || stp >= stmax)) || ...
+            infoc == 0 || ...
+           (bracketed && stmax-stmin <= self.xtol*stmax)
+>>>>>>> 777dc57db9fd3e478fd721447f3381155df7b8c5
           stp = LO.alpha;
         end
         %
@@ -493,7 +521,11 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
         %
         % Test for convergence.
         %
+<<<<<<< HEAD
         if (bracketed && (stp <= self.step_min || stp >= self.step_max) ) || infoc == 0
+=======
+        if (bracketed && (stp <= stmin || stp >= stmax) ) || infoc == 0
+>>>>>>> 777dc57db9fd3e478fd721447f3381155df7b8c5
           info = 6;
         elseif stp == step_maxmax && f <= ftest1 && Df <= self.c1Df0
           info = 5;
@@ -544,7 +576,11 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
           % Call cstep to update the interval of uncertainty
           % and to compute the new step.
           %
+<<<<<<< HEAD
           [LO, HI, stp, bracketed, infoc] = self.safeguardedStep( LO, HI, M, bracketed, step_maxmax );
+=======
+          [LO, HI, stp, bracketed, infoc] = self.safeguardedStep( LO, HI, M, bracketed );
+>>>>>>> 777dc57db9fd3e478fd721447f3381155df7b8c5
           %
           % Reset the function and gradient values for f.
           %
@@ -561,7 +597,11 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
           M.alpha = stp;
           M.f     = f;
           M.Df    = Df;
+<<<<<<< HEAD
           [LO, HI, stp, bracketed, infoc] = self.safeguardedStep( LO, HI, M, bracketed, step_maxmax );
+=======
+          [LO, HI, stp, bracketed, infoc] = self.safeguardedStep( LO, HI, M, bracketed );
+>>>>>>> 777dc57db9fd3e478fd721447f3381155df7b8c5
         end
         %
         % Force a sufficient decrease in the size of the interval of uncertainty.
