@@ -8,7 +8,6 @@ addpath('../lib');
 addpath('../functions');
 
 r = Barrier1();
-disp(r.arity());
 
 %search_method   = LinesearchGoldenSection();
 search_method   = LinesearchMoreThuente();
@@ -42,7 +41,7 @@ title('CG x0 = [0,0.8]');
 
 if true
   for kkk=24:24
-    fprintf('\n\n\n\n\n\n\n%d\n\n\n\n\n\n\n',kkk);
+    fprintf('\n\n\n\n\n\n\nmethod N.%d\n\n\n\n\n\n\n',kkk);
     dir_method.selectByNumber(kkk);
     %x0 = r.guess(int32(1));
     x0 = [0; 0.999993944545];

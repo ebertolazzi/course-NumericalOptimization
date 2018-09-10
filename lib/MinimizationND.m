@@ -112,7 +112,7 @@ classdef MinimizationND < handle
         %
         % advance
         x1 = x0 + alpha * d;
-        % only for debug
+        %
         if self.save_iterate
           self.x_history = [ self.x_history x1(:) ];
         end

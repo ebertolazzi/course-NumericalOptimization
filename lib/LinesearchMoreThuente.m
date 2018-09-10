@@ -44,9 +44,6 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
   properties (SetAccess = private, Hidden = true)
     xtol         % Linesearch termination occurs when the relative width
                  % of the interval of uncertainty is at most xtol.
-    max_fun_eval % a positive integer input variable.
-                 % Linesearch termination occurs when the number of calls
-                 % to f(alpha) is at least max_fun_eval by the end of an iteration.
     info         % an integer output variable set as follows:
                  % info = 0  Improper input parameters.
                  %
@@ -67,11 +64,14 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
                  %           sufficient decrease and curvature conditions.
                  %           Tolerances may be too small.
     xtrapf
+    
+    step_min
+    step_max
   end
 
   methods (Hidden = true)
 
-    function [LO, HI, alphaf, bracketed, info] = safeguardedStep( self, LO, HI, M, bracketed )
+    function [LO, HI, alphaf, bracketed, info] = safeguardedStep( self, LO, HI, M, bracketed, step_maxmax )
       %
       % The purpose of cstep is to compute a safeguarded step for
       % a linesearch and to update an interval of uncertainty for
@@ -107,8 +107,9 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
       % Otherwise info = 0, and this indicates improper input parameters.
       %
       % Check the input parameters for errors.
-      aL = min(LO.alpha,HI.alpha);
-      aR = max(LO.alpha,HI.alpha);
+      aL = min( LO.alpha, HI.alpha );
+      aR = max( LO.alpha, HI.alpha );
+      alphaf = 0;
       if bracketed
         if M.alpha <= aL || M.alpha >= aR
           info = 0;
@@ -207,7 +208,7 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
         if r < 0 && gamma ~= 0
           alphac = M.alpha + r*(LO.alpha - M.alpha);
         elseif M.alpha > LO.alpha
-          alphac = self.alpha_max;
+          alphac = step_maxmax;
         else
           alphac = self.alpha_min;
         end
@@ -248,9 +249,9 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
           alphac = M.alpha + r*(HI.alpha - M.alpha);
           alphaf = alphac;
         elseif M.alpha > LO.alpha
-          alphaf = alphamax;
+          alphaf = step_maxmax;
         else
-          alphaf = alphamin;
+          alphaf = self.step_min;
         end
       end
       %
@@ -268,7 +269,8 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
       %
       % Compute the new step and safeguard it.
       %
-      alphaf = min(self.alpha_max,max(self.alpha_min,alphaf));
+      alphaf = min( alphaf, step_maxmax );
+      alphaf = max( alphaf, self.alpha_min );
       if bracketed && bound
         atmp = LO.alpha+0.66*(HI.alpha-LO.alpha);
         if HI.alpha > LO.alpha
@@ -287,10 +289,9 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
       self@LinesearchForwardBackward('MoreThuente');
       self.xtol         = 1e-2;
       self.xtrapf       = 4;
-      self.max_fun_eval = 1000;
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    function plotDebug( self, alpha_guess )
+    function plotDebug( self )
       self.printInfo();
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -301,22 +302,22 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
     function printInfo( self )
       switch (self.info)
       case 0
-        M.frintf('Improper input parameters.\n');
+        fprintf('Improper input parameters.\n');
       case 1
-        M.frintf('The sufficient decrease condition and the directional derivative condition hold.\n');
+        fprintf('The sufficient decrease condition and the directional derivative condition hold.\n');
       case 2
-        M.frintf('Relative width of the interval of uncertainty is at most xtol.\n');
+        fprintf('Relative width of the interval of uncertainty is at most xtol.\n');
       case 3
-        M.frintf('Number of calls to fcn has reached max_fun_eval.\n');
+        fprintf('Number of calls to fcn has reached max_fun_eval.\n');
       case 4
-        M.frintf('The step is at the lower bound alpha_min.\n');
+        fprintf('The step is at the lower bound alpha_min.\n');
       case 5
-        M.frintf('The step is at the upper bound alpha_max.\n');
+        fprintf('The step is at the upper bound alpha_max.\n');
       case 6
-        M.frintf('Rounding errors prevent further progress.\n');
-        M.frintf('There may not be a step which satisfies the\n');
-        M.frintf('sufficient decrease and curvature conditions.\n');
-        M.frintf('Tolerances may be too small..\n');
+        fprintf('Rounding errors prevent further progress.\n');
+        fprintf('There may not be a step which satisfies the\n');
+        fprintf('sufficient decrease and curvature conditions.\n');
+        fprintf('Tolerances may be too small..\n');
       end
     end
     %
@@ -324,7 +325,7 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
     % Line Search Routine
     % ----------------------------------------------------------------------
     %
-    function [stp,info] = MTsearch( self, stp )
+    function [ stp, info ] = MTsearch( self, stp )
       % The purpose of ******** is to find a step which satisfies
       % a sufficient decrease condition and a curvature condition.
       %
@@ -366,7 +367,7 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
       %      Termination occurs  when the relative width of the interval
       %      of uncertainty is at most xtol.
       %
-      %	stpmin and stpmax are nonnegative input variables which
+      %	self.step_min and self.step_max are nonnegative input variables which
       %	  specify lower and upper bounds for the step.
       %
       %	maxfev is a positive integer input variable.
@@ -385,24 +386,26 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
       %
       %	  info = 3  Number of calls to fcn has reached maxfev.
       %
-      %	  info = 4  The step is at the lower bound stpmin.
+      %	  info = 4  The step is at the lower bound self.step_min.
       %
-      %	  info = 5  The step is at the upper bound stpmax.
+      %	  info = 5  The step is at the upper bound self.step_max.
       %
       %	  info = 6  Rounding errors prevent further progress.
       %             There may not be a step which satisfies the
       %             sufficient decrease and curvature conditions.
       %             Tolerances may be too small.
       %
-      % nfev is an integer output variable set to the number of calls to fcn.
-      %
-      xtrapf = 4;
-      info   = 0;
-      infoc  = 1;
+      self.n_fun_eval = 0;
+      self.xtrapf     = 4;
+      info            = 0;
+      infoc           = 1;
+      step_maxmax     = self.alpha_max;
       %
       % Check the input parameters for errors.
       %
-      if stp <= 0 || self.c1 < 0 || self.c2 < 0 || self.xtol < 0 || ...
+      if stp <= 0 || ...
+         self.c1 < 0 || self.c2 < 0 || ...
+         self.xtol < 0 || ...
          self.alpha_min < 0 || self.alpha_max < self.alpha_min
         return;
       end
@@ -418,8 +421,6 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
       %
       bracketed = false;
       stage1    = true;
-      nfev      = 0;
-      %c1Df0     = self.c1*Df0;
       width     = self.alpha_max - self.alpha_min;
       width1    = width/0.5;
       %
@@ -444,46 +445,63 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
         % to the present interval of uncertainty.
         %
         if bracketed
-          stmin = min(LO.alpha,HI.alpha);
-          stmax = max(LO.alpha,HI.alpha);
+          self.step_min = min( LO.alpha, HI.alpha );
+          self.step_max = max( LO.alpha, HI.alpha );
         else
-          stmin = LO.alpha;
-          stmax = stp + self.xtrapf*(stp - LO.alpha);
+          self.step_min = LO.alpha;
+          self.step_max = stp + self.xtrapf*(stp - LO.alpha);
         end
         %
-        % Force the step to be within the bounds stpmax and stpmin.
+        % Force the step to be within the bounds self.step_max and self.step_min.
         %
-        stp = max(min(stp,self.alpha_max),self.alpha_min);
+        stp = min( stp, step_maxmax );
+        stp = max( stp, self.alpha_min );
         %
         % If an unusual termination is to occur then let
         % stp be the lowest point obtained so far.
         %
-        %nfev >= maxfev || 
-        %
-        if (bracketed && (stp <= stmin || stp >= stmax)) || ...
-            infoc == 0 || ...
-           (bracketed && stmax-stmin <= self.xtol*stmax)
+        if (bracketed && (stp <= self.step_min || stp >= self.step_max)) || ...
+            infoc == 0 || self.n_fun_eval >= self.max_fun_eval || ...
+           (bracketed && self.step_max-self.step_min <= self.xtol*self.step_max)
           stp = LO.alpha;
         end
         %
         % Evaluate the function and gradient at stp
         % and compute the directional derivative.
         %
-        f      = self.fun1D.eval(stp);
-        Df     = self.fun1D.eval_D(stp);
+        [ f, Df ] = self.fDf( stp );
+         
+        if ~isfinite(f)
+          bracketed = false;
+          % in case f(alpha) is infinite try to detect the barrier
+          if LO.alpha < HI.alpha
+            L = LO;
+          else
+            L = HI;
+          end
+          R.alpha       = stp;
+          [ R.f, R.Df ] = self.fDf(stp);
+          %
+          % check if f(alpha) is infinite
+          [ L, R ] = self.infGrow( L, R, stp );
+
+          stp = R.alpha;
+          [ f, Df ] = self.fDf( stp );
+        end
+        
         ftest1 = self.f0 + stp*self.c1Df0;
         %
         % Test for convergence.
         %
-        if (bracketed && (stp <= stmin || stp >= stmax) ) || infoc == 0
+        if (bracketed && (stp <= self.step_min || stp >= self.step_max) ) || infoc == 0
           info = 6;
-        elseif stp == self.alpha_max && f <= ftest1 && Df <= self.c1Df0
+        elseif stp == step_maxmax && f <= ftest1 && Df <= self.c1Df0
           info = 5;
         elseif stp == self.alpha_min && (f > ftest1 || Df >= self.c1Df0)
           info = 4;
-        %elseif nfev >= maxfev
-        %  info = 3;
-        elseif bracketed && stmax-stmin <= self.xtol*stmax
+        elseif self.n_fun_eval >= self.max_fun_eval
+          info = 3;
+        elseif bracketed && self.step_max-self.step_min <= self.xtol*self.step_max
           info = 2;
         elseif f <= ftest1 && abs(Df) <= self.c2*(-self.Df0)
           info = 1;
@@ -526,7 +544,7 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
           % Call cstep to update the interval of uncertainty
           % and to compute the new step.
           %
-          [LO, HI, stp, bracketed, infoc] = self.safeguardedStep( LO, HI, M, bracketed );
+          [LO, HI, stp, bracketed, infoc] = self.safeguardedStep( LO, HI, M, bracketed, step_maxmax );
           %
           % Reset the function and gradient values for f.
           %
@@ -543,7 +561,7 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
           M.alpha = stp;
           M.f     = f;
           M.Df    = Df;
-          [LO, HI, stp, bracketed, infoc] = self.safeguardedStep( LO, HI, M, bracketed );
+          [LO, HI, stp, bracketed, infoc] = self.safeguardedStep( LO, HI, M, bracketed, step_maxmax );
         end
         %
         % Force a sufficient decrease in the size of the interval of uncertainty.
@@ -564,6 +582,14 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
     function [alpha,ok] = search( self, alpha_guess )
       self.info = 0;
       ok        = false;
+      
+      [ self.f0, self.Df0 ] = self.fDf(0);
+      self.c1Df0 = self.c1*self.Df0;
+ 
+      [alpha,info] = self.MTsearch(alpha_guess);
+      ok = info == 1 || info == 6;
+      return ;
+
       %
       % Check the input parameters for errors.
       %

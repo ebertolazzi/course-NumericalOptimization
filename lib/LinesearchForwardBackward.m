@@ -11,18 +11,29 @@ classdef LinesearchForwardBackward < handle
                  % f(alpha)   = fun1D.eval(alpha)
                  % f'(alpha)  = fun1D.eval_D(alpha)
                  % f''(alpha) = fun1D.eval_D_DD(alpha)
+
+    n_fun_eval
+    max_fun_eval % a positive integer input variable.
+                 % Linesearch termination occurs when the number of calls
+                 % to f(alpha) is at least max_fun_eval by the end of an iteration.
+
     c1           % Armijo constant to accept the step (0,1/2]: f(alpha) <= f(0) + c1 * alpha * f'(0)
     c2           % Wolfe constant to accept the step [c1,1/2]: f'(alpha) >= c2 * f'(0)
+
     tau_LS       % multiplicative factor for Forward search
     tau_acc      % modify tau to accelerate exploration for large or very small interval
+
     alpha_min    % minimum accepted step
     alpha_max    % maximum accepted step
+
     barrier_reduce
     alpha_epsi   % minimum interval lenght for Wolfe linesearch
     debug_status % if true activate debug messages
+
     f0           % stored value f(0)
     Df0          % stored value f'(0)
     c1Df0        % stored value max(c1*f'(0),slopemax)
+
     name         % name of linesearch, set by the serived classed
   end
 
@@ -34,9 +45,8 @@ classdef LinesearchForwardBackward < handle
       % search for a finite value
       L0 = L;
       while ~isfinite(R.f)
-        tmp.alpha = (L.alpha+R.alpha)/2;
-        tmp.f     = self.fun1D.eval(tmp.alpha);
-        tmp.Df    = self.fun1D.eval_D(tmp.alpha);
+        tmp.alpha         = (L.alpha+R.alpha)/2;
+        [ tmp.f, tmp.Df ] = self.fDf( tmp.alpha );
         if isfinite(tmp.f) && ...
            tmp.f <= self.f0 + tmp.alpha * self.c1Df0 && ...
            tmp.Df < 0
@@ -51,6 +61,12 @@ classdef LinesearchForwardBackward < handle
         R = L;
         L = L0;
       end
+    end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function [f,Df] = fDf( self, alpha )
+      self.n_fun_eval = self.n_fun_eval+1;
+      f  = self.fun1D.eval( alpha );
+      Df = self.fun1D.eval_D( alpha );
     end
   end
 
@@ -67,6 +83,7 @@ classdef LinesearchForwardBackward < handle
       self.alpha_min      = 1e-50;
       self.alpha_max      = 1e50;
       self.barrier_reduce = 1e-3;
+      self.max_fun_eval   = 1000;
       self.alpha_epsi     = eps^(1/3);
       self.debug_status   = false;
       self.name           = name;
@@ -174,16 +191,15 @@ classdef LinesearchForwardBackward < handle
       %
       % ierr = -1 f(0) infinite or NaN
       % ierr = -2 f'(0) >= 0
+      self.n_fun_eval = 0;
       LO = {};
       HI = {};
       sname = sprintf( 'Linesearch[%s]::ForwardBackward: ', self.name );
 
       %
       % compute initial value and derivative
-      %f          = @(a) self.fun1D.eval(a);
-      %df         = @(a) self.fun1D.eval_D(a);
-      self.f0    = self.fun1D.eval(0);
-      self.Df0   = self.fun1D.eval_D(0);
+      %
+      [ self.f0, self.Df0 ] = self.fDf(0);
       self.c1Df0 = 0;
 
       %
@@ -205,12 +221,11 @@ classdef LinesearchForwardBackward < handle
 
       %
       % in case f(alpha) is infinite try to detect the barrier
-      L.alpha = 0;
-      L.f     = self.f0;
-      L.Df    = self.Df0;
-      R.alpha = alpha_guess;
-      R.f     = self.fun1D.eval(alpha_guess);
-      R.Df    = self.fun1D.eval_D(alpha_guess);
+      L.alpha       = 0;
+      L.f           = self.f0;
+      L.Df          = self.Df0;
+      R.alpha       = alpha_guess;
+      [ R.f, R.Df ] = self.fDf(alpha_guess);
       %
       % check if f(alpha) is infinite
       if ~isfinite(R.f)
@@ -231,24 +246,22 @@ classdef LinesearchForwardBackward < handle
       if (R.f - self.f0) > R.alpha*self.c1Df0
         % Armijo NOT satified
         % reduce the step until f(R) <= f(L) < f(0)
-        tauf     = self.tau_LS;
-        L.alpha  = max(R.alpha/tauf,self.alpha_min);
-        L.f      = self.fun1D.eval(L.alpha);
-        L.Df     = self.fun1D.eval_D(L.alpha);
-        S        = R;
-        Llesscnt = 0;
+        tauf          = self.tau_LS;
+        L.alpha       = max(R.alpha/tauf,self.alpha_min);
+        [ L.f, L.Df ] = self.fDf( L.alpha );
+        S             = R;
+        Llesscnt      = 0;
         while R.alpha > self.alpha_min
           if L.f < self.f0
             if L.f >= R.f; break; end
             Llesscnt = Llesscnt+1;
             if Llesscnt > 10; break; end
           end
-          S       = R;
-          R       = L;
-          L.alpha = max(R.alpha/tauf,self.alpha_min);
-          L.f     = self.fun1D.eval(L.alpha);
-          L.Df    = self.fun1D.eval_D(L.alpha);
-          tauf    = tauf * self.tau_acc; % update tau factor
+          S             = R;
+          R             = L;
+          L.alpha       = max(R.alpha/tauf,self.alpha_min);
+          [ L.f, L.Df ] = self.fDf( L.alpha );
+          tauf          = tauf * self.tau_acc; % update tau factor
         end
         if L.f < self.f0
           R = S;
@@ -259,19 +272,17 @@ classdef LinesearchForwardBackward < handle
         end
       else
         % satisfy Armijo at first step, try to enlarge interval
-        tauf    = self.tau_LS;
-        N.alpha = tauf * R.alpha;
-        N.f     = self.fun1D.eval(N.alpha);
-        N.Df    = self.fun1D.eval_D(N.alpha);
+        tauf          = self.tau_LS;
+        N.alpha       = tauf * R.alpha;
+        [ N.f, N.Df ] = self.fDf( N.alpha );
         while N.alpha < self.alpha_max && ...
               (N.f-self.f0) <= N.alpha * self.c1Df0 && ...
               N.f <= R.f && N.Df < 0
-          L       = R;
-          R       = N;
-          N.alpha = tauf * N.alpha;
-          N.f     = self.fun1D.eval(N.alpha);
-          N.Df    = self.fun1D.eval_D(N.alpha);
-          tauf    = tauf * self.tau_acc; % update tau factor
+          L             = R;
+          R             = N;
+          N.alpha       = tauf * N.alpha;
+          [ N.f, N.Df ] = self.fDf( N.alpha );
+          tauf          = tauf * self.tau_acc; % update tau factor
         end
 
         if ~isfinite(N.f)
