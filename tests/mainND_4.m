@@ -10,8 +10,8 @@ addpath('../functions');
 r = Barrier1();
 disp(r.arity());
 
-%search_method   = LinesearchGoldenSection();
-search_method   = LinesearchMoreThuente();
+search_method   = LinesearchGoldenSection();
+%search_method   = LinesearchMoreThuente();
 %search_method = LinesearchArmijo();
 %search_method = LinesearchWolfe();
 
