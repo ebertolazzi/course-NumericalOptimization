@@ -36,7 +36,7 @@ classdef KowalikAndOsborne < FunctionMap
   end
 
   methods
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = KowalikAndOsborne()
       % KowalikAndOsborne( )...............N = 4; M = 11;
       self@FunctionMap(int32(4),int32(11));       % call superclass constructor
@@ -47,7 +47,7 @@ classdef KowalikAndOsborne < FunctionMap
       self.yi = [ 0.1957 0.1947 0.1735 0.1600 0.0844 0.0627 0.0456 0.0342 0.0323 0.0235 0.0246 ].';
       self.ui = [ 4      2      1      0.5    0.25   0.1670 0.1250 0.1000 0.0833 0.0714 0.0625 ].';
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function F = evalMap(self,x)
       % evaluate the entries (not squared) of the function.
       X1 = x(1);
@@ -60,7 +60,7 @@ classdef KowalikAndOsborne < FunctionMap
 
       F  =  y + ( X1*(u.^2 + u.*X2)) ./ (u.^2 + u.*X3 + X4 ); % vector of [ f_1(x) ... f_n(x) ] values.
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function J = jacobian( self, x )
       % use analytic jacobian
       self.check_x( x );
@@ -80,7 +80,7 @@ classdef KowalikAndOsborne < FunctionMap
       J  = [ (u2 + u.*X2)./UXX, (u.*X1./UXX), - u.*X1.*( u2+u.*X2 )./UXX2, -X1.*( u2+u.*X2 )./UXX2 ];
 
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function T = tensor( self, x )
       % use analytic tensor
       self.check_x( x );
@@ -116,7 +116,7 @@ classdef KowalikAndOsborne < FunctionMap
       % Dimensions = MxNxN
       T  = cat(3,T1,T2,T3,T4);
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
 end
 

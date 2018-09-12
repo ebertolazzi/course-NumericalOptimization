@@ -49,22 +49,26 @@ classdef ShekelSQRN10 < FunctionND
       self.check_x(x);
       n = 4;
       m = 10;
-      f = 0.0;
-      for j = 1 : m
-        f = f - 1.0 / ( self.c(j) + sum ( ( x - self.a(1:n,j) ).^2 ) );
+      f = 0;
+      for j = 1:m
+        d = self.c(j) + sum ( ( x - self.a(:,j) ).^2 );
+        f = f - 1/d;
       end
     end
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function g = grad( self, x )
       % use analitic gradient
+      %g  = self.FD_grad( x );
+      %return
       self.check_x(x);
-      g = zeros ( 1, 4 );
       n = 4;
       m = 10;
-      for k = 1 : n
-        for j = 1 : m
-          d = self.c(j) + sum ( ( x - self.a(1:n,j) ).^2 );
-          g(k) = g(k) + ( 2.0 * ( x(k) - self.a(k,j) ) ) / d^2;
+      g = zeros( 1, n );
+      for j = 1:m
+        d = self.c(j) + sum ( ( x - self.a(:,j) ).^2 );
+        for k = 1:n
+          d_k  = 2*( x(k) - self.a(k,j) );
+          g(k) = g(k) + d_k / d^2;
         end
       end
     end

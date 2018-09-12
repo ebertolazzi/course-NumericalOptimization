@@ -404,7 +404,8 @@ classdef MinimizationConjugateGradient < MinimizationND
         self.x_history = x(:);
       end
       %
-      for self.iter=1:self.max_iter
+      for iter=1:self.max_iter
+        self.iter = iter;
         %
         % gradient of the function
         g1 = self.funND.grad( x ).';

@@ -23,9 +23,6 @@ classdef Helix < FunctionMap
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function res = f_theta(self,X,Y)
       res = atan2(Y,X)/(2*pi);
-      if X < 0
-        res = res + 0.5;
-      end
     end
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function res = f_theta_1(self,X,Y)
@@ -62,15 +59,15 @@ classdef Helix < FunctionMap
     end
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function res = hypot_1_1(self,x,y)
-      res = y^2/hypot(x,y)^(3/2);
+      res = y^2/hypot(x,y)^3;
     end
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function res = hypot_1_2(self,x,y)
-      res = -x*y/hypot(x,y)^(3/2);
+      res = -x*y/hypot(x,y)^3;
     end
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function res = hypot_2_2(self,x,y)
-      res = x^2/hypot(x,y)^(3/2);
+      res = x^2/hypot(x,y)^3;
     end
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
@@ -89,7 +86,8 @@ classdef Helix < FunctionMap
       Y = x(2);
       Z = x(3);
       F = [ 10*( Z - 10*self.f_theta(X,Y) ); ...
-            10*( hypot(X,Y)  - 1 ); Z ];
+            10*( hypot(X,Y)  - 1 ); ...
+            Z ];
     end
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function J = jacobian( self, x )

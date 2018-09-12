@@ -3,8 +3,8 @@ classdef BrownBadlyScaled < FunctionMap
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = BrownBadlyScaled()
       self@FunctionMap(int32(2),int32(3));
-      self.exact_solutions = [ 1.0; 1.0 ];     % one known solution
-      self.guesses         = [ 1e6; 2e6 ];
+      self.exact_solutions = [ 1e6; 2e-6 ];     % one known solution
+      self.guesses         = [ 1e6; 2e6  ];
     end
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function F = evalMap(self,x)

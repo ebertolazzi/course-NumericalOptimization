@@ -46,10 +46,10 @@ classdef GregoryAndKarney < FunctionND
 
     end
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    function f = eval(self,x)
+    function f = eval( self, x )
       % evaluate function
       self.check_x(x);
-      f = x(1) * x(1) + 2.0 * dot( x, x );
+      f = x(1) * x(1) + 2 * dot( x, x );
       for i = 1 : self.N - 1
         f = f - 2.0 * x(i) * x(i+1);
       end
@@ -59,48 +59,29 @@ classdef GregoryAndKarney < FunctionND
     function g = grad( self, x )
       % use analitic gradient
       self.check_x(x);
-      g = zeros ( 1, self.N );
-
-      for i = 1 : self.N
-
-        if ( i == 1 )
-          g(i) = x(i);
-        else
-          g(i) = 2.0 * x(i);
-        end
-
-        if ( 1 < i )
-          g(i) = g(i) - x(i-1);
-        end
-
-        if ( i < self.N )
-          g(i) = g(i) - x(i+1);
-        end
-
+      g = zeros( 1, self.N );
+      g(1) = 6*x(1);
+      for i=2:self.N
+        g(i) = 4*x(i);
       end
-
-      g(1) = g(1) - 2.0;
+      for i = 1 : self.N - 1
+        g(i)   = g(i)   - 2*x(i+1);
+        g(i+1) = g(i+1) - 2*x(i);
+      end
+      g(1) = g(1) - 2;
     end
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function h = hessian( self, x )
       % use analitic hessian
       self.check_x(x);
-      h = zeros ( self.N, self.N );
-
-      for i = 1 : self.N
-        for j = 1 : self.N
-          if i == j
-            if i == 1
-              h(i,j) = 2.0;
-            else
-              h(i,j) = 4.0;
-            end
-          elseif i == j + 1 || i == j - 1
-            h(i,j) = - 2.0;
-          else
-            h(i,j) = 0.0;
-          end
-        end
+      h = zeros( self.N, self.N );
+      h(1,1) = 6;
+      for i = 1:self.N
+        h(i,i) = 4;
+      end
+      for i = 1:self.N-1
+        h(i,i+1) = h(i,i+1)-2;
+        h(i+1,i) = h(i+1,i)-2;
       end
     end
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

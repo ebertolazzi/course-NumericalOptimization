@@ -28,34 +28,44 @@ classdef Box3 < FunctionMap
       self.guesses         = [ 0.0; 10.0; 5.0 ];
     end
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    function F = evalMap(self,x)
+    function F = evalMap( self, xx )
       % evaluate function
-      self.check_x(x);
-      F = zeros(10,1);
+      self.check_x( xx );
+      x1 = xx(1);
+      x2 = xx(2);
+      x3 = xx(3);
+      F  = zeros(10,1);
       for i = 1:10
-        c    = - i / 10.0;
-        F(i) = exp( c * x(1) ) - exp( c * x(2) ) - x(3) * ( exp( c ) - exp( 10.0 * c ) );
+        c    = -i/10;
+        F(i) = exp(c*x1) - exp(c*x2) - x3*( exp(c) - exp(10*c) );
       end
     end
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    function J = jacobian( self, x )
+    function J = jacobian( self, xx )
       % use analitic jacobian
-      self.check_x(x);
-      J = zeros(10,3);
+      self.check_x( xx );
+      x1 = xx(1);
+      x2 = xx(2);
+      x3 = xx(3);
+      J  = zeros(10,3);
       for i = 1:10
-        c      = - i / 10.0;
-        J(i,:) = [ c * exp( c * x(1) ), - c * exp( c * x(2) ),  exp( 10.0 * c )  - exp( c ) ];
+        c      = -i/10;
+        J(i,:) = [ c * exp(c*x1), -c * exp(c*x2), exp(10*c) - exp(c) ];
       end
     end
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    function T = tensor( self, x )
+    function T = tensor( self, xx )
+      self.check_x( xx );
+      x1 = xx(1);
+      x2 = xx(2);
+      x3 = xx(3);
       % use analitic tensor of second derivative
       T = zeros(10,3,3);
       for i = 1:10
         c        = - i / 10.0;
-        T(i,:,:) = c^2 * [ exp( c * x(1) ), 0, 0;  ...
-                           0, -exp( c * x(2) ), 0; ...
-                           0, 0, 0 ];
+        T(i,:,:) = c^2 * [ exp(c*x1),          0, 0; ...
+                           0,         -exp(c*x2), 0; ...
+                           0,                  0, 0 ];
       end
     end
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

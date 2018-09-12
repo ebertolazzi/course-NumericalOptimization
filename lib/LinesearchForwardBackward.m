@@ -76,8 +76,8 @@ classdef LinesearchForwardBackward < handle
       %
       % constructor
       %
-      self.c1             = 0.1;
-      self.c2             = 0.2;
+      self.c1             = 1e-4;
+      self.c2             = 0.05;
       self.tau_LS         = 1.1;
       self.tau_acc        = 1.2;
       self.alpha_min      = 1e-50;

@@ -20,7 +20,7 @@ classdef Barrier1 < FunctionND
       self@FunctionND(int32(2));
       self.exact_solutions = []; % no known solution
       self.guesses         = [ 0.9999; 0];
-      self.epsi            = 1e-7;
+      self.epsi            = 1e-8;
     end
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function f = eval(self,xx)

@@ -218,35 +218,16 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
         bound = true;
 
         if self.isMonotonic( LO, M )
-          alphaf = self.minQuadratic( M, LO );
+          alphac = LO.alpha + self.xtrapf * (M.alpha - LO.alpha);
+          if M.alpha > LO.alpha
+            alphac = min( alphac, step_maxmax );
+          else
+            alphac = max( alphac, self.alpha_min);
+          end
         else
-            
-          %alphaf = self.minQuadratic( M, LO )
-          alphaf = self.minCubic( LO, M );
-            
-        if false
-            
-        theta = 3*(LO.f - M.f)/(M.alpha - LO.alpha) + LO.Df + M.Df;
-        s     = max(abs([theta,LO.Df,M.Df]));
-        %
-        % The case gamma = 0 only arises if the cubic does not tend
-        % to infinity in the direction of the step.
-        %
-        gamma = s*sqrt(max(0,(theta/s)^2- (LO.Df/s)*(M.Df/s)));
-        if M.alpha > LO.alpha
-          gamma = -gamma;
+          alphac = self.minCubic( LO, M );
         end
-        p = (gamma - M.Df) + theta;
-        q = (gamma + (LO.Df - M.Df)) + gamma;
-        r = p/q;
-        if r < 0 && gamma ~= 0
-          alphac = M.alpha + r*(LO.alpha - M.alpha);
-        elseif M.alpha > LO.alpha
-          alphac = step_maxmax;
-        else
-          alphac = self.alpha_min;
-        end
-          fprintf(2,'gamma %g alphac %g r %g\n',gamma,alphac,r);
+
         alphas = self.minQuadratic2( M, LO );
         if bracketed
           if abs(M.alpha-alphac) < abs(M.alpha-alphas)
@@ -261,10 +242,7 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
             alphaf = alphas;
           end
         end
-        
-        end
-        
-        end
+
       else
         %
         % Fourth case.
@@ -433,10 +411,7 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
       %
       % Check the input parameters for errors.
       %
-      if stp <= 0 || ...
-         self.c1 < 0 || self.c2 < 0 || ...
-         self.xtol < 0 || ...
-         self.alpha_min < 0 || self.alpha_max < self.alpha_min
+      if stp <= 0
         return;
       end
       %
@@ -482,7 +457,7 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
           self.step_max = stp + self.xtrapf*(stp - LO.alpha);
         end
         %
-        % Force the step to be within the bounds self.step_max and self.step_min.
+        % Force the step to be within the bounds self.alpha_min and self.alpha_max.
         %
         stp = min( stp, step_maxmax );
         stp = max( stp, self.alpha_min );

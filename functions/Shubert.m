@@ -30,15 +30,13 @@ classdef Shubert < FunctionND
     function f = eval(self,x)
       % evaluate function
       self.check_x(x);
-      factor1 = 0.0;
-      for i = 1 : 5
-        y = i;
-        factor1 = factor1 + y * cos ( ( y + 1.0 ) * x(1) + y );
+      factor1 = 0;
+      for y=1:5
+        factor1 = factor1 + y * cos( (y+1) * x(1) + y );
       end
-      factor2 = 0.0;
-      for i = 1 : 5
-        y = i;
-        factor2 = factor2 + y * cos ( ( y + 1.0 ) * x(2) + y );
+      factor2 = 0;
+      for y=1:5
+        factor2 = factor2 + y * cos ( (y+1) * x(2) + y );
       end
       f = factor1 * factor2;
     end
@@ -46,22 +44,20 @@ classdef Shubert < FunctionND
     function g = grad( self, x )
       % use analitic gradient
       self.check_x(x);
-      g = zeros ( 1, 2 );
-
-      factor1 = 0.0;
-      df1dx1  = 0.0;
-      for i = 1 : 5
-        y = i;
-        factor1 = factor1 + y * cos ( ( y + 1.0 ) * x(1) + y );
-        df1dx1 = df1dx1 - y * ( y + 1.0 ) * sin ( ( y + 1.0 ) * x(1) + y );
+      factor1 = 0;
+      df1dx1  = 0;
+      for y=1:5
+        arg     = (y+1) * x(1) + y;
+        factor1 = factor1 + y * cos(arg);
+        df1dx1  = df1dx1  - y * (y+1) * sin(arg);
       end
 
-      factor2 = 0.0;
-      df2dx2 = 0.0;
-      for i = 1 : 5
-        y = i;
-        factor2 = factor2 + y * cos ( ( y + 1.0 ) * x(2) + y );
-        df2dx2 = df2dx2 - y * ( y + 1.0 ) * sin ( ( y + 1.0 ) * x(2) + y );
+      factor2 = 0;
+      df2dx2  = 0;
+      for y=1:5
+        arg     = (y+1) * x(2) + y ;
+        factor2 = factor2 + y * cos (arg);
+        df2dx2  = df2dx2 - y * (y+1) * sin(arg);
       end
 
       g(1) = df1dx1 * factor2;
