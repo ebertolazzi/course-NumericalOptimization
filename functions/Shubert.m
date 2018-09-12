@@ -20,13 +20,13 @@ classdef Shubert < FunctionND
   %
 
   methods
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = Shubert()
       self@FunctionND(int32(2));
       self.exact_solutions = [ 0; 0 ];     % one known solution
       self.guesses         = [ 0.5; 1.0];
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function f = eval(self,x)
       % evaluate function
       self.check_x(x);
@@ -42,7 +42,7 @@ classdef Shubert < FunctionND
       end
       f = factor1 * factor2;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function g = grad( self, x )
       % use analitic gradient
       self.check_x(x);
@@ -67,7 +67,7 @@ classdef Shubert < FunctionND
       g(1) = df1dx1 * factor2;
       g(2) = factor1 * df2dx2;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function h = hessian( self, x )
       % use analitic hessian
       self.check_x(x);
@@ -97,17 +97,17 @@ classdef Shubert < FunctionND
       h(2,1) = df1dx1 * df2dx2;
       h(2,2) = factor1 * df2dx22;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function [f,g] = eval_FG( self, x )
       f = self.eval(x);
       g = self.grad(x);
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function [f,g,H] = eval_FGH( self, x )
       f = self.eval(x);
       g = self.grad(x);
       H = self.hessian(x);
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
 end

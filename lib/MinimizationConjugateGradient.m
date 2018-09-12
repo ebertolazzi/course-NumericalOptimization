@@ -39,7 +39,7 @@ classdef MinimizationConjugateGradient < MinimizationND
   end
 
   methods (Hidden = true)
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function d = HS( ~, g1, g0, d0, ~ )
       % M.R.Hestenes and E.L.Stiefel
       % Methods of conjugate gradients for solving linear systems,
@@ -48,7 +48,7 @@ classdef MinimizationConjugateGradient < MinimizationND
       beta = dot(g1,y)/dot(d0,y);
       d    = -g1 + beta * d0;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function d = HSplus( ~, g1, g0, d0, ~ )
       % M. J. D. Powell
       % Nonconvex minimization calculations and the conjugate gradient method,
@@ -58,7 +58,7 @@ classdef MinimizationConjugateGradient < MinimizationND
       beta = max(0,dot(g1,y)/dot(d0,y));
       d    = -g1 + beta * d0;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function d = FR( ~, g1, g0, d0, ~ )
       % R. Fletcher and C. Reeves
       % Function minimization by conjugate gradients,
@@ -66,7 +66,7 @@ classdef MinimizationConjugateGradient < MinimizationND
       beta = dot(g1,g1)/dot(g0,g0);
       d    = -g1 + beta * d0;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function d = PRP( ~, g1, g0, d0, ~ )
       % E. Polak and G. Ribiere
       % Note sur la convergence de directions conjugees,
@@ -79,7 +79,7 @@ classdef MinimizationConjugateGradient < MinimizationND
       beta = dot(g1,y)/dot(g0,g0);
       d    = -g1 + beta * d0;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function d = PRPplus( ~, g1, g0, d0, ~ )
       % J. C. Gilbert and J. Nocedal
       % Global convergence properties of conjugate gradient methods for optimization,
@@ -88,7 +88,7 @@ classdef MinimizationConjugateGradient < MinimizationND
       beta = max(0,dot(g1,y)/dot(g0,g0));
       d    = -g1 + beta * d0;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function d = aPRP( ~, g1, g0, ~, s )
       % N. Andrei
       % Another nonlinear conjugate gradient algorithm with sufficient descent conditions for unconstrained optimization
@@ -97,7 +97,7 @@ classdef MinimizationConjugateGradient < MinimizationND
       beta = ( dot(y,g1) - dot(y,y)*dot(s,g1)/dot(g0,g0) )/dot(y,s); % ORIGINAL
       d    = -g1 + beta * s;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function d = CCOMB( ~, g1, g0, ~, s )
       % N. Andrei
       % New hybrid conjugate gradient algorithms as a convex combination of PRP and DY for unconstrained optimization
@@ -115,7 +115,7 @@ classdef MinimizationConjugateGradient < MinimizationND
       beta  = (1-theta)*prp + theta * dy;
       d     = -g1 + beta * s;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function d = NDOMB( ~, g1, g0, ~, s )
       % N. Andrei
       % New hybrid conjugate gradient algorithms for unconstrained optimization
@@ -131,7 +131,7 @@ classdef MinimizationConjugateGradient < MinimizationND
       beta  = (1-theta)*prp + theta * dy;
       d     = -g1 + beta * s;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function d = CD( ~, g1, g0, d0, ~ )
       % R. Fletcher
       % Practical Methods of Optimization vol. 1: Unconstrained Optimization,
@@ -139,7 +139,7 @@ classdef MinimizationConjugateGradient < MinimizationND
       beta = -dot(g1,g1)/dot(g0,d0);
       d    = -g1 + beta * d0;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function d = LS( ~, g1, g0, d0, ~ )
       % Y. Liu and C. Storey
       % Efficient generalized conjugate gradient algorithms, Part 1: Theory,
@@ -148,7 +148,7 @@ classdef MinimizationConjugateGradient < MinimizationND
       beta = -dot(g1,y)/dot(g0,d0);
       d    = -g1 + beta * d0;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function d = DY( ~, g1, g0, d0, ~ )
       % Y. H. Dai and Y. Yuan
       % A nonlinear conjugate gradient method with a strong global convergence property
@@ -157,7 +157,7 @@ classdef MinimizationConjugateGradient < MinimizationND
       beta = dot(g1,g1)/dot(y,d0);
       d    = -g1 + beta * d0;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function d = DL( ~, g1, g0, ~, s )
       % Y.H. Dai and L.Z. Liao
       % New conjugacy conditions and related nonlinear conjugate gradient methods
@@ -167,7 +167,7 @@ classdef MinimizationConjugateGradient < MinimizationND
       beta = dot(g1,y-t*s)/dot(y,s);
       d    = -g1 + beta * s;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function d = DLplus( ~, g1, g0, ~, s )
       % H. Yabe and M. Takano
       % Global convergence properties of nonlinear conjugate gradient methods with modified secant conditions
@@ -178,7 +178,7 @@ classdef MinimizationConjugateGradient < MinimizationND
       beta = max(0,dot(g1,y)/ys) - t*dot(g1,s)/ys;
       d    = -g1 + beta * s;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function d = ACGA( ~, g1, g0, ~, s )
       % N. Andrei
       % Another nonlinear conjugate gradient algorithm for unconstrained optimization
@@ -192,7 +192,7 @@ classdef MinimizationConjugateGradient < MinimizationND
         d = -g1;
       end
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function d = ACGAplus( ~, g1, g0, ~, s )
       % N. Andrei
       % Another nonlinear conjugate gradient algorithm for unconstrained optimization
@@ -206,7 +206,7 @@ classdef MinimizationConjugateGradient < MinimizationND
         d = -g1;
       end
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function d = CGSD( ~, g1, g0, ~, s )
       % N. Andrei, A Dai-Yuan
       % conjugate gradient algorithm with sufficient descent and conjugacy conditions for unconstrained optimization.
@@ -223,7 +223,7 @@ classdef MinimizationConjugateGradient < MinimizationND
         d = -g1;
       end
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function d = BM( ~, g1, g0, ~, s )
       % E. Birgin and J.M. Martínez
       % A spectral conjugate gradient method for unconstrained optimization
@@ -234,7 +234,7 @@ classdef MinimizationConjugateGradient < MinimizationND
       beta  = dot(theta*y-s,g1)/ys;
       d     = -theta * g1 + beta * s;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function d = BMplus( ~, g1, g0, ~, s )
       % E. Birgin and J.M. Martínez
       % A spectral conjugate gradient method for unconstrained optimization
@@ -245,7 +245,7 @@ classdef MinimizationConjugateGradient < MinimizationND
       beta  = (max(0,dot(theta*y,g1))-dot(s,g1))/ys;
       d     = -theta * g1 + beta * s;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function d = N( ~, g1, g0, d0, s )
       % W. W. Hager and H. Zhang
       % A new conjugate gradient method with guaranteed descent and an efficient line search
@@ -256,7 +256,7 @@ classdef MinimizationConjugateGradient < MinimizationND
       beta = max( eta, dot(z,g1)/dot(s,y) );
       d    = -g1 + beta * s;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function d = HyTAS( ~, g1, g0, d0, ~ )
       % D. Touati-Ahmed and C. Storey
       % Efficient hybrid conjugate gradient techniques,
@@ -271,7 +271,7 @@ classdef MinimizationConjugateGradient < MinimizationND
       end
       d = -g1 + beta * d0;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function d = HyHS( ~, g1, g0, d0, ~ )
       % Y. F. Hu and C. Storey
       % Global convergence result for conjugate gradient methods,
@@ -282,7 +282,7 @@ classdef MinimizationConjugateGradient < MinimizationND
       beta    = max(0,min(betaPRP,betaFR));
       d       = -g1 + beta * d0;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function d = HyNG( ~, g1, g0, d0, ~ )
       % J. C. Gilbert and J. Nocedal
       % Global convergence properties of conjugate gradient methods for optimization,
@@ -293,7 +293,7 @@ classdef MinimizationConjugateGradient < MinimizationND
       beta    = max(-betaFR,min(betaPRP,betaFR));
       d       = -g1 + beta * d0;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function d = HyDY( ~, g1, g0, d0, ~ )
       % Y. H. Dai and Y. Yuan
       % An efficient hybrid conjugate gradient method for unconstrained optimization,
@@ -301,7 +301,7 @@ classdef MinimizationConjugateGradient < MinimizationND
       beta = dot(g1,g1)/max( dot(d0,g1-g0), -dot(g0,d0));
       d    = -g1 + beta * d0;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function d = dirEval( self, g1, g0, d0, s )
       % Compute the value of `beta` for the selected nonlinear CG method
       switch ( self.method )
@@ -333,11 +333,11 @@ classdef MinimizationConjugateGradient < MinimizationND
         error('MinimizationCG, dirEval no method selected (this should not be happen)');
       end
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
 
   methods
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = MinimizationConjugateGradient( fun, ls )
       %
       % fun = function to be minimized
@@ -359,17 +359,17 @@ classdef MinimizationConjugateGradient < MinimizationND
       self.method          = self.method_names{1};
       self.angle_too_small = cos(pi/2+pi/180); % 90-1 degree
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function n = numOfMethods( self )
       % return the number of methods available
       n = length(self.method_names);
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function name = activeMethod( self )
       % return active CG method used in minimization
       name = self.method;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function selectByNumber( self, k )
       % select the CG method by number
       if k < 1 || k > length(self.method_names)
@@ -377,7 +377,7 @@ classdef MinimizationConjugateGradient < MinimizationND
       end
       self.method = self.method_names{k};
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function selectByName( self, name )
       % select the CG method by its name
       if ischar(name)
@@ -392,7 +392,7 @@ classdef MinimizationConjugateGradient < MinimizationND
         error('MinimizationCG, selectByName, expected string as arument, found %s',class(name));
       end
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function [x,converged] = minimize( self, x0 )
       % generic onjugate gradient minimization algorithm
       % x0 = initial point
@@ -476,6 +476,6 @@ classdef MinimizationConjugateGradient < MinimizationND
         s  = alpha*d;
       end
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
 end

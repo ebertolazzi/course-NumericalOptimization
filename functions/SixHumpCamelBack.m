@@ -21,14 +21,14 @@ classdef SixHumpCamelBack < FunctionND
   %
 
   methods
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = SixHumpCamelBack()
       self@FunctionND(int32(2));
       self.exact_solutions = [ -0.0898,  0.7126;
                                 0.0898, -0.7126 ].';
       self.guesses = [ -1.5; 0.5 ]; % one guess
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function f = eval( self, xx )
       self.check_x( xx );
       x  = xx(1);
@@ -37,7 +37,7 @@ classdef SixHumpCamelBack < FunctionND
       y2 = y*y;
       f  = ( 4 + x2*(x2/3-2.1) ) * x2 + x * y + 4*( y2 - 1 ) * y2;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function g = grad( self, xx )
       % use analitic gradient
       self.check_x( xx );
@@ -48,7 +48,7 @@ classdef SixHumpCamelBack < FunctionND
       g(1) = 2*x*(4+x2*(x2-4.2)) + y;
       g(2) = 2*y*(8*y*y-4) + x;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function h = hessian( self, xx )
       % use analitic hessian
       self.check_x( xx );
@@ -63,17 +63,17 @@ classdef SixHumpCamelBack < FunctionND
       h(2,1) = 1;
       h(2,2) = 48*y2-8;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function [f,g] = eval_FG( self, x )
       f = self.eval(x);
       g = self.grad(x);
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function [f,g,H] = eval_FGH( self, x )
       f = self.eval(x);
       g = self.grad(x);
       H = self.hessian(x);
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
 end

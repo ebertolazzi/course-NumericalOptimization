@@ -20,13 +20,13 @@ classdef Colville < FunctionND
   %
 
   methods
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = Colville()
       self@FunctionND(int32(4));
       self.exact_solutions = [ 1; 1; 1; 1 ];     % one known solution
       self.guesses         = [ 0.5; 1.0; -0.5; -1.0 ];
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function f = eval(self,x)
       % evaluate function
       self.check_x(x);
@@ -37,7 +37,7 @@ classdef Colville < FunctionND
         + 10.1 * ( ( x(2) - 1.0 )^2 + ( x(4) - 1.0 )^2 ) ...
         + 19.8 * ( x(2) - 1.0 ) * ( x(4) - 1.0 );
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function g = grad( self, x )
       % use analitic gradient
       self.check_x(x);
@@ -48,7 +48,7 @@ classdef Colville < FunctionND
       g(3) = -360.0 * x(3) * x(4) + 360.0 * x(3)^3 + 2.0 * x(3) - 2.0;
       g(4) = + 180.0 * x(4) - 180.0 * x(3)^2 + 20.2 * x(4) + 19.8 * x(2) - 40.0;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function h = hessian( self, x )
       % use analitic hessian
       self.check_x(x);
@@ -67,17 +67,17 @@ classdef Colville < FunctionND
       h(4,3) = - 360.0 * x(3);
       h(4,4) = 200.2;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function [f,g] = eval_FG( self, x )
       f = self.eval(x);
       g = self.grad(x);
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function [f,g,H] = eval_FGH( self, x )
       f = self.eval(x);
       g = self.grad(x);
       H = self.hessian(x);
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
 end

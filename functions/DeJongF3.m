@@ -20,37 +20,37 @@ classdef DeJongF3 < FunctionND
   %
 
   methods
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = DeJongF3()
       self@FunctionND(int32(5.12));
       self.exact_solutions = [ -5; -5; -5; -5; -5 ]; % one known solution
       self.guesses         = [ -5.12; -2.56; 0; 2.56; 5.12 ];
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function f = eval(self,x)
       % evaluate function
       self.check_x(x);
       f = sum( floor (x) );
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function g = grad( self, x )
       g = self.FD_grad( x );
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function H = hessian( self, x )
       H = self.FD_hessianj( x );
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function [f,g] = eval_FG( self, x )
       f = self.eval(x);
       g = self.grad(x);
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function [f,g,H] = eval_FGH( self, x )
       f = self.eval(x);
       g = self.grad(x);
       H = self.hessian(x);
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
 end

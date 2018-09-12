@@ -2,11 +2,11 @@ classdef LinesearchArmijo < LinesearchForwardBackward
   % Armijo linesearch
 
   methods
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = LinesearchArmijo()
       self@LinesearchForwardBackward('Armijo');
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function [alpha_ott,ok] = search( self, alpha_guess )
       % find step that satisfy Armijo condition
       % of ok = false search failed
@@ -26,6 +26,6 @@ classdef LinesearchArmijo < LinesearchForwardBackward
         ok        = false;
       end
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
 end

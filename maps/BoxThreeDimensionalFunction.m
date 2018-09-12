@@ -31,7 +31,7 @@ classdef BoxThreeDimensionalFunction < FunctionMap
   end
 
   methods
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = BoxThreeDimensionalFunction( M )
       % BoxThreeDimensionalFunction()...............N = 3; M >= N;
       self@FunctionMap(int32(3),int32(M));                    % call superclass constructor (initialize M)
@@ -42,7 +42,7 @@ classdef BoxThreeDimensionalFunction < FunctionMap
       self.ii = (1:double(self.M)).'; % create indexes for t
       self.ti = 0.1.*self.ii;         % t for the function
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function f = evalMap(self,x)
       % evaluate the entries (not squared) of the function.
       X1 = x(1);
@@ -58,7 +58,7 @@ classdef BoxThreeDimensionalFunction < FunctionMap
 
       % vector of [ f_1(x) ... f_n(x) ] values, i is automatically spanned (this is Matlab, do not forget it MAN!)
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function J = jacobian( self, x )
       % use analytic jacobian
       self.check_x( x );
@@ -73,7 +73,7 @@ classdef BoxThreeDimensionalFunction < FunctionMap
              t(i).*exp( t(i).*x(2) ) , ...
              - ( exp( -t(i) ) - exp( -10.*t(i) ) ) ];
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function T = tensor( self, x )
       % use analytic tensor
 
@@ -94,7 +94,7 @@ classdef BoxThreeDimensionalFunction < FunctionMap
       T  = cat(3,T1,T2,T3);
 
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
 end
 

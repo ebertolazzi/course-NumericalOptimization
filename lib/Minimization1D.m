@@ -7,7 +7,7 @@ classdef (Abstract) Minimization1D < handle
   end
 
   methods
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = Minimization1D( varargin )
       % funObj will be initialized using setFunction
       % varargin{1}  tol
@@ -18,10 +18,10 @@ classdef (Abstract) Minimization1D < handle
       if nargin > 0; self.tol      = varargin{1}; end
       if nargin > 1; self.max_iter = varargin{2}; end
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function setFunction( self, f )
       self.funObj = f;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
 end

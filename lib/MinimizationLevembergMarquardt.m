@@ -31,13 +31,13 @@ classdef MinimizationLevembergMarquardt < MinimizationND
   end
 
   methods
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = MinimizationLevembergMarquardt( fun )
       self@MinimizationND( fun, [] ); % Linesearch is empty -> no linesearch method in LM
       self.tol2 = 1e-6;
       self.tau  = 1e-6;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function setTau( self , tau )
       % Change tau of the LM algorithm:
       % Note the higher the tau the higher the confidence to start close to the minimum:
@@ -47,7 +47,7 @@ classdef MinimizationLevembergMarquardt < MinimizationND
       end
       self.tau = tau;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function setEpsilon2( self , tolerance )
       % Change tolerance epsilon 2 (see ref[1]):
       if tolerance <= 0
@@ -55,7 +55,7 @@ classdef MinimizationLevembergMarquardt < MinimizationND
       end
       self.tol2 = tolerance;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function [f,g,A] = eval_FGA( self, x )
       use_map = self.funND.is_a_map();
       f = self.funND.eval(x);
@@ -68,7 +68,7 @@ classdef MinimizationLevembergMarquardt < MinimizationND
         A = self.funND.hessian(x);
       end
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function [ x, converged ] = minimize( self , x0 )
       % Launch the minimization algorithm
       % Initial values -> see ref[1] algorithm 3.16
@@ -152,8 +152,8 @@ classdef MinimizationLevembergMarquardt < MinimizationND
       end
       % == END ITERATION ========
     end
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
-  % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 end
 
 %  #######################################################

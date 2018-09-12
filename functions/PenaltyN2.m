@@ -20,7 +20,7 @@ classdef PenaltyN2 < FunctionND
   %
 
   methods
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = PenaltyN2( varargin )
       if nargin == 0
         n = int32(2);
@@ -39,7 +39,7 @@ classdef PenaltyN2 < FunctionND
       self.exact_solutions = zeros(n,0); % unknown solution
       self.guesses         = 0.5 * ones( n, 1 );
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function f = eval(self,x)
       % evaluate function
       self.check_x(x);
@@ -65,7 +65,7 @@ classdef PenaltyN2 < FunctionND
 
       f = ap * ( t2 + t3 ) + t1 * t1 + ( x(1) - 0.2 )^2;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function g = grad( self, x )
       % use analitic gradient
       self.check_x(x);
@@ -95,7 +95,7 @@ classdef PenaltyN2 < FunctionND
 
       g(1) = g(1) + 2.0 * ( x(1) - 0.2 );
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function h = hessian( self, x )
       % use analitic hessian
       self.check_x(x);
@@ -143,17 +143,17 @@ classdef PenaltyN2 < FunctionND
         h(i,i+1:n) = h(i+1:n,i);
       end
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function [f,g] = eval_FG( self, x )
       f = self.eval(x);
       g = self.grad(x);
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function [f,g,H] = eval_FGH( self, x )
       f = self.eval(x);
       g = self.grad(x);
       H = self.hessian(x);
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
 end

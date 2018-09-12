@@ -21,7 +21,7 @@ classdef GregoryAndKarney < FunctionND
   %
 
   methods
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = GregoryAndKarney( varargin )
       if nargin == 0
         n = int32(2);
@@ -45,7 +45,7 @@ classdef GregoryAndKarney < FunctionND
       self.guesses = zeros( n, 1 );
 
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function f = eval(self,x)
       % evaluate function
       self.check_x(x);
@@ -55,7 +55,7 @@ classdef GregoryAndKarney < FunctionND
       end
       f = f - 2.0 * x(1);
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function g = grad( self, x )
       % use analitic gradient
       self.check_x(x);
@@ -81,7 +81,7 @@ classdef GregoryAndKarney < FunctionND
 
       g(1) = g(1) - 2.0;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function h = hessian( self, x )
       % use analitic hessian
       self.check_x(x);
@@ -103,17 +103,17 @@ classdef GregoryAndKarney < FunctionND
         end
       end
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function [f,g] = eval_FG( self, x )
       f = self.eval(x);
       g = self.grad(x);
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function [f,g,H] = eval_FGH( self, x )
       f = self.eval(x);
       g = self.grad(x);
       H = self.hessian(x);
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
 end

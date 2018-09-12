@@ -26,13 +26,13 @@ classdef Himmelblau < FunctionMap
   %
 
   methods
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = Himmelblau()
       self@FunctionMap(int32(2),int32(2));
       self.exact_solutions = [ 3.0; 2.0];     % one known solution
       self.guesses         = [ -1.3; 2.7];
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function F = evalMap(self,x)
       % evaluate function
       self.check_x(x);
@@ -40,7 +40,7 @@ classdef Himmelblau < FunctionMap
       Y = x(2);
       F = [ X^2 + Y - 11; X + Y^2 - 7 ];
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function J = jacobian( self, x )
       % use analitic jacobian
       self.check_x(x);
@@ -48,13 +48,13 @@ classdef Himmelblau < FunctionMap
       Y = x(2);
       J = [ 2*X, 1; 1, 2*Y ];
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function T = tensor( self, x )
       % use analitic tensor of second derivative
       T = zeros(2,2,2);
       T(1,:,:) = [ 2, 0; 0, 0 ];
       T(2,:,:) = [ 0, 0; 0, 2 ];
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
 end

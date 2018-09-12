@@ -7,7 +7,7 @@ classdef LinesearchGoldenSection < LinesearchForwardBackward
   end
 
   methods
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = LinesearchGoldenSection()
       % PASSA al costruttore della super-classe
       self@LinesearchForwardBackward('GoldenSection');
@@ -15,7 +15,7 @@ classdef LinesearchGoldenSection < LinesearchForwardBackward
       self.tol      = 1e-4;
       self.max_iter = 8;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function setMaxIteration( self, max_iter )
       if length(max_iter) > 1 || ~isinteger(max_iter)
         error('LinesearchGoldenSection:setMaxIteration, expected a scalar  integer\n');
@@ -25,14 +25,14 @@ classdef LinesearchGoldenSection < LinesearchForwardBackward
       end
       self.max_iter = max_iter;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function setTolerance( self, tol )
       if tol <= 0
         error('LinesearchGoldenSection:setTolerance, bad tolerance %g\n',tol);
       end
       self.tol = tol;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function [a,b] = minimize( self, a_in, b_in )
       % check that b > al
       a      = min(a_in,b_in);
@@ -64,7 +64,7 @@ classdef LinesearchGoldenSection < LinesearchForwardBackward
         end
       end
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function [alpha,ok] = search( self, alpha_guess )
       [ LO, HI, ierr ] = self.ForwardBackward( alpha_guess );
       ok = ierr >= 0;
@@ -75,6 +75,6 @@ classdef LinesearchGoldenSection < LinesearchForwardBackward
         alpha = alpha_guess/100;
       end
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
 end

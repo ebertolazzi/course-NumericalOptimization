@@ -27,7 +27,7 @@ classdef GaussianFunction < FunctionMap
   end
 
   methods
-
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = GaussianFunction()
       % GaussianFunction()...............N = 3; M = 15;
       self@FunctionMap(int32(3),int32(15));        % call superclass constructor (initialize M)
@@ -40,7 +40,7 @@ classdef GaussianFunction < FunctionMap
                                                              % it's a column vector for consistency with Jacobian
                                                              % actually it is a gaussian -.-
     end
-
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function F = evalMap(self,x)
       % evaluate the entries (not squared) of the function.
       X1 = x(1);
@@ -51,7 +51,7 @@ classdef GaussianFunction < FunctionMap
       F    = ( X1 .* exp( ( - X2 .* ( ti_i - X3 ) .^ 2 ) ./ 2) ) - self.yi_i; % vector of [ f_1(x) ... f_n(x) ] values.
                                                                             % i is automatically spanned
     end
-
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function J = jacobian( self, x )
       % use analytic jacobian
       self.check_x( x );
@@ -64,7 +64,7 @@ classdef GaussianFunction < FunctionMap
                  -X1 .* (ti_i - X3) .^ 2  .* exp( -X2 .* (ti_i - X3) .^ 2 ./ 2) ./ 2, ...
                   X1 .* X2 .* (ti_i - X3) .* exp( -X2 .* (ti_i - X3) .^ 2 ./ 2)];
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function T = tensor( self, x )
       % use analytic tensor
       self.check_x( x );
@@ -91,7 +91,7 @@ classdef GaussianFunction < FunctionMap
       T  = cat(3,T1,T2,T3);
 
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
 end
 

@@ -38,7 +38,7 @@ classdef LinesearchForwardBackward < handle
   end
 
   methods (Hidden = true)
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function [L,R] = infGrow( self, L, R, alpha_guess )
       % minimum in [0,alpha_guess] but interval must be reduced
       dAlphaMin = max( self.barrier_reduce * alpha_guess, self.alpha_min );
@@ -62,7 +62,7 @@ classdef LinesearchForwardBackward < handle
         L = L0;
       end
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function [f,Df] = fDf( self, alpha )
       self.n_fun_eval = self.n_fun_eval+1;
       f  = self.fun1D.eval( alpha );
@@ -71,7 +71,7 @@ classdef LinesearchForwardBackward < handle
   end
 
   methods
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = LinesearchForwardBackward( name )
       %
       % constructor
@@ -87,12 +87,12 @@ classdef LinesearchForwardBackward < handle
       self.debug_status   = false;
       self.name           = name;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function setFunction( self, fun1D )
       % set the function object used in the 1D minimization
       self.fun1D = fun1D;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function setInitialTau( self, tau_LS )
       % set the initial dumping factor tau used in forward backward search
       if ( tau_LS > 1 ) || (tau_LS < 1000 )
@@ -100,7 +100,7 @@ classdef LinesearchForwardBackward < handle
       end
       self.tau_LS = tau_LS;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function setAccelerationTau( self, tau_acc )
       % set acceleration factor used in forward backward search
       if ( tau_acc >= 1 ) || (tau_acc < 10 )
@@ -108,7 +108,7 @@ classdef LinesearchForwardBackward < handle
       end
       self.tau_acc = tau_acc;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function setAlphaRange( self, amin, amax )
       % set the range for alpha step
       if ~ (isscalar(amin) && isscalar(amax))
@@ -120,7 +120,7 @@ classdef LinesearchForwardBackward < handle
       self.alpha_min = amin;
       self.alpha_max = amax;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function setC1C2( self, c1, c2 )
       % set the coefficients c1 (Armijo) and c2 (Wolfe) for lineasearch
       seps = sqrt(eps);
@@ -145,19 +145,19 @@ classdef LinesearchForwardBackward < handle
         self.c2 = c2;
       end
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function y = ArmijoSlope( self, x )
       y = self.f0+self.c1Df0*x;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function debug_on( self )
       self.debug_status = true;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function debug_off( self )
       self.debug_status = false;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function plotDebug( self, alpha_guess )
       figure();
       subplot(3,1,1);
@@ -167,7 +167,7 @@ classdef LinesearchForwardBackward < handle
       subplot(3,1,3);
       self.plot(alpha_guess/10);
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     %                     _          _   _
     %   __ _ _  _ __ _ __| |_ _ __ _| |_(_)__
     %  / _` | || / _` / _` | '_/ _` |  _| / _|
@@ -177,7 +177,7 @@ classdef LinesearchForwardBackward < handle
     function alpha = quadratic( ~, f0, Df0, fp, p )
       alpha = Df0 * p^2 / ( 2*(f0+Df0*p-fp) );
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     %   ___                           _ ___          _                       _
     %  | __|__ _ ___ __ ____ _ _ _ __| | _ ) __ _ __| |____ __ ____ _ _ _ __| |
     %  | _/ _ \ '_\ V  V / _` | '_/ _` | _ \/ _` / _| / /\ V  V / _` | '_/ _` |
@@ -303,7 +303,7 @@ classdef LinesearchForwardBackward < handle
         HI = R;
       end
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function plot( self, alpha_max )
       alpha = -alpha_max/10:alpha_max/1000:alpha_max;
       y     = zeros(size(alpha));
@@ -312,6 +312,6 @@ classdef LinesearchForwardBackward < handle
       end
       plot( alpha, y );
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
 end

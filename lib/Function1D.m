@@ -20,7 +20,7 @@ classdef (Abstract) Function1D < handle
 
   methods
     % Finite difference approximation
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function Dy = FD_eval_D( self, x )
       % Finite difference approximation of the first derivative
       h  = max(1,abs(x))*sqrt(eps); % "eps" is the "machine epsilon precision"
@@ -28,7 +28,7 @@ classdef (Abstract) Function1D < handle
       fm = self.eval(x-h);
       Dy = (fp-fm)./(2*h);
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function DDy = FD_eval_DD( self, x )
       % Finite difference approximation of the second derivative
       h   = max(1,abs(x))*(eps^(1/3));
@@ -37,6 +37,6 @@ classdef (Abstract) Function1D < handle
       fc  = self.eval(x);
       DDy = (fp+fm-2*fc)./(h.^2);
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
 end

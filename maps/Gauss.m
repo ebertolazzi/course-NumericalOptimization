@@ -31,7 +31,7 @@ classdef Gauss < FunctionMap
   end
 
   methods
-
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = Gauss()
       self@FunctionMap(int32(3),int32(15));
       self.exact_solutions = [ 0; 0; 0 ];     % one known solution
@@ -42,7 +42,7 @@ classdef Gauss < FunctionMap
                  0.3521, 0.2420, 0.1295, 0.0540, ...
                  0.0175, 0.0044, 0.0009 ];
     end
-
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function F = evalMap(self,x)
       % evaluate function
       self.check_x(x);
@@ -54,7 +54,7 @@ classdef Gauss < FunctionMap
         F(i) = X * exp ( - 0.5 * Y * ( 3.5 - 0.5 * (i - 1) - Z )^2 ) - self.y(i);
       end
     end
-
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function J = jacobian( self, x )
       % use analitic jacobian
       self.check_x(x);
@@ -68,7 +68,7 @@ classdef Gauss < FunctionMap
         J(i,:) = tmp2 * [ 1, -0.5 * tmp1^2 * X, - X * Y * tmp1 ];
       end
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function T = tensor( self, x )
       % use analitic tensor of second derivative
       T = zeros(15,3,3);
@@ -86,6 +86,6 @@ classdef Gauss < FunctionMap
                             T31,       T23, (X*Y/4)*(Y*tmp1^2-4) ];
       end
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
 end

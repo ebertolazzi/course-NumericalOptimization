@@ -13,7 +13,7 @@ classdef (Abstract) FunctionMap < FunctionND
   end
 
   methods
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = FunctionMap( N, M )
       % Constructor of base (abstract) class
       self@FunctionND(N); % call the contructor of the superclass
@@ -25,16 +25,16 @@ classdef (Abstract) FunctionMap < FunctionND
       end
       self.M = M;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function ok = is_a_map( self )
       ok = true;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function m = dimension( self )
       % return the number of components of the map
       m = self.M;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function J = FD_jacobian( self, x )
       % finite difference approximation of the jacobian
       self.check_x(x);
@@ -52,7 +52,7 @@ classdef (Abstract) FunctionMap < FunctionND
         xm(k)  = x(k);
       end
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function T = FD_tensor( self, x )
       % finite difference approximation of the second derivative
       % T(k,:,:) is the hessian of the k-th components of the map
@@ -84,7 +84,7 @@ classdef (Abstract) FunctionMap < FunctionND
         T(k,:,:) = 0.5*(Ttemp + Ttemp.');
       end
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     % rewrite of gradient and hessian of the sum of the squares of the map
     % Virtual methods definitions
     function f = eval( self, x )
@@ -93,7 +93,7 @@ classdef (Abstract) FunctionMap < FunctionND
       F = self.evalMap( x );
       f = 0.5*dot(F,F);
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function g = grad( self, x )
       % gradient of sum f_k(x)^2 --> sum f_k(x) grad_k(x) = 2*F(x)^T J(x)
       self.check_x(x);
@@ -101,7 +101,7 @@ classdef (Abstract) FunctionMap < FunctionND
       J = self.jacobian(x);
       g = F.' * J;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function H = hessian( self, x )
       % hessian of sum f_k(x)^2 --> 2*(J^T(x) *J(x) + sum f_k(x) Hessian_k(x))
       self.check_x(x);
@@ -113,17 +113,17 @@ classdef (Abstract) FunctionMap < FunctionND
         H = H + F(k) * squeeze(T(k,:,:));
       end
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function [f,g] = eval_FG( self, x )
       f = self.eval(x);
       g = self.grad(x);
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function [f,g,H] = eval_FGH( self, x )
       f = self.eval(x);
       g = self.grad(x);
       H = self.hessian(x);
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
 end

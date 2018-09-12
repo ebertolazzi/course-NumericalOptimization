@@ -16,7 +16,7 @@ classdef (Abstract) FunctionND < handle
   end
 
   methods
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = FunctionND( N )
       % Constructor of base (abstract) class
       if ~isinteger(N)
@@ -29,15 +29,15 @@ classdef (Abstract) FunctionND < handle
       self.guesses         = zeros(N,0); % no inital guess
       self.exact_solutions = zeros(N,0); % no exact solutions
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function ok = is_a_map( self )
       ok = false;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function n = num_guess( self )
       n = size(self.guesses,2);
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function g = guess( self, idx )
       if ~isinteger(idx)
         error('FunctionND:guess argument must be an integer, found %s',class(idx));
@@ -47,11 +47,11 @@ classdef (Abstract) FunctionND < handle
       end
       g = double(self.guesses(:,idx));
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function n = num_exact( self )
       n = size(self.exact_solutions,2);
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function e = exact( self, idx )
       if ~isinteger(idx)
         error('FunctionND:exact argument must be an integer, found %s',class(idx));
@@ -61,12 +61,12 @@ classdef (Abstract) FunctionND < handle
       end
       e = double(self.exact_solutions(:,idx));
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function N = arity( self )
       % return the number of arguments of the function
       N = self.N;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function check_x( self, x )
       szdim = length(size(x));
       if szdim ~= 2
@@ -78,7 +78,7 @@ classdef (Abstract) FunctionND < handle
         error('FunctionND, size(x) = %d x %d, expected %d x 1\n',n,m,self.N);
       end
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function g = FD_grad( self, x )
       % finite difference approximation of the gradient
       h  = max(1,abs(x))*eps^(1/3);
@@ -95,7 +95,7 @@ classdef (Abstract) FunctionND < handle
         xm(k) = x(k);
       end
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function H = FD_hessian( self, x )
       % finite difference approximation of the hessian
       % Baseed on a code by Brendan C. Wood
@@ -124,7 +124,7 @@ classdef (Abstract) FunctionND < handle
       % Make H symmetric numerically, this is not mandatory but could help
       H = 0.5*(H+H.');
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function contour( self, xmm, ymm, nc, fun )
       % plot 2D contour of the function
       if self.N ~= 2

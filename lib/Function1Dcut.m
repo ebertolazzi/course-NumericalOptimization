@@ -14,7 +14,7 @@ classdef Function1Dcut < Function1D
   end
 
   methods
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = Function1Dcut( object_function_ND, x0, d )
       %% Constructor
       % Given the object object_functionND which represents
@@ -33,29 +33,29 @@ classdef Function1Dcut < Function1D
       self.FD_D  = true;
       self.FD_DD = true;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function use_FD_D( self )
       self.FD_D = true;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function no_FD_D( self )
       self.FD_D = false;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function use_FD_DD( self )
       self.FD_D = true;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function no_FD_DD( self )
       self.FD_D = false;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function res = eval( self, alpha )
       % This method evaluate the function in a point of the "line of cut".
       % $\alpha$ represents the coordinate along the line.
       res = self.funND.eval( self.x0 + alpha * self.d );
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function res = eval_D( self, alpha )
       if self.FD_D
         res = self.FD_eval_D( alpha );
@@ -64,7 +64,7 @@ classdef Function1Dcut < Function1D
         res = dot( g.', self.d );
       end
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function res = eval_DD( self, alpha )
       if self.FD_DD
         res = self.FD_eval_DD( alpha );
@@ -73,17 +73,17 @@ classdef Function1Dcut < Function1D
         res = dot( H * self.d, self.d );
       end
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function [f,g] = eval_FG( self, x )
       f = self.eval(x);
       g = self.eval_D(x);
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function [f,g,H] = eval_FGH( self, x )
       f = self.eval(x);
       g = self.eval_D(x);
       H = self.eval_DD(x);
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
 end

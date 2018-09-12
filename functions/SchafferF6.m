@@ -24,7 +24,7 @@ classdef SchafferF6 < FunctionND
   %
 
   methods (Hidden = true)
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function res = Sinc( ~, x )
       % function $ \sin(x)/x $ with taylor expansion
       if abs(x) < 0.002
@@ -33,7 +33,7 @@ classdef SchafferF6 < FunctionND
         res = sin(x)/x;
       end
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function res = Cosc( ~, x )
       % function $ 1-\cos(x)/x $ with taylor expansion
       x2 = x*x;
@@ -43,7 +43,7 @@ classdef SchafferF6 < FunctionND
         res = (1-cos(x))/x;
       end
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function res = dSinc( self, x )
       % function $ (1-\mathrm{sinc}(x))/x^2 $ with taylor expansion
       if abs(x) < 0.018
@@ -53,7 +53,7 @@ classdef SchafferF6 < FunctionND
         res = (1-self.Sinc(x))/x^2;
       end
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function res = dCosc( self, x )
       % function $ (x/2-\mathrm{cosc}(x))/x^3 $ with taylor expansion
       if abs(x) < 0.026
@@ -62,7 +62,7 @@ classdef SchafferF6 < FunctionND
         res = (1/2-self.Cosc(x)/x)/x^2;
       end
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function varargout = a2( ~, r2 )
       a = 1/(1 + 0.001*r2);
       if nargout > 0
@@ -75,7 +75,7 @@ classdef SchafferF6 < FunctionND
         varargout{3} = -0.003*varargout{2}*a;
       end
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function varargout = b( self, r2 )
       r = sqrt(r2);
       if nargout > 0
@@ -94,17 +94,17 @@ classdef SchafferF6 < FunctionND
         varargout{3} = t1+(t2+(t3+t4*r2)*r2)*r2;
       end
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
 
   methods
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = SchafferF6()
       self@FunctionND(int32(2));
       self.exact_solutions = [ 0; 0 ];       % one known solution
       self.guesses         = [ -5.0; +10.0 ]; % one guess
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function f = eval(self,x)
       % evaluate Rosenbrock (2D) function.
       self.check_x(x);
@@ -115,7 +115,7 @@ classdef SchafferF6 < FunctionND
       b  = self.b(r2);
       f  = 0.5 + a2*b;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function g = grad( self, x )
       % use analitic gradient
       self.check_x(x);
@@ -127,7 +127,7 @@ classdef SchafferF6 < FunctionND
       d1        = 2*(a2*b_1+a2_1*b);
       g         = d1 * [X,Y];
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function h = hessian( self, x )
       % use analitic hessian
       h = zeros( 2, 2 );
@@ -147,17 +147,17 @@ classdef SchafferF6 < FunctionND
       h(2,1) = d2*r2*X*Y;
       h(1,2) = h(2,1);
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function [f,g] = eval_FG( self, x )
       f = self.eval(x);
       g = self.grad(x);
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function [f,g,H] = eval_FGH( self, x )
       f = self.eval(x);
       g = self.grad(x);
       H = self.hessian(x);
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
 end
