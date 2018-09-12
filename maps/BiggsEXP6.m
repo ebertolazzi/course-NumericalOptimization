@@ -36,7 +36,13 @@ classdef BiggsEXP6 < FunctionMap
 
   methods
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    function self = BiggsEXP6(M)
+    function self = BiggsEXP6( varargin )
+      if nargin == 1
+        M = varargin{1};
+      else
+        M = 6;
+      end
+      
       % BiggsEXP6( M )...............N = 6; M = M;
       self@FunctionMap(int32(6),int32(M)); % call superclass constructor
       self.exact_solutions = [];                 % no exacts solution provided

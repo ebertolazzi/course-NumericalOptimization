@@ -39,7 +39,7 @@ classdef MinimizationQuasiNewton < MinimizationND
   end
 
   methods
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = MinimizationQuasiNewton( fun, ls )
       self@MinimizationND( fun, ls );
 	  self.direction_short = 1e-10;
@@ -47,7 +47,7 @@ classdef MinimizationQuasiNewton < MinimizationND
       self.method_names = { 'BFGS', 'DFP' };
       self.method       = self.method_names{1};
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function H = H_update( self, g0, g1, s, H )
       y  = g1 - g0;
       sy = dot(s,y);
@@ -63,17 +63,17 @@ classdef MinimizationQuasiNewton < MinimizationND
         end
       end
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function n = numOfMethods( self )
       % return the number of methods available
       n = length(self.method_names);
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function name = activeMethod( self )
       % return active CG method used in minimization
       name = self.method;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function selectByNumber( self, k )
       % select the CG method by number
       if k < 1 || k > length(self.method_names)
@@ -81,7 +81,7 @@ classdef MinimizationQuasiNewton < MinimizationND
       end
       self.method = self.method_names{k};
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function selectByName( self, name )
       % select the CG method by its name
       if ischar(name)
@@ -96,7 +96,7 @@ classdef MinimizationQuasiNewton < MinimizationND
         error('MinimizationCG, selectByName, expected string as arument, found %s',class(name));
       end
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function [ x,converged] = minimize( self, x0 )
       x         = x0(:);
       %H        = inv(self.funND.hessian(x));
@@ -109,6 +109,7 @@ classdef MinimizationQuasiNewton < MinimizationND
       end
 
       for iter=1:self.max_iter
+        self.iter = iter;
         g1 = self.funND.grad( x ).';
         % check if converged
         norm_inf_g1 = norm(g1,inf);
@@ -123,10 +124,10 @@ classdef MinimizationQuasiNewton < MinimizationND
         %
         if self.verbose
           fprintf( '[%s] iter = %5d ||grad f||_inf = %12.6g', ...
-                   self.method, iter, norm_inf_g1 );
+                   self.method, self.iter, norm_inf_g1 );
         end
         %
-        if iter > 1
+        if self.iter > 1
           H = self.H_update( g0, g1, s, H );
         end
         %
@@ -134,7 +135,7 @@ classdef MinimizationQuasiNewton < MinimizationND
         d = -H*g1;
         %
         % check direction -------------------------------------------------
-        if iter > 1 && abs(dot(g0,g1)) >= 0.2 * dot(g1,g1) % check restart criteria of Powell
+        if self.iter > 1 && abs(dot(g0,g1)) >= 0.2 * dot(g1,g1) % check restart criteria of Powell
           fprintf(2,' [Powell restart] ');
           d = -g1; % reset direction as if H = eye
         else

@@ -3,6 +3,8 @@ classdef Rastrigin < FunctionND
     function self = Rastrigin()
       arity = 2;
       self@FunctionND(int32(arity));
+      self.exact_solutions = [ 0;0];
+      self.guesses         = [ 2;3];
     end
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function f = eval(self,x)

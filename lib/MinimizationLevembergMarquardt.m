@@ -86,7 +86,7 @@ classdef MinimizationLevembergMarquardt < MinimizationND
       if converged
         if self.verbose
           fprintf( 'starting point is already a minimum, ||grad f||_inf = %12.6g\n', ...
-                   iter, norm_inf_g );
+                    norm_inf_g );
         end
         return;
       end
@@ -96,11 +96,11 @@ classdef MinimizationLevembergMarquardt < MinimizationND
       end
 
       % == START ITERATION ======
-      for iter = 1:self.max_iter
+      for self.iter = 1:self.max_iter
 
         if self.verbose
           fprintf('[LM] iter = %5d ||grad f||_inf = %12.6g ni = %5d , mi = %12.6g\n', ...
-                  iter, norm_inf_g, ni, mi );
+                  self.iter, norm_inf_g, ni, mi );
         end
 
         if self.save_iterate

@@ -32,7 +32,12 @@ classdef BoxThreeDimensionalFunction < FunctionMap
 
   methods
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    function self = BoxThreeDimensionalFunction( M )
+    function self = BoxThreeDimensionalFunction( varargin )
+      if nargin == 1
+        M = varargin{1};
+      else
+        M = 3;
+      end
       % BoxThreeDimensionalFunction()...............N = 3; M >= N;
       self@FunctionMap(int32(3),int32(M));              % call superclass constructor (initialize M)
       self.exact_solutions  = [ 1, 10, 1; 10, 1,-1 ].'; % more than one (f = 0 those cases)

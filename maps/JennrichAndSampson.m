@@ -21,40 +21,45 @@ classdef JennrichAndSampson < FunctionMap
   % Author: Giammarco Valenti - University of Trento
   % -> final debug required
   methods
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    function self = JennrichAndSampson( M )
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function self = JennrichAndSampson( varargin )
+      if nargin == 1
+        M = varargin{1};
+      else
+        M = 10;
+      end
       % JennrichAndSampson( M )...............N = 2; M = M;
       self@FunctionMap(int32(2),int32(M));        % call superclass constructor (initialize M)
       %exact_solutions        = [];                % no exacts solution provided
       if M == 10
         approximated_solutions = 0.2578.*[1 1];         % approximated solution provided only if M == 10
       end
-      guesses = [0.3 0.4].';            % one guess
+      self.guesses = [0.3; 0.4];            % one guess
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function F = evalMap(self,x)
       % evaluate the entries (not squared) of the function.
       X1 = x(1);
       X2 = x(2);
-      i  = (1:self.M).'; % column vector required
+      i  = double(1:self.M).'; % column vector required
       F  = 2 + 2.*i - ( exp( i.*X1 ) + exp( i.*X2 ) ); % vector of [ f_1(x) ... f_n(x) ] values.
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function J = jacobian( self, x )
       % use analytic jacobian
       self.check_x( x );
       X1 = x(1);
       X2 = x(2);
-      i  = (1:self.M).'; % column vector required
+      i  = double(1:self.M).'; % column vector required
       J  = [ -i .* exp(i .* X1) , -i .* exp(i .* X2) ];
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function T = tensor( self, x )
       % use analytic tensor
       self.check_x( x );
       X1 = x(1);
       X2 = x(2);
-      i  = (1:self.M).'; % column vector required
+      i  = double(1:self.M).'; % column vector required
       % Create the n-matrices of T
 
       % D J / D X1
@@ -67,7 +72,7 @@ classdef JennrichAndSampson < FunctionMap
       % Dimensions = MxNxN
       T  = cat(3,T1,T2);
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
 end
 

@@ -404,7 +404,7 @@ classdef MinimizationConjugateGradient < MinimizationND
         self.x_history = x(:);
       end
       %
-      for iter=1:self.max_iter
+      for self.iter=1:self.max_iter
         %
         % gradient of the function
         g1 = self.funND.grad( x ).';
@@ -423,12 +423,12 @@ classdef MinimizationConjugateGradient < MinimizationND
         % only for debug
         if self.verbose
           fprintf('[%s] iter = %5d ||grad f||_inf = %12.6g', ...
-                  self.method, iter, norm_inf_g1 );
+                  self.method, self.iter, norm_inf_g1 );
         end
         %
         % build search direction
         %
-        if iter == 1
+        if self.iter == 1
           d = -g1; % first iteration, search direction is -gradient
         elseif abs(dot(g0,g1)) >= 0.2 * dot(g1,g1) % check restart criteria of Powell
           if self.verbose

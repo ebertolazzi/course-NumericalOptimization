@@ -4,6 +4,8 @@ classdef Easy_function_3D < FunctionND
     function self = Easy_function_3D()
       arity = 2;
       self@FunctionND(int32(arity));
+      self.exact_solutions = [ 0;.0 ];  % one known solution
+      self.guesses         = [ 2; 3 ];
     end
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function f = eval(self,x)
@@ -17,11 +19,11 @@ classdef Easy_function_3D < FunctionND
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     % Use finite difference for grad and hessian
     function g = grad( self, x )
-      g = self.FD_grad( self, x );
+      g = self.FD_grad( x );
     end
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function H = hessian( self, x )
-      H = self.FD_hessian( self, x );
+      H = self.FD_hessian( x );
     end
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function [f,g] = eval_FG( self, x )

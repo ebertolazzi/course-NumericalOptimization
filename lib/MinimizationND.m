@@ -9,15 +9,16 @@ classdef MinimizationND < handle
                 % linesearch.setFunction(fun)
                 % [alpha,ok] = linesearch.search(alpha_guess)
     tol         % tolleranza per |grad|
-    max_iter    % massimo numero iterate ammesse
     FD_D        % use finite 1D difference or gradient for directional derivative computation
     x_history   % list of iteration
     verbose     % if true do some additional printing and store iterations
     save_iterate
+    max_iter    % massimo numero iterate ammesse
+    iter
   end
 
   methods
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = MinimizationND( fun, ls )
       self.tol          = 1e-3;
       self.max_iter     = 100;
@@ -26,23 +27,24 @@ classdef MinimizationND < handle
       self.FD_D         = false;
       self.funND        = fun;
       self.linesearch   = ls;
+      self.iter         = 0;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function setFunction( self, f )
       self.funND = f;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function setLinesearch( self, ls )
       self.linesearch = ls;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function setTolerance( self, tol )
       if tol <= 0
         error('MinimizationND, bad tolerance %g\n',tol);
       end
       self.tol = tol;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function setMaxIteration( self, max_iter )
       if length(max_iter) > 1 || ~isinteger(max_iter)
         error('MinimizationND, expected a scalar  integer\n');
@@ -52,31 +54,35 @@ classdef MinimizationND < handle
       end
       self.max_iter = max_iter;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function iter = getIteration( self )
+      iter = self.iter;
+    end
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function verbose_on( self )
       self.verbose = true;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function verbose_off( self )
       self.verbose = false;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function save_iterate_on( self )
       self.save_iterate = true;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function save_iterate_off( self )
       self.save_iterate = false;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function use_FD_D( self )
       self.FD_D = true;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function no_FD_D( self )
       self.FD_D = false;
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function [ x1, alpha, ok ] = step1D( self, x0, d, alpha_guess )
       %
       % Perform linesearch of ND-function starting from x0 along direction d
@@ -119,7 +125,7 @@ classdef MinimizationND < handle
         end
       end
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function [xmin,ymin,xmax,ymax] = iterRange( self )
       if size(self.x_history,1) == 2
         xmin = min(self.x_history(1,:));
@@ -136,7 +142,7 @@ classdef MinimizationND < handle
         ymax = 0;
       end
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function plotIter( self, last )
       if size(self.x_history,1) == 2
         hold on;
@@ -155,7 +161,7 @@ classdef MinimizationND < handle
               'MarkerFaceColor','black');
       end
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function plotResidual( self, varargin )
       N = size(self.x_history,2);
       if N > 0
@@ -166,6 +172,6 @@ classdef MinimizationND < handle
         semilogy( 1:N, r, varargin{:} );
       end
     end
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
 end
