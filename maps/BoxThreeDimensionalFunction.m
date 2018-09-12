@@ -34,62 +34,49 @@ classdef BoxThreeDimensionalFunction < FunctionMap
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = BoxThreeDimensionalFunction( M )
       % BoxThreeDimensionalFunction()...............N = 3; M >= N;
-      self@FunctionMap(int32(3),int32(M));                    % call superclass constructor (initialize M)
-      self.exact_solutions  = [ [ 1 10 1].', [ 10 1 -1 ].' ]; % more than one (f = 0 those cases)
-      self.exact_linear_set = [ 1 1 0 ].';                  % minimum when x1=x2 and x3=0. so it is span(exact_linear_set)
+      self@FunctionMap(int32(3),int32(M));              % call superclass constructor (initialize M)
+      self.exact_solutions  = [ 1, 10, 1; 10, 1,-1 ].'; % more than one (f = 0 those cases)
+      self.exact_linear_set = [ 1; 1; 0 ];              % minimum when x1=x2 and x3=0. so it is span(exact_linear_set)
       self.guesses          = [ 0; 10; 20 ];
-
-      self.ii = (1:double(self.M)).'; % create indexes for t
-      self.ti = 0.1.*self.ii;         % t for the function
+      self.ti               = 0.1*(1:double(self.M)).';         % t for the function
     end
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    function f = evalMap(self,x)
+    function f = evalMap( self, xx )
       % evaluate the entries (not squared) of the function.
-      X1 = x(1);
-      X2 = x(2);
-      X3 = x(3);
-      i  = self.ii;   % create indexes for t
+      x1 = xx(1);
+      x2 = xx(2);
+      x3 = xx(3);
+      t  = self.ti;   % t for the function
+      f  = exp( -t*x1 ) - exp( -t*x2 ) + x3 * (exp( -10*t ) - exp( -t ));
+    end
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function J = jacobian( self, xx )
+      % use analytic jacobian
+      self.check_x( xx );
+      x1 = xx(1);
+      x2 = xx(2);
+      x3 = xx(3);
       t  = self.ti;   % t for the function
 
-      f = exp( -t(i).*x(1) ) ...
-        - exp( -t(i).*x(2) ) ...
-        - x(3).*( exp( -t(i) ) ...
-        - exp( -10.*t(i) ) );
-
-      % vector of [ f_1(x) ... f_n(x) ] values, i is automatically spanned (this is Matlab, do not forget it MAN!)
-    end
-    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    function J = jacobian( self, x )
-      % use analytic jacobian
-      self.check_x( x );
-      X1 = x(1);
-      X2 = x(2);
-      X3 = x(3);
-      i = self.ii;   % create indexes for t
-      t = self.ti;   % t for the function
-
       % Matlab fashion assignment of Jacobian
-      J = [ -t(i).*exp( t(i).*x(1) ) , ...
-             t(i).*exp( t(i).*x(2) ) , ...
-             - ( exp( -t(i) ) - exp( -10.*t(i) ) ) ];
+      J = [ -t.*exp( -t*x1 ), t.*exp( -t*x2 ),  exp( -10*t ) - exp( -t ) ];
     end
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    function T = tensor( self, x )
+    function T = tensor( self, xx )
       % use analytic tensor
 
-      X1 = x(1);
-      X2 = x(2);
-      X3 = x(3);
+      x1 = xx(1);
+      x2 = xx(2);
+      x3 = xx(3);
       % Create the n-matrices of T
 
-      i = self.ii;   % create indexes for t
       t = self.ti;   % t for the function
 
       zz = zeros(self.M,1);
 
-      T1 = [ +t(i).^2.*exp( t(i).*x(1) )   , zz                          ,    zz ];
-      T2 = [ zz                            , -t(i).^2.*exp( t(i).*x(2) ) ,    zz ];
-      T3 = [ zz                            , zz                          ,    zz ];
+      T1 = [ t.^2.*exp( t*x1 ), zz,                 zz ];
+      T2 = [ zz,                -t.^2.*exp( t*x2 ), zz ];
+      T3 = [ zz,                zz,                 zz ];
 
       T  = cat(3,T1,T2,T3);
 

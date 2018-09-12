@@ -88,7 +88,8 @@ classdef Helix < FunctionMap
       X = x(1);
       Y = x(2);
       Z = x(3);
-      F = [ 10*( Z - 10*self.f_theta(X,Y) ); 10*( hypot(X,Y)  - 1 ); Z ];
+      F = [ 10*( Z - 10*self.f_theta(X,Y) ); ...
+            10*( hypot(X,Y)  - 1 ); Z ];
     end
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function J = jacobian( self, x )

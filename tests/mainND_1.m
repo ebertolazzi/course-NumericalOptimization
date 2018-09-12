@@ -6,7 +6,7 @@ addpath('../lib');
 addpath('../functions');
 addpath('../maps');
 
-r = Rosenbrock();
+%r = Rosenbrock();
 %r = SchafferF7();
 %r = BoxThreeDimensionalFunction(3);
 %r = KowalikAndOsborne();
@@ -14,12 +14,12 @@ r = Rosenbrock();
 %r = Box3();
 %r = PowellSingular();
 %r = Han();
-%r = Helix();
-%r = SixHumpCamelBack();
+%r = Helix(); %%%
+%r = SixHumpCamelBack(); %%%
 %r = PenaltyN1();
 %r = PenaltyN2();
 %r = Colville();
-%r = ShekelSQRN5();
+r = ShekelSQRN5();
 
 disp(r.arity());
 

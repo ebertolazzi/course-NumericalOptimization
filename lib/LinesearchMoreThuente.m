@@ -104,6 +104,14 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
       alphaq = L.alpha + t*DX;
     end
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %
+    % minimum of a quadratic interpolating L.f, L.Df, R.Df
+    %
+    function ok = isMonotonic( ~, L, R )
+      DFDX = (R.f - L.f)/(R.alpha - L.alpha);
+      ok   = (L.Df^2+R.Df^2+L.Df*R.Df)+9*DFDX^2-6*(L.Df+R.Df)*DFDX < 0;
+    end
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function [LO, HI, alphaf, bracketed, info] = ...
       safeguardedStep( self, LO, HI, M, bracketed, step_maxmax )
       %
@@ -208,6 +216,16 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
         %
         info  = 3;
         bound = true;
+
+        if self.isMonotonic( LO, M )
+          alphaf = self.minQuadratic( M, LO );
+        else
+            
+          %alphaf = self.minQuadratic( M, LO )
+          alphaf = self.minCubic( LO, M );
+            
+        if false
+            
         theta = 3*(LO.f - M.f)/(M.alpha - LO.alpha) + LO.Df + M.Df;
         s     = max(abs([theta,LO.Df,M.Df]));
         %
@@ -228,6 +246,7 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
         else
           alphac = self.alpha_min;
         end
+          fprintf(2,'gamma %g alphac %g r %g\n',gamma,alphac,r);
         alphas = self.minQuadratic2( M, LO );
         if bracketed
           if abs(M.alpha-alphac) < abs(M.alpha-alphas)
@@ -241,6 +260,10 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
           else
             alphaf = alphas;
           end
+        end
+        
+        end
+        
         end
       else
         %
