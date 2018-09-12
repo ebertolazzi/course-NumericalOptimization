@@ -397,9 +397,10 @@ classdef MinimizationConjugateGradient < MinimizationND
       % generic onjugate gradient minimization algorithm
       % x0 = initial point
       %
-      x         = x0;
-      alpha     = 1;
-      converged = false;
+      self.n_fail = 0;
+      x           = x0;
+      alpha       = 1;
+      converged   = false;
       if self.save_iterate
         self.x_history = x(:);
       end

@@ -42,31 +42,37 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
   %
 
   properties (SetAccess = private, Hidden = true)
-    xtol         % Linesearch termination occurs when the relative width
-                 % of the interval of uncertainty is at most xtol.
-    info         % an integer output variable set as follows:
-                 % info = 0  Improper input parameters.
-                 %
-                 % info = 1  The sufficient decrease condition and the
-                 %           directional derivative condition hold.
-                 %
-                 % info = 2  Relative width of the interval of uncertainty
-                 %           is at most xtol.
-                 %
-                 % info = 3  Number of calls to fcn has reached max_fun_eval.
-                 %
-                 % info = 4  The step is at the lower bound alpha_min.
-                 %
-                 % info = 5  The step is at the upper bound alpha_max.
-                 %
-                 % info = 6  Rounding errors prevent further progress.
-                 %           There may not be a step which satisfies the
-                 %           sufficient decrease and curvature conditions.
-                 %           Tolerances may be too small.
+
+    xtol % Linesearch termination occurs when the relative width
+         % of the interval of uncertainty is at most xtol.
+
+    info % an integer output variable set as follows:
+         %
+         % info = 0  Improper input parameters.
+         %
+         % info = 1  The sufficient decrease condition and the
+         %           directional derivative condition hold.
+         %
+         % info = 2  Relative width of the interval of uncertainty
+         %           is at most xtol.
+         %
+         % info = 3  Number of calls to fcn has reached max_fun_eval.
+         %
+         % info = 4  The step is at the lower bound alpha_min.
+         %
+         % info = 5  The step is at the upper bound alpha_max.
+         %
+         % info = 6  Rounding errors prevent further progress.
+         %           There may not be a step which satisfies the
+         %           sufficient decrease and curvature conditions.
+         %           Tolerances may be too small.
+
     xtrapf
 
     step_min
     step_max
+
+    f0_extra_epsi
   end
 
   methods (Hidden = true)
@@ -79,7 +85,9 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
       theta = 3*(L.f - R.f)/dA + R.Df + L.Df;
       s     = max(abs([ theta, R.Df, L.Df ]));
       gamma = s*sqrt( (theta/s)^2 - (R.Df/s)*(L.Df/s) );
-      if L.alpha > R.alpha; gamma = -gamma; end
+      if L.alpha > R.alpha
+        gamma = -gamma;
+      end
       p      = (gamma - L.Df) + theta;
       q      = ((gamma - L.Df) + gamma) + R.Df;
       r      = p/q;
@@ -115,24 +123,24 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
     function [LO, HI, alphaf, bracketed, info] = ...
       safeguardedStep( self, LO, HI, M, bracketed, step_maxmax )
       %
-      % The purpose of cstep is to compute a safeguarded step for
+      % The purpose of safeguardedStep is to compute a safeguarded step for
       % a linesearch and to update an interval of uncertainty for
       % a minimizer of the function.
       %
       % The struct LO contains the step with the least function value.
       % The struct M contains the current step.
-      % It is assumed that the derivative at LO is negative in the direction
-      % of the step.
+      % It is assumed that the derivative at LO is negative in the
+      % direction of the step.
       % If bracketed is set true then a minimizer has been bracketed in an
       % interval of uncertainty with endpoints LO.alpha and HI.alpha.
       %
       % LO specify the step at the best step obtained so far.
-      % The derivative must be negative in the direction of the step, that is,
-      % LO.Df and (M.alpha-LO.alpha) must have opposite signs.
+      % The derivative must be negative in the direction of the step,
+      % that is, LO.Df and (M.alpha-LO.alpha) must have opposite signs.
       % On output these parameters are updated appropriately.
       %
-      % HI specify the step at the other endpoint of the interval of uncertainty.
-      % output these parameters are updated appropriately.
+      % HI specify the step at the other endpoint of the interval of
+      % uncertainty. On output these parameters are updated appropriately.
       %
       % struct M specify the current step.
       % If bracketed is set true then on input M.alpha must be between
@@ -144,8 +152,8 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
       % If the minimizer is bracketed then on output bracketed is set true.
       %
       % info is an integer output variable set as follows:
-      % If info = 1,2,3,4,5, then the step has been computed according to one
-      % of the five cases below.
+      % If info = 1,2,3,4,5 then the step has been computed according
+      % to one of the six cases below.
       % Otherwise info = 0, and this indicates improper input parameters.
       %
       % Check the input parameters for errors.
@@ -158,14 +166,15 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
           return;
         end
       end
-      if LO.Df*(M.alpha-LO.alpha) >= 0
+      DX = M.alpha - LO.alpha;
+      if LO.Df*DX >= 0
         info = 0;
         return;
       end
       %
       % Determine if the derivatives have opposite sign.
       %
-      sgnd = M.Df*sign(LO.Df);
+      sgnd = sign(M.Df*LO.Df);
       %
       % First case.
       % A higher function value. The minimum is bracketed.
@@ -295,8 +304,9 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = LinesearchMoreThuente()
       self@LinesearchForwardBackward('MoreThuente');
-      self.xtol         = 1e-2;
-      self.xtrapf       = 4;
+      self.xtol          = 1e-2;
+      self.xtrapf        = 4;
+      self.f0_extra_epsi = 100*eps;
     end
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function plotDebug( self )
@@ -333,8 +343,8 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
     % Line Search Routine
     % ----------------------------------------------------------------------
     %
-    function [ stp, info ] = MTsearch( self, stp )
-      % The purpose of ******** is to find a step which satisfies
+    function [ stp, info ] = search( self, stp )
+      % The purpose of search is to find a step which satisfies
       % a sufficient decrease condition and a curvature condition.
       %
       % At each stage the subroutine updates an interval of uncertainty with
@@ -403,17 +413,22 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
       %             sufficient decrease and curvature conditions.
       %             Tolerances may be too small.
       %
-      self.n_fun_eval = 0;
-      self.xtrapf     = 4;
-      info            = 0;
-      infoc           = 1;
-      step_maxmax     = self.alpha_max;
+      self.info = 0;
+      info      = 0;
       %
       % Check the input parameters for errors.
       %
       if stp <= 0
         return;
       end
+
+      [ self.f0, self.Df0 ] = self.fDf(0);
+      self.c1Df0 = self.c1*self.Df0;
+
+      self.n_fun_eval = 0;
+      self.xtrapf     = 4;
+      infoc           = 1;
+      step_maxmax     = self.alpha_max;
       %
       % Compute the initial gradient in the search direction
       % and check that s is a descent direction.
@@ -441,6 +456,7 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
       LO.f     = self.f0;
       LO.Df    = self.Df0;
       HI       = LO;
+
       %
       % Start of iteration.
       %
@@ -484,8 +500,9 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
           else
             L = HI;
           end
-          R.alpha       = stp;
-          [ R.f, R.Df ] = self.fDf(stp);
+          R.alpha = stp;
+          R.f     = f;
+          R.Df    = Df;
           %
           % check if f(alpha) is infinite
           [ L, R ] = self.infGrow( L, R, stp );
@@ -494,28 +511,38 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
           [ f, Df ] = self.fDf( stp );
         end
 
-        ftest1 = self.f0 + stp*self.c1Df0;
+        % added self.f0_extra_epsi to make more robust the check
+        ftest1 = self.f0 + stp*self.c1Df0 + self.f0_extra_epsi;
         %
         % Test for convergence.
         %
         if (bracketed && (stp <= self.step_min || stp >= self.step_max) ) || infoc == 0
-          info = 6;
+          %	Rounding errors prevent further progress.
+          % There may not be a step which satisfies the sufficient decrease
+          % and curvature conditions. Tolerances may be too small.
+          self.info = 6;
         elseif stp == step_maxmax && f <= ftest1 && Df <= self.c1Df0
-          info = 5;
+          %	The step is at the upper bound self.step_max.
+          self.info = 5;
         elseif stp == self.alpha_min && (f > ftest1 || Df >= self.c1Df0)
-          info = 4;
+          % The step is at the lower bound self.step_min.
+          self.info = 4;
         elseif self.n_fun_eval >= self.max_fun_eval
-          info = 3;
+          % Number of calls to fcn has reached maxfev.
+          self.info = 3;
         elseif bracketed && self.step_max-self.step_min <= self.xtol*self.step_max
-          info = 2;
+          % Relative width of the interval of uncertainty is at most xtol.
+          self.info = 2;
         elseif f <= ftest1 && abs(Df) <= self.c2*(-self.Df0)
-          info = 1;
+          % The sufficient decrease condition and the directional
+          % derivative condition hold.
+          self.info = 1;
         end
         %
         % Check for termination.
         %
-        if info ~= 0
-          return;
+        if self.info ~= 0
+          break;
         end
         %
         % In the first stage we seek a step for which the modified
@@ -582,30 +609,7 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
         % End of iteration.
         %
       end
-    end
-    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    function [alpha,ok] = search( self, alpha_guess )
-      self.info = 0;
-      ok        = false;
-
-      [ self.f0, self.Df0 ] = self.fDf(0);
-      self.c1Df0 = self.c1*self.Df0;
-
-      [alpha,info] = self.MTsearch(alpha_guess);
-      ok = info == 1 || info == 6;
-      return ;
-
-      %
-      % Check the input parameters for errors.
-      %
-      alpha = alpha_guess;
-      if alpha <= 0; return; end
-
-      [LO,HI,ierr] = self.ForwardBackward( alpha_guess );
-      if ierr == 0
-        [alpha,info] = self.MTsearch(LO.alpha);
-        ok = info == 1 || info == 6;
-      end
+      info = self.info;
     end
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end

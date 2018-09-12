@@ -97,12 +97,12 @@ classdef MinimizationQuasiNewton < MinimizationND
       end
     end
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    function [ x,converged] = minimize( self, x0 )
-      x         = x0(:);
-      %H        = inv(self.funND.hessian(x));
-      H         = eye(length(x));
-      alpha     = 1;
-      converged = false;
+    function [ x, converged ] = minimize( self, x0 )
+      self.n_fail = 0;
+      x           = x0(:);
+      H           = eye(length(x));
+      alpha       = 1;
+      converged   = false;
 
       if self.save_iterate
         self.x_history = x;
@@ -155,7 +155,7 @@ classdef MinimizationQuasiNewton < MinimizationND
         end
         %------------------------------------------------------------------
         % minimize along search direction
-        [ x1, alpha, ok ] = self.step1D( x, d, max(alpha,1e-10) );
+        [ x1, alpha, ok ] = self.step1D( x, d, 10*alpha );
         if ~ok
           % cannot advance see if accept a low precision solution
           fprintf(2,'\nMinimizationQN, step1D failed\n');

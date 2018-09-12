@@ -15,6 +15,8 @@ classdef MinimizationND < handle
     save_iterate
     max_iter    % massimo numero iterate ammesse
     iter
+    max_n_fail
+    n_fail
   end
 
   methods
@@ -28,6 +30,8 @@ classdef MinimizationND < handle
       self.funND        = fun;
       self.linesearch   = ls;
       self.iter         = 0;
+      self.max_n_fail   = 5;
+      self.n_fail       = 0;
     end
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function setFunction( self, f )
@@ -97,32 +101,35 @@ classdef MinimizationND < handle
       %
       % build the 1D function along the search direction
       fcut = Function1Dcut( self.funND, x0, d ./ norm_2_d );
-
       % set analitic gradient if necessary
       if self.FD_D
         fcut.use_FD_D();
       else
         fcut.no_FD_D();
       end
+      self.linesearch.setFunction( fcut );
 
-      %
       % do a 1D minimization
       % search an interval for minimization
-      self.linesearch.setFunction( fcut );
-      [ alpha, ok ] = self.linesearch.search( alpha_guess * norm_2_d );
+      [ alpha, info ] = self.linesearch.search( alpha_guess * norm_2_d );
       alpha = alpha / norm_2_d;
       %
       % check error
-      if ~ok
-        x1 = x0;
+      if info > 1
+        self.n_fail = self.n_fail+1;
       else
-        %
+        self.n_fail = 0;
+      end
+      ok = info == 1 || (info > 1 && self.n_fail < self.max_n_fail) ;
+      if ok
         % advance
         x1 = x0 + alpha * d;
-        %
         if self.save_iterate
           self.x_history = [ self.x_history x1(:) ];
         end
+      else
+        alpha = alpha_guess;
+        x1    = x0;
       end
     end
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

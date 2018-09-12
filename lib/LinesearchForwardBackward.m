@@ -63,6 +63,22 @@ classdef LinesearchForwardBackward < handle
       end
     end
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function [L,R] = forwardGrow( self, L, R )
+      % satisfy Armijo at first step, try to enlarge interval
+      tauf          = self.tau_LS;
+      N.alpha       = tauf * R.alpha;
+      [ N.f, N.Df ] = self.fDf( N.alpha );
+      while N.alpha < self.alpha_max && ...
+           (N.f-self.f0) <= N.alpha * self.c1Df0 && ...
+            N.f <= R.f && N.Df < 0
+        L             = R;
+        R             = N;
+        N.alpha       = tauf * N.alpha;
+        [ N.f, N.Df ] = self.fDf( N.alpha );
+        tauf          = tauf * self.tau_acc; % update tau factor
+      end
+    end
+    %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function [f,Df] = fDf( self, alpha )
       self.n_fun_eval = self.n_fun_eval+1;
       f  = self.fun1D.eval( alpha );
@@ -294,7 +310,7 @@ classdef LinesearchForwardBackward < handle
       % at this point
       % L.f < self.f0 && L.Df > 0;
       % minimum in [0,L.alpha]
-      ierr    = 0;
+      ierr = 0;
       if L.f > R.f
         LO = R;
         HI = L;

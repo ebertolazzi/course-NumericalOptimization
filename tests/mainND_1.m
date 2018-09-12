@@ -1,10 +1,10 @@
 clear all;
-% 
+%
 %    1  converged YES iteration  13 : Beale
 %    2  converged YES iteration   8 : BiggsEXP6
 %    3  converged YES iteration  16 : Box3
 %    4  converged YES iteration  26 : BoxThreeDimensionalFunction
-%    5  converged NO  iteration 200 : BrownBadlyScaled
+%    5  converged NO  iteration  18 : BrownBadlyScaled
 %    6  converged YES iteration   4 : Gauss
 %    7  converged YES iteration  20 : GaussianFunction
 %    8  converged YES iteration  11 : Han
@@ -14,7 +14,7 @@ clear all;
 %   12  converged YES iteration  26 : KowalikAndOsborne
 %   13  converged YES iteration  41 : Leon
 %   14  converged YES iteration   1 : PowellSingular
-%   15  converged NO  iteration 200 : PowellBadlyScaled
+%   15  converged NO  iteration 193 : PowellBadlyScaled
 %   16  converged YES iteration  35 : Rosenbrock
 %   17  converged YES iteration   2 : TrivialQuadratic
 %   18  converged YES iteration   6 : Barrier1
@@ -36,18 +36,18 @@ clear all;
 %   34  converged YES iteration  11 : PenaltyN2
 %   35  converged YES iteration  10 : Powell3D
 %   36  converged YES iteration   5 : Quadratic2D
-%   37  converged NO  iteration   3 : Rastrigin
+%   37  converged YES iteration   4 : Rastrigin
 %   38  converged YES iteration   3 : SchafferF6
 %   39  converged YES iteration   4 : SchafferF7
-%   40  converged NO  iteration 200 : ShekelSQRN10
+%   40  converged YES iteration   9 : ShekelSQRN10
 %   41  converged YES iteration  11 : ShekelSQRN5
-%   42  converged YES iteration  10 : ShekelSQRN7
-%   43  converged NO  iteration 200 : Shubert
+%   42  converged YES iteration   9 : ShekelSQRN7
+%   43  converged NO  iteration  13 : Shubert
 %   44  converged YES iteration   7 : SixHumpCamelBack
 %   45  converged YES iteration  19 : mckinnon
+% converged = 42, NOT converged = 3
 %
-% converged = 40, NOT converged = 5
-%
+
 close all;
 clc;
 
