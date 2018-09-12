@@ -125,7 +125,7 @@ classdef (Abstract) FunctionND < handle
       H = 0.5*(H+H.');
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    function contour( self, xmm, ymm, nc, linear )
+    function contour( self, xmm, ymm, nc, fun )
       % plot 2D contour of the function
       if self.N ~= 2
         error('FunctionND:contour can be used only for 2D functions');
@@ -149,10 +149,10 @@ classdef (Abstract) FunctionND < handle
       miZ = min(min(Z(idx)));
       maZ = max(max(Z(idx)));
       Z   = (Z-miZ)/(maZ-miZ);
-      if nargin > 4 && linear
-        contour(X,Y,Z,nc);
+      if nargin > 4
+        contourf(X,Y,feval(fun,Z),nc);
       else
-        contour(X,Y,sqrt(Z),nc);
+        contourf(X,Y,sqrt(Z),nc);
       end
     end
   end

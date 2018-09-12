@@ -86,7 +86,7 @@ classdef MinimizationND < handle
       if norm(d,inf) == 0
         error('MinimizationND, bad direction d == 0\n');
       else
-        d = d ./ norm(d);
+        norm_2_d = 1; %norm(d);
       end
       %
       % build the 1D function along the search direction

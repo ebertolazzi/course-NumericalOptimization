@@ -29,27 +29,39 @@ classdef SixHumpCamelBack < FunctionND
       self.guesses = [ -1.5; 0.5 ]; % one guess
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    function f = eval(self,x)
-      % evaluate Rosenbrock (2D) function.
-      self.check_x(x);
-      f = ( 4.0 - 2.1 * x(1)^2 + x(1)^4 / 3.0 ) * x(1)^2 + x(1) * x(2) + 4.0 * ( x(2)^2 - 1.0 ) * x(2)^2;
+    function f = eval( self, xx )
+      self.check_x( xx );
+      x  = xx(1);
+      y  = xx(2);
+      x2 = x*x;
+      y2 = y*y;
+      f  = ( 4 + x2*(x2/3-2.1) ) * x2 + x * y + 4*( y2 - 1 ) * y2;
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    function g = grad( self, x )
+    function g = grad( self, xx )
       % use analitic gradient
-      self.check_x(x);
-      g = zeros ( 1, 2 );
-      g(1) = 8.0 * x(1) - 8.4 * x(1)^3 + 2.0 * x(1)^5 + x(2);
-      g(2) = x(1) - 8.0 * x(2) + 16.0 * x(2)^3;
+      self.check_x( xx );
+      x  = xx(1);
+      y  = xx(2);
+      x2 = x*x;
+      g  = zeros( 1, 2 );
+      g(1) = 2*x*(4+x2*(x2-4.2)) + y;
+      g(2) = 2*y*(8*y*y-4) + x;
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    function h = hessian( self, x )
+    function h = hessian( self, xx )
       % use analitic hessian
-      h = zeros ( 2, 2 );
-      h(1,1) = 8.0 - 25.2 * x(1)^2 + 10.0 * x(1)^4;
-      h(1,2) = 1.0;
-      h(2,1) = 1.0;
-      h(2,2) = -8.0 + 48.0 * x(2)^2;
+      self.check_x( xx );
+      x  = xx(1);
+      y  = xx(2);
+      x2 = x*x;
+      y2 = y*y;
+
+      h = zeros( 2, 2 );
+      h(1,1) = (10*x2-25.2)*x2+8;
+      h(1,2) = 1;
+      h(2,1) = 1;
+      h(2,2) = 48*y2-8;
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function [f,g] = eval_FG( self, x )

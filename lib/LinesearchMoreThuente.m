@@ -64,13 +64,71 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
                  %           sufficient decrease and curvature conditions.
                  %           Tolerances may be too small.
     xtrapf
-    
+
     step_min
     step_max
   end
 
   methods (Hidden = true)
-
+    %
+    % minimum of a cubic closer to L
+    %
+    function alphac = minCubic( ~, L, R )
+      dA    = R.alpha - L.alpha;
+      theta = 3*(L.f - R.f)/dA + R.Df + L.Df;
+      s     = max(abs([ theta, R.Df, L.Df ]));
+      gamma = s*sqrt( (theta/s)^2 - (R.Df/s)*(L.Df/s) );
+      if L.alpha > R.alpha; gamma = -gamma; end
+      p      = (gamma - L.Df) + theta;
+      q      = ((gamma - L.Df) + gamma) + R.Df;
+      r      = p/q;
+      alphac = L.alpha + r*dA;
+    end
+    %
+    % minimum of a cubic interpolating L.f, L.Df, R.f, R.Df 
+    %
+    function alphac = minCubic_MIO( ~, L, R )
+      DX    = R.alpha - L.alpha;
+      DFDX  = (R.f-L.f)/DX;
+      % parabola of the derivative of the interpolaing cubic
+      a     = sign(DX)*3*(L.Df+R.Df-2*DFDX);
+      b     = sign(DX)*3*DFDX-(2*L.Df+R.Df);
+      c     = sign(DX)*L.Df;
+      if abs(a) > eps*max(abs([b,c]))
+        delta = b*b-a*c;
+        if delta < 0
+          alphac = Inf*sign(DX);
+          return;
+        end
+        delta = sqrt(delta);
+        % compute root of the minimum
+        if b > 0
+          t = -c/(delta+b);
+        else
+          t = (delta-b)/a;
+        end
+      else
+        t = -a/(2*b);          
+      end
+      alphac = L.alpha + t*DX;
+    end
+    %
+    % minimum of a quadratic interpolating L.f, L.Df, R.f
+    %
+    function alphaq = minQuadratic( ~, L, R )
+      DX     = R.alpha - L.alpha;
+      t      = 0.5*(L.Df/(L.Df+(L.f - R.f)/DX));
+      alphaq = L.alpha + t*DX;
+    end
+    %
+    % minimum of a quadratic interpolating L.f, L.Df, R.Df
+    %
+    function alphaq = minQuadratic2( ~, L, R )
+      DX     = R.alpha - L.alpha;
+      t      = L.Df/(L.Df-R.Df);
+      alphaq = L.alpha + t*DX;
+    end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function [LO, HI, alphaf, bracketed, info] = safeguardedStep( self, LO, HI, M, bracketed, step_maxmax )
       %
       % The purpose of cstep is to compute a safeguarded step for
@@ -107,6 +165,11 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
       % Otherwise info = 0, and this indicates improper input parameters.
       %
       % Check the input parameters for errors.
+
+      if abs(LO.alpha-M.alpha) < 10*eps*abs(LO.alpha-HI.alpha)
+        error('azzo'); 
+      end
+
       aL = min( LO.alpha, HI.alpha );
       aR = max( LO.alpha, HI.alpha );
       alphaf = 0;
@@ -123,35 +186,25 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
       %
       % Determine if the derivatives have opposite sign.
       %
-      sgnd = M.Df*sign(LO.Df);
-      %
-      % First case.
-      % A higher function value. The minimum is bracketed.
-      % If the cubic step is closer to LO.alpha than the quadratic step,
-      % the cubic step is taken, else the average of the cubic and
-      % quadratic steps is taken.
-      %
       if M.f > LO.f
+        % First case.
+        % A higher function value. The minimum is bracketed.
+        % If the cubic step is closer to LO.alpha than the quadratic step,
+        % the cubic step is taken, else the average of the cubic and
+        % quadratic steps is taken.
         info  = 1;
         bound = true;
-        theta = 3*(LO.f - M.f)/(M.alpha - LO.alpha) + LO.Df + M.Df;
-        s     = max(abs([theta,LO.Df,M.Df]));
-        gamma = s*sqrt((theta/s)^2 - (LO.Df/s)*(M.Df/s));
-        if M.alpha < LO.alpha
-          gamma = -gamma;
-        end
-        p = (gamma - LO.Df) + theta;
-        q = ((gamma - LO.Df) + gamma) + M.Df;
-        r = p/q;
-        alphac = LO.alpha + r*(M.alpha - LO.alpha);
-        alphaq = LO.alpha + ((LO.Df/((LO.f-M.f)/(M.alpha-LO.alpha)+LO.Df))/2)*(M.alpha - LO.alpha);
+
+        alphac = self.minCubic( LO, M );
+        alphaq = self.minQuadratic( LO, M );
+ 
         if abs(alphac-LO.alpha) < abs(alphaq-LO.alpha)
           alphaf = alphac;
         else
           alphaf = alphac + (alphaq - alphac)/2;
-        end
+        end        
         bracketed = true;
-      elseif sgnd < 0
+      elseif M.Df*LO.Df < 0
         %
         % Second case.
         % A lower function value and derivatives of opposite sign.
@@ -161,24 +214,18 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
         %
         info  = 2;
         bound = false;
-        theta = 3*(LO.f - M.f)/(M.alpha - LO.alpha) + LO.Df + M.Df;
-        s     = max(abs([theta,LO.Df,M.Df]));
-        gamma = s*sqrt((theta/s)^2 - (LO.Df/s)*(M.Df/s));
-        if M.alpha > LO.alpha
-          gamma = -gamma;
-        end
-        p = (gamma - M.Df) + theta;
-        q = ((gamma - M.Df) + gamma) + LO.Df;
-        r = p/q;
-        alphac = M.alpha + r*(LO.alpha - M.alpha);
-        alphaq = M.alpha + (M.Df/(M.Df-LO.Df))*(LO.alpha - M.alpha);
-        if abs(alphac-M.alpha) >  abs(alphaq-M.alpha)
+
+        alphac = self.minCubic( LO, M );
+        alphas = self.minQuadratic2( LO, M );
+
+        if abs(alphac-M.alpha) >= abs(alphas-M.alpha)
           alphaf = alphac;
         else
-          alphaf = alphaq;
+          alphaf = alphas;
         end
+        
         bracketed = true;
-      elseif abs(M.Df) < abs(LO.Df)
+      elseif abs(M.Df) <= abs(LO.Df)
         %
         % Third case.
         % A lower function value, derivatives of the same sign, and the
@@ -192,40 +239,45 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
         %
         info  = 3;
         bound = true;
-        theta = 3*(LO.f - M.f)/(M.alpha - LO.alpha) + LO.Df + M.Df;
-        s     = max(abs([theta,LO.Df,M.Df]));
         %
         % The case gamma = 0 only arises if the cubic does not tend
         % to infinity in the direction of the step.
         %
-        gamma = s*sqrt(max(0,(theta/s)^2- (LO.Df/s)*(M.Df/s)));
-        if M.alpha > LO.alpha
-          gamma = -gamma;
-        end
-        p = (gamma - M.Df) + theta;
-        q = (gamma + (LO.Df - M.Df)) + gamma;
-        r = p/q;
-        if r < 0 && gamma ~= 0
-          alphac = M.alpha + r*(LO.alpha - M.alpha);
-        elseif M.alpha > LO.alpha
-          alphac = step_maxmax;
-        else
-          alphac = self.alpha_min;
-        end
-        alphaq = M.alpha + (M.Df/(M.Df-LO.Df))*(LO.alpha - M.alpha);
-        if bracketed
-          if abs(M.alpha-alphac) < abs(M.alpha-alphaq)
-            alphaf = alphac;
+        alphac = self.minCubic( LO, M );
+        alphas = self.minQuadratic2( LO, M );
+        
+        if isfinite(alphac) && LO.Df*(alphac-LO.alpha) < 0
+          if isfinite(alphas) && LO.Df*(alphas-LO.alpha) < 0
+            if abs(LO.alpha-alphac) < abs(LO.alpha-alphas)
+              alphaf = alphac;
+            else
+              alphaf = alphas;
+            end
           else
-            alphaf = alphaq;
-          end
-        else
-          if abs(M.alpha-alphac) > abs(M.alpha-alphaq)
             alphaf = alphac;
+          end 
+        else
+          if isfinite(alphas) && LO.Df*(alphas-LO.alpha) < 0
+            alphaf = alphas;
           else
-            alphaf = alphaq;
-          end
+            error('AZZZOOOO');
+          end 
         end
+
+%         if bracketed
+%           if abs(LO.alpha-alphac) < abs(LO.alpha-alphas)
+%             alphaf = alphac;
+%           else
+%             alphaf = alphas;
+%           end
+%         else
+%           if abs(LO.alpha-alphac) > abs(LO.alpha-alphas)
+%           %if abs(HI.alpha-alphac) > abs(HI.alpha-alphaq)
+%             alphaf = alphac;
+%           else
+%             alphaf = alphas;
+%           end
+%         end
       else
         %
         % Fourth case.
@@ -236,18 +288,8 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
         %
         info  = 4;
         bound = false;
-        if bracketed
-          theta = 3*(M.f - HI.f)/(HI.alpha - M.alpha) + HI.Df + M.Df;
-          s     = max(abs([theta,HI.Df,M.Df]));
-          gamma = s*sqrt((theta/s)^2 - (HI.Df/s)*(M.Df/s));
-          if M.alpha > HI.alpha
-            gamma = -gamma;
-          end
-          p = (gamma - M.Df) + theta;
-          q = ((gamma - M.Df) + gamma) + HI.Df;
-          r = p/q;
-          alphac = M.alpha + r*(HI.alpha - M.alpha);
-          alphaf = alphac;
+        if true || bracketed
+          alphaf = self.minCubic( M, HI );
         elseif M.alpha > LO.alpha
           alphaf = step_maxmax;
         else
@@ -257,11 +299,11 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
       %
       % Update the interval of uncertainty.
       % This update does not depend on the new step or the case analysis above.
-      %
-      if M.f > LO.f
+      %      
+      if M.f >= LO.f
         HI = M;
       else
-        if sgnd < 0
+        if M.Df*LO.Df < 0
           HI = LO;
         end
         LO = M;
@@ -279,6 +321,15 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
           alphaf = max(atmp,alphaf);
         end
       end
+ 
+      if abs(LO.alpha-alphaf) < 10*eps*abs(HI.alpha-LO.alpha)
+        error('azzo2 %d',info); 
+      end
+
+      if LO.Df*(alphaf-LO.alpha) >= 0
+        %error('azzo3 %d',info); 
+      end
+      
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   end
@@ -287,7 +338,7 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = LinesearchMoreThuente()
       self@LinesearchForwardBackward('MoreThuente');
-      self.xtol         = 1e-2;
+      self.xtol         = 1e-3;
       self.xtrapf       = 4;
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -326,7 +377,7 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
     % ----------------------------------------------------------------------
     %
     function [ stp, info ] = MTsearch( self, stp )
-      % The purpose of ******** is to find a step which satisfies
+      % The purpose of MTsearch is to find a step which satisfies
       % a sufficient decrease condition and a curvature condition.
       %
       % At each stage the subroutine updates an interval of uncertainty with
@@ -403,10 +454,7 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
       %
       % Check the input parameters for errors.
       %
-      if stp <= 0 || ...
-         self.c1 < 0 || self.c2 < 0 || ...
-         self.xtol < 0 || ...
-         self.alpha_min < 0 || self.alpha_max < self.alpha_min
+      if stp <= 0
         return;
       end
       %
@@ -460,9 +508,13 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
         % If an unusual termination is to occur then let
         % stp be the lowest point obtained so far.
         %
-        if (bracketed && (stp <= self.step_min || stp >= self.step_max)) || ...
-            infoc == 0 || self.n_fun_eval >= self.max_fun_eval || ...
-           (bracketed && self.step_max-self.step_min <= self.xtol*self.step_max)
+        if bracketed
+          if stp <= self.step_min || stp >= self.step_max || ...
+             (self.step_max-self.step_min) <= self.xtol*self.step_max
+            stp = LO.alpha;
+          end
+        end
+        if infoc == 0 || self.n_fun_eval >= self.max_fun_eval
           stp = LO.alpha;
         end
         %
@@ -470,7 +522,7 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
         % and compute the directional derivative.
         %
         [ f, Df ] = self.fDf( stp );
-         
+
         if ~isfinite(f)
           bracketed = false;
           % in case f(alpha) is infinite try to detect the barrier
@@ -488,8 +540,9 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
           stp = R.alpha;
           [ f, Df ] = self.fDf( stp );
         end
-        
-        ftest1 = self.f0 + stp*self.c1Df0;
+
+        % add 100*eps
+        ftest1 = self.f0 + stp*self.c1Df0 + 10*eps; %%%%%%%%%%%%%%%%
         %
         % Test for convergence.
         %
@@ -503,7 +556,7 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
           info = 3;
         elseif bracketed && self.step_max-self.step_min <= self.xtol*self.step_max
           info = 2;
-        elseif f <= ftest1 && abs(Df) <= self.c2*(-self.Df0)
+        elseif f <= ftest1 && abs(Df) <= self.c2AbsDf0
           info = 1;
         end
         %
@@ -517,7 +570,7 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
         % function has a nonpositive value and nonnegative derivative.
         %
         if stage1
-          if f <= ftest1 && Df >= min(self.c1,self.c2)*self.Df0
+          if f <= ftest1 && Df >= 0 % min(self.c1,self.c2)*self.Df0
             stage1 = false;
           end
         end
@@ -548,6 +601,9 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
           %
           % Reset the function and gradient values for f.
           %
+          M.f   = f;
+          M.Df  = Df;
+
           LO.f  = LO.f + LO.alpha*self.c1Df0;
           LO.Df = LO.Df + self.c1Df0;
 
@@ -582,10 +638,12 @@ classdef LinesearchMoreThuente < LinesearchForwardBackward
     function [alpha,ok] = search( self, alpha_guess )
       self.info = 0;
       ok        = false;
-      
+
       [ self.f0, self.Df0 ] = self.fDf(0);
-      self.c1Df0 = self.c1*self.Df0;
- 
+      self.c1Df0    = self.c1*self.Df0;
+      self.c2AbsDf0 = self.c2*abs(self.Df0)+100*eps;
+
+
       [alpha,info] = self.MTsearch(alpha_guess);
       ok = info == 1 || info == 6;
       return ;

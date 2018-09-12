@@ -19,6 +19,7 @@ dir_method = MinimizationQuasiNewton( r, search_method );
 dir_method.setMaxIteration( int32(400) );
 dir_method.setTolerance(1e-6);
 dir_method.save_iterate_on();
+%dir_method.selectByName('DFP');
 
 t = 0:2*pi/1000:2*pi;
 

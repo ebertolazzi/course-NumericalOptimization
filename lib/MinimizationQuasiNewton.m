@@ -122,7 +122,7 @@ classdef MinimizationQuasiNewton < MinimizationND
         end
         %
         if self.verbose
-          fprintf( '[%s] iter = %5d ||grad f||_inf = %12.6g ...', ...
+          fprintf( '[%s] iter = %5d ||grad f||_inf = %12.6g', ...
                    self.method, iter, norm_inf_g1 );
         end
         %
@@ -134,7 +134,7 @@ classdef MinimizationQuasiNewton < MinimizationND
         d = -H*g1;
         %
         % check direction -------------------------------------------------
-        if iter~=1 && abs(dot(g0,g1)) >= 0.2 * dot(g1,g1) % check restart criteria of Powell
+        if iter > 1 && abs(dot(g0,g1)) >= 0.2 * dot(g1,g1) % check restart criteria of Powell
           fprintf(2,' [Powell restart] ');
           d = -g1; % reset direction as if H = eye
         else
@@ -150,11 +150,11 @@ classdef MinimizationQuasiNewton < MinimizationND
         end
         % last check of direction search
         if norm(d,inf) == 0
-          error('nMinimizationQN, bad direction d == 0\n');
+          error('MinimizationQN, bad direction d == 0\n');
         end
         %------------------------------------------------------------------
         % minimize along search direction
-        [ x1, alpha, ok ] = self.step1D( x, d, 2*alpha );
+        [ x1, alpha, ok ] = self.step1D( x, d, max(alpha,1e-10) );
         if ~ok
           % cannot advance see if accept a low precision solution
           fprintf(2,'\nMinimizationQN, step1D failed\n');

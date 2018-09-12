@@ -422,7 +422,7 @@ classdef MinimizationConjugateGradient < MinimizationND
         %
         % only for debug
         if self.verbose
-          fprintf('[%s] iter = %5d ||grad f||_inf = %12.6g ...', ...
+          fprintf('[%s] iter = %5d ||grad f||_inf = %12.6g', ...
                   self.method, iter, norm_inf_g1 );
         end
         %
@@ -456,16 +456,16 @@ classdef MinimizationConjugateGradient < MinimizationND
         %
         % minimize along search direction
         [ x, alpha, ok ] = self.step1D( x, d, 10*alpha );
-        if ~ok
-          % step failed try to use gradient direction
-          d = -g1;
-          [x,alpha,ok] = self.step1D( x, d, alpha );
+        %if ~ok
+        %  % step failed try to use gradient direction
+        %  d = -g1;
+        %  [x,alpha,ok] = self.step1D( x, d, alpha );
           if ~ok
             % cannot advance see if accept a low precision solution
             fprintf(2,'\nMinimizationCG, step1D failed\n');
             return;
           end
-        end
+        %end
         %
         if self.verbose
           fprintf(' alpha = %8.4g\n', alpha);

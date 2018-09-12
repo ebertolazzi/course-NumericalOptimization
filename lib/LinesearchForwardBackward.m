@@ -27,12 +27,12 @@ classdef LinesearchForwardBackward < handle
     alpha_max    % maximum accepted step
 
     barrier_reduce
-    alpha_epsi   % minimum interval lenght for Wolfe linesearch
     debug_status % if true activate debug messages
 
     f0           % stored value f(0)
     Df0          % stored value f'(0)
     c1Df0        % stored value max(c1*f'(0),slopemax)
+    c2AbsDf0     % stored value c2*abs(f'(0))
 
     name         % name of linesearch, set by the serived classed
   end
@@ -84,7 +84,6 @@ classdef LinesearchForwardBackward < handle
       self.alpha_max      = 1e50;
       self.barrier_reduce = 1e-3;
       self.max_fun_eval   = 1000;
-      self.alpha_epsi     = eps^(1/3);
       self.debug_status   = false;
       self.name           = name;
     end
@@ -200,7 +199,8 @@ classdef LinesearchForwardBackward < handle
       % compute initial value and derivative
       %
       [ self.f0, self.Df0 ] = self.fDf(0);
-      self.c1Df0 = 0;
+      self.c1Df0    = 0;
+      self.c2AbsDf0 = 0;
 
       %
       % check initial point
@@ -242,7 +242,8 @@ classdef LinesearchForwardBackward < handle
 
       %
       % check Armijo
-      self.c1Df0 = self.c1*self.Df0;
+      self.c1Df0    = self.c1*self.Df0;
+      self.c2AbsDf0 = self.c2*abs(self.Df0);
       if (R.f - self.f0) > R.alpha*self.c1Df0
         % Armijo NOT satified
         % reduce the step until f(R) <= f(L) < f(0)
