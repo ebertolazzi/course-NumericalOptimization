@@ -41,7 +41,6 @@ classdef BiggsEXP6 < FunctionMap
       self@FunctionMap(int32(6),int32(M)) ;        % call superclass constructor
       %exact_solutions        = [];                % no exacts solution provided
       if self.M == 13
-      	disp('HALLOO')
       	self.approximated_solutions = [ 1 10 1 5 4 3 ].'; % approximated solution provided only when M=13
       end
       self.guesses                  = [ 1  2 1 1 1 1 ].'; % one guess

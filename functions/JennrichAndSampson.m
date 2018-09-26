@@ -5,7 +5,7 @@ classdef JennrichAndSampson < FunctionMap
   % JENNRICH, R.I., AND SAMPSON,P.F. Applicatmn of stepwise
   % regression to nonlinear estimatmn. Technometrtcs 10 (1968), 63-72.
   %
-  % see also in reference test N.6
+  % see also number 6 in:
   %
   % @article{More:1981,
   %   author  = {Mor{\'e}, Jorge J. and Garbow, Burton S. and Hillstrom, Kenneth E.},
@@ -19,7 +19,7 @@ classdef JennrichAndSampson < FunctionMap
   % }
   %
   % Author: Giammarco Valenti - University of Trento
-  % -> final debug required
+  %
   methods
 
     function self = JennrichAndSampson( M )
@@ -27,9 +27,9 @@ classdef JennrichAndSampson < FunctionMap
       self@FunctionMap(int32(2),int32(M)) ;        % call superclass constructor (initialize M)
       %exact_solutions        = [];                % no exacts solution provided
       if M == 10
-        approximated_solutions = 0.2578.*[1 1];         % approximated solution provided only if M == 10
+        self.approximated_solutions = 0.2578.*[1 1];         % approximated solution provided only if M == 10
       end
-      guesses                 = [0.3 0.4].' ;            % one guess
+      self.guesses                 = [0.3 0.4].' ;            % one guess
     end
 
     function F = evalMap(self,x)

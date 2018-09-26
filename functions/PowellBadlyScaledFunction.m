@@ -1,11 +1,10 @@
-classdef Powell_bsf < FunctionMap
+classdef PowellBadlyScaledFunction < FunctionMap
   %
   % Function Powell bad scaled function
   %
-  % Detailed reference missing:
   % "Powell,M.J.D.","A hybrid method for nonlinear equations" 1970
   %
-  % see also in reference test N.3
+  % see also number 3 in:
   %
   % @article{More:1981,
   %   author  = {Mor{\'e}, Jorge J. and Garbow, Burton S. and Hillstrom, Kenneth E.},
@@ -22,11 +21,11 @@ classdef Powell_bsf < FunctionMap
   
   methods
 
-    function self = Powell_bsf()
+    function self = PowellBadlyScaledFunction()
       self@FunctionMap(int32(2),int32(2)) ; %
       %exact_solutions        = [];                % no exacts solution provided
-      approximated_solutions  = [1.098e-05,9.106]; % Known approximated solution
-      guesses                 = [0;1] ;            % one guess
+      self.approximated_solutions  = [1.098e-05,9.106]; % Known approximated solution
+      self.guesses                 = [0;1] ;            % one guess
     end
 
     function F = evalMap(self,x)

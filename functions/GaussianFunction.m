@@ -4,8 +4,7 @@ classdef GaussianFunction < FunctionMap
   %
   % unpublished
   % 
-  %
-  % see also in reference test N.9
+  % see also number 9 in:
   %
   % @article{More:1981,
   %   author  = {Mor{\'e}, Jorge J. and Garbow, Burton S. and Hillstrom, Kenneth E.},
@@ -32,8 +31,8 @@ classdef GaussianFunction < FunctionMap
       % GaussianFunction()...............N = 3 ; M = 15;
       self@FunctionMap(int32(3),int32(15)) ;        % call superclass constructor (initialize M)
       %exact_solutions        = [];                % no exacts solution provided
-      approximated_solutions =  1.12793 * 10^-8   ;                 % approximated solution provided only if M == 10
-      guesses                = [ 0.4 , 1 , 0     ];                 % one guess
+      self.approximated_solutions =  1.12793 * 10^-8   ;                 % approximated solution provided only if M == 10
+      self.guesses                = [ 0.4 , 1 , 0     ];                 % one guess
 
       self.yi_half = [ 0.0009 0.0044 0.0175 0.0540 0.1295 0.2420 0.3521 0.3989 ];
       self.yi_i    = [ self.yi_half fliplr(self.yi_half(1:end-1)) ].'; % it's a symmetric vector w.r.t to i = 8;

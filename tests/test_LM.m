@@ -1,8 +1,8 @@
 
 % TEST (only 2D)
 
-addpath(genpath('/Users/giammarco/GoogleDriveUNITN/PhDall/corsi/BertoProject/optimization/lib'));
-addpath(genpath('/Users/giammarco/GoogleDriveUNITN/PhDall/corsi/BertoProject/optimization/functions'));
+addpath(genpath('../lib'));
+addpath(genpath('../functions'));
 
 
 

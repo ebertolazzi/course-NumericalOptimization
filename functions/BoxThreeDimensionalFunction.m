@@ -2,12 +2,11 @@
 
 classdef BoxThreeDimensionalFunction < FunctionMap
   %
-  % Gaussian Function N = 3 , M = 15;
+  %
   %
   % Box, M.J. A comparison of several current optimization methods, and the use of transformations in constrained problems. Comput. J 9 (1966), 67-77.
   % 
-  %
-  % see also in reference test N.12
+  % see also number 12 in:
   %
   % @article{More:1981,
   %   author  = {Mor{\'e}, Jorge J. and Garbow, Burton S. and Hillstrom, Kenneth E.},

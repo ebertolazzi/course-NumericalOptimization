@@ -5,8 +5,8 @@ classdef MinimizationLM < MinimizationND
   % Minimization of a nonlinear multiuvariate functions using Levenberg-Marquardt method.
   % The algorithm is described in the references.
   %
-  % The function to minimize must be of class "functionMAP << FunctionND"
-  % And it must contain the instance method "jacobian(x)"
+  % The function to minimize must be of class "functionMAP < FunctionND"
+  % And it must contain the instance method "jacobian( self , x )"
   %
   % Reference algorithm is in ref[1]: algorithm 3.16;
   %
@@ -67,7 +67,7 @@ classdef MinimizationLM < MinimizationND
 
 
     
-    function [x,converged] = minimize( self , x0 )
+    function [ x , converged ] = minimize( self , x0 )
       % Launch the minimization algorithm
 
       % Initial values -> see ref[1] algorithm 3.16
