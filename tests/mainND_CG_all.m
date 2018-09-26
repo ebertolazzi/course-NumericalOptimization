@@ -6,7 +6,8 @@ addpath('../lib');
 addpath('../functions');
 
 fun_name = 'SchafferF6';
-fplot    = @(z) log(1+z) ;
+fplot    = @(z) log(1+z);
+
 switch fun_name
 case 'Quad'
   r  = Quadratic2D();
@@ -50,8 +51,8 @@ end
 linesearch_method.debug_on() ;
 
 %min_method = MinimizationGradientMethod(r,search_method);
-%min_method = MinimizationBFGS( r, linesearch_method );
-min_method = MinimizationCG( r, linesearch_method );
+min_method = MinimizationBFGS( r, linesearch_method );
+%min_method = MinimizationCG( r, linesearch_method );
 %min_method = MinimizationBFGS( r, linesearch_method );
 min_method.setMaxIteration( int32(1000) );
 min_method.setTolerance(1e-8);

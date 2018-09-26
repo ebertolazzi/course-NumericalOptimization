@@ -5,7 +5,7 @@ clc;
 addpath('../lib');
 addpath('../functions');
 
-fun_name = 'Rosen';
+fun_name = 'Boha2';
 
 switch fun_name
 case 'Quad'
