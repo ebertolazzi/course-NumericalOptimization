@@ -64,8 +64,6 @@ classdef ExtendedRosenbrock < FunctionMap
       J( 2   : 2*N+2 : N*N ) = -1;
       J( N+1 : 2*N+2 : N*N ) = 10;
 
-      J = J.';
-
 
     end
 

@@ -5,7 +5,7 @@ clc;
 addpath('../lib');
 addpath('../functions');
 
-fun_name = 'SchafferF6';
+fun_name = 'Rosen';
 
 switch fun_name
 case 'Quad'
@@ -41,8 +41,8 @@ search_method = LinesearchWolfe();
 
 search_method.debug_on();
 
-%dir_method = MinimizationGradientMethod(r,search_method);
-dir_method = MinimizationBFGS(r,search_method);
+dir_method = MinimizationGradientMethod(r,search_method);
+%dir_method = MinimizationBFGS(r,search_method);
 
 dir_method.setMaxIteration( int32(1000) );
 dir_method.setTolerance(1e-6);
