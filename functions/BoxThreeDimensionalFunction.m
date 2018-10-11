@@ -35,7 +35,7 @@ classdef BoxThreeDimensionalFunction < FunctionMap
       self.exact_solutions        = [ [ 1 10 1].', [ 10 1 -1 ].' ]; % more than one (f = 0 those cases)
       self.exact_linear_set       =   [ 1 1 0 ].';                  % minimum when x1=x2 and x3=0. so it is span(exact_linear_set)             
       %approximated_solutions = []  ;                    
-      self.guesses                = [ 0  ; 10 ; 20 ]; 
+      self.guesses                = [ 0 ; 10 ; 20 ]; 
 
       self.ii    = (1:double(self.M)).'; % create indexes for t
       self.ti    = 0.1.*self.ii;         % t for the function
@@ -47,9 +47,6 @@ classdef BoxThreeDimensionalFunction < FunctionMap
 
     function f = evalMap(self,x)
       % evaluate the entries (not squared) of the function.
-      X1 = x(1) ;
-      X2 = x(2) ;
-      X3 = x(3) ;
       i    = self.ii;   % create indexes for t
       t    = self.ti;   % t for the function
 
@@ -61,9 +58,6 @@ classdef BoxThreeDimensionalFunction < FunctionMap
     function J = jacobian( self, x )
       % use analytic jacobian
       self.check_x( x );
-      X1 = x(1) ;
-      X2 = x(2) ;
-      X3 = x(3) ;
       i    = self.ii;   % create indexes for t
       t    = self.ti;   % t for the function
 
@@ -76,10 +70,6 @@ classdef BoxThreeDimensionalFunction < FunctionMap
 
     function T = tensor( self, x )
       % use analytic tensor
-
-      X1 = x(1) ;
-      X2 = x(2) ;
-      X3 = x(3) ;
       % Create the n-matrices of T
 
       i    = self.ii;   % create indexes for t
@@ -96,8 +86,6 @@ classdef BoxThreeDimensionalFunction < FunctionMap
       T  = cat(3,T1,T2,T3);
 
     end
-
-    % For tensor and jacobian a maple/wolfram file is available: ask to the author if needed
 
   end
 end

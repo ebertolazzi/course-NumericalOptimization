@@ -36,7 +36,7 @@ classdef JennrichAndSampson < FunctionMap
       % evaluate the entries (not squared) of the function.
       X1 = x(1) ;
       X2 = x(2) ;
-      i  = (1:self.M).'; % column vector required
+      i  = double((1:self.M).'); % column vector required
       F  = 2 + 2.*i - ( exp( i.*X1 ) + exp( i.*X2 ) ); % vector of [ f_1(x) ... f_n(x) ] values.
     end
 
@@ -45,7 +45,7 @@ classdef JennrichAndSampson < FunctionMap
       self.check_x( x );
       X1 = x(1) ;
       X2 = x(2) ;
-      i  = (1:self.M).'; % column vector required
+      i  = double((1:self.M).'); % column vector required
       J  = [ -i .* exp(i .* X1) , -i .* exp(i .* X2) ];
     end
 
@@ -54,7 +54,7 @@ classdef JennrichAndSampson < FunctionMap
       self.check_x( x );
       X1 = x(1) ;
       X2 = x(2) ;
-      i  = (1:self.M).'; % column vector required
+      i  = double((1:self.M).'); % column vector required
       % Create the n-matrices of T
 
       % D J / D X1

@@ -31,8 +31,8 @@ classdef GaussianFunction < FunctionMap
       % GaussianFunction()...............N = 3 ; M = 15;
       self@FunctionMap(int32(3),int32(15)) ;        % call superclass constructor (initialize M)
       %exact_solutions        = [];                % no exacts solution provided
-      self.approximated_solutions =  1.12793 * 10^-8   ;                 % approximated solution provided only if M == 10
-      self.guesses                = [ 0.4 , 1 , 0     ];                 % one guess
+      %self.approximated_solutions =  1.12793 * 10^-8   ;                 % approximated solution provided only if M == 10
+      self.guesses                = [ 0.4 , 1 , 0 ].';                 % one guess
 
       self.yi_half = [ 0.0009 0.0044 0.0175 0.0540 0.1295 0.2420 0.3521 0.3989 ];
       self.yi_i    = [ self.yi_half fliplr(self.yi_half(1:end-1)) ].'; % it's a symmetric vector w.r.t to i = 8;
@@ -45,7 +45,7 @@ classdef GaussianFunction < FunctionMap
       X1 = x(1) ;
       X2 = x(2) ;
       X3 = x(3) ;
-      i    = (1:self.M).'  ; % create indexes for yi_i
+      i    = double((1:self.M).')  ; % create indexes for yi_i
       ti_i = ( 8 - i ) ./ 2; % ti_i for the function
       F    = ( X1 .* exp( ( - X2 .* ( ti_i - X3 ) .^ 2 ) ./ 2) ) - self.yi_i ; % vector of [ f_1(x) ... f_n(x) ] values.
                                                                             % i is automatically spanned
@@ -57,7 +57,7 @@ classdef GaussianFunction < FunctionMap
       X1 = x(1) ;
       X2 = x(2) ;
       X3 = x(3) ;
-      i    = (1:self.M).'  ; % create indexes for yi_i
+      i    = double((1:self.M).')  ; % create indexes for yi_i
       ti_i = ( 8 - i ) ./ 2; % ti_i for the function
       J  = [ exp(-X2 .* (ti_i - X3) .^ 2 / 2),...
                  -X1 .* (ti_i - X3) .^ 2  .* exp( -X2 .* (ti_i - X3) .^ 2 ./ 2) ./ 2, ...
@@ -70,6 +70,8 @@ classdef GaussianFunction < FunctionMap
       X1 = x(1) ;
       X2 = x(2) ;
       X3 = x(3) ;
+      i    = double((1:self.M).')  ; % create indexes for yi_i
+      ti_i = ( 8 - i ) ./ 2; % ti_i for the function
       % Create the n-matrices of T
 
       % D J / D X1

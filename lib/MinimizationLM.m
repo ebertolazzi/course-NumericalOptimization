@@ -102,8 +102,6 @@ classdef MinimizationLM < MinimizationND
 
       for iter = 1:self.max_iter 
 
-
-
         if self.debug_state % DEBUG ONLY
 
           fprintf(1,'iter = %5d ||grad f||_inf = %12.6g ', iter, nrm_g ) ;
@@ -115,7 +113,6 @@ classdef MinimizationLM < MinimizationND
 
         % Solve( (J'J - uI)h = - grad ) 
         h_lm = -  ( A + mi * eye(length(x)) ) \ g  ;
-
 
         % Condition on the h_lm
         nrm_h_lm      = norm(h_lm);
