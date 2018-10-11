@@ -1,34 +1,36 @@
-classdef Helical_valley < FunctionND
-  methods
-    function self = Helical_valley()
-      arity = 3;
-      self@FunctionND(int32(arity)) ;
+classdef Helical_valley < FunctionMap
+    methods
+        function self = Helical_valley()
+            arity = 3;
+            M     = 3;
+            self@FunctionMap(int32(arity) , int32(M)) ;
+            self.exact_solutions = [+1,0,0];   % one known solution
+            self.guesses         = [-1,0,0] ; % one guess
+        end
+        
+        function F = evalMap(self , x) % return a column vector with the not squared entries f1 f2 f3...
+            f1 = 10*(x(3)-10*theta(x(1) , x(2)) );
+            f2 = 10*(sqrt(x(1)^2 + x(2)^2) - 1  );
+            f3 = x(3);
+            F = [ f1 ; f2 ; f3 ];
+            
+            function a = theta(X1,X2)
+                b = 0;
+                if X1 < 0 % NB: Case X1 = 0 is not defined in the paper, here I defined it the same as X1 >0
+                    b = 0.5;
+                end
+                a =  1/(2*pi)*atan(X2/X1) + b;
+            end
+        end
+        
+        % Use finite difference for grad and hessian
+        function g = grad( self, x )
+            g = self.FD_grad( self, x );
+        end
+        
+        function h = hessian( self, x )
+            h = self.FD_hessian( self, x );
+        end
+        
     end
-    
-    function f = eval(self,x)
-      % Evaluate Brown badly scaled 2D function.
-      % if x is a 2 by m matrix return m values in a row vector.
-      % if x is a 2 by m x n matrix return m x n values in a matrix vector.
-      X1 = squeeze(x(1,:,:)) ;
-      X2 = squeeze(x(2,:,:)) ;
-      X3 = squeeze(x(3,:,:)) ;
-      
-      f_theta  = @(X1,X2) 1/(2*pi)*piecewise(X1 > 0, atan(X2/X1), X1 < 0  , atan(X2/X1)+0.5   ); 
-      
-      f1 = 10*( X3    - 10*f_theta(X1,X2) );
-      f2 = 10*( sqrt( X1.^2 + X2.^2)  - 1 );
-      f3 = X3;
-      f = f1^2 + f2^2 + f3^2;
-    end
-
-    % Use finite difference for grad and hessian
-    function g = grad( self, x )
-      g = self.FD_grad( self, x );
-    end
-
-    function h = hessian( self, x )
-      h = self.FD_hessian( self, x );
-    end
-
-  end
 end

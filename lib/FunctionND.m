@@ -4,6 +4,7 @@ classdef (Abstract) FunctionND < handle
     N               % arity of the function
     exact_solutions % matrix N x dim with all the known solutions. dim can be 0 if no known solution arer available 
     guesses         % matrix N x dim with suggested inital guess used for testing.
+    approximated_solutions %
   end
 
   methods (Abstract)

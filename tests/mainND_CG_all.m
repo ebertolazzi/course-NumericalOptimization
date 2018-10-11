@@ -4,7 +4,7 @@ clc;
 
 addpath('../lib');
 addpath('../functions');
-
+%%
 fun_name = 'SchafferF6';
 fplot    = @(z) log(1+z);
 
@@ -32,8 +32,9 @@ case 'SchafferF6'
   x0 = r.guess(int32(1));
   fplot = @(z) z ;
 end
-
-disp(r.arity());
+%%
+%r = Meyer_function;
+%disp(r.arity());
 
 ls = 'Wolfe';
 
@@ -50,10 +51,10 @@ end
 
 linesearch_method.debug_on() ;
 
-%min_method = MinimizationGradientMethod(r,search_method);
-min_method = MinimizationBFGS( r, linesearch_method );
-%min_method = MinimizationCG( r, linesearch_method );
+%min_method = MinimizationGradientMethod(r,linesearch_method);
 %min_method = MinimizationBFGS( r, linesearch_method );
+min_method = MinimizationCG( r, linesearch_method );
+
 min_method.setMaxIteration( int32(1000) );
 min_method.setTolerance(1e-8);
 min_method.debug_on();

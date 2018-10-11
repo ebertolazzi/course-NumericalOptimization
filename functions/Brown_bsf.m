@@ -38,11 +38,11 @@ classdef Brown_bsf < FunctionND
 	    % use analitic gradient
       self.check_x(x);
       g  = zeros ( 1, 2 );
-	    f1 = x(1) - 10^6;
+	  f1 = x(1) - 10^6;
       f2 = x(2) -2*10^(-6);
       f3 = x(1)*x(2) - 2;
-	    g(1) = 2*f1 + 2*f3*x(2);
-	    g(2) = 2*f2 + 2*f3*x(1);
+	  g(1) = 2*f1 + 2*f3*x(2);
+	  g(2) = 2*f2 + 2*f3*x(1);
     end
 
     function h = hessian( self, x )

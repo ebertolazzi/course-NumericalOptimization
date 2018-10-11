@@ -67,3 +67,4 @@ classdef BohachevskyN2 < FunctionND
     end
   end
 end
+

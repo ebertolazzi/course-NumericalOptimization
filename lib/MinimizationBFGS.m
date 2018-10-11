@@ -31,7 +31,7 @@ classdef MinimizationBFGS < MinimizationND
   %
   % Authors: Enrico Bertolazzi & Davide Vignotto
   %
-  properties (SetAccess = private, Hidden = true)
+  properties (SetAccess = private, Hidden = true) 
     direction_short %
     angle_too_small %
   end

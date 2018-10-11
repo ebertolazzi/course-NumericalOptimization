@@ -12,11 +12,11 @@ classdef Quadratic2D < FunctionND
 
     % Use finite difference for grad and hessian
     function g = grad( self, x )
-      g = self.FD_grad( self, x );
+      g = self.FD_grad( x );
     end
 
     function h = hessian( self, x )
-      h = self.FD_hessian( self, x );
+      h = self.FD_hessian( x );
     end
 
   end
