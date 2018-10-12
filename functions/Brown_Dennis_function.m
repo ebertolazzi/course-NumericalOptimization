@@ -1,22 +1,24 @@
 classdef Brown_Dennis_function < FunctionMap
-    
-%     properties(SetAccess = private , Hidden = true)
-%         approximated_solutions
-%     end
+    properties(SetAccess = private , Hidden = true)
+        approximated_minima;
+    end
     
     methods
         function self = Brown_Dennis_function( M_input)
             fixed_arity = 4;
             self@FunctionMap(int32(fixed_arity) , int32(M_input)) ; % arity = 4;
             self.guesses         = [25;5;-5;-1] ;  % one guess
+            self.exact_solutions = NaN*ones(fixed_arity,1);    % one known solution
             self.M = M_input;
-            self.N = fixed_arity;
+            %self.N = fixed_arity;
+            
             if M_input<fixed_arity
                 error('M must be greater than 3')
             end
             
+            self.approximated_minima = NaN;
             if M_input == 20
-               self.approximated_solutions = 85822.2;
+               self.approximated_minima = 85822.2;
             end
         end 
         

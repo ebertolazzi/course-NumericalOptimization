@@ -4,6 +4,7 @@ clc;
 
 addpath('../lib');
 addpath('../functions');
+
 %%
 fun_name = 'SchafferF6';
 fplot    = @(z) log(1+z);

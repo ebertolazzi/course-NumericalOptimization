@@ -4,8 +4,8 @@ classdef Helical_valley < FunctionMap
             arity = 3;
             M     = 3;
             self@FunctionMap(int32(arity) , int32(M)) ;
-            self.exact_solutions = [+1,0,0];   % one known solution
-            self.guesses         = [-1,0,0] ; % one guess
+            self.exact_solutions = [+1;0;0];   % one known solution
+            self.guesses         = [-1;0;0] ; % one guess
         end
         
         function F = evalMap(self , x) % return a column vector with the not squared entries f1 f2 f3...
@@ -25,11 +25,11 @@ classdef Helical_valley < FunctionMap
         
         % Use finite difference for grad and hessian
         function g = grad( self, x )
-            g = self.FD_grad( self, x );
+            g = self.FD_grad( x );
         end
         
         function h = hessian( self, x )
-            h = self.FD_hessian( self, x );
+            h = self.FD_hessian( x );
         end
         
     end

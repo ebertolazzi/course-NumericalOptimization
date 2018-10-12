@@ -1,4 +1,4 @@
-classdef Brown_bsf < FunctionND
+classdef Brown_badly_scaled_function < FunctionND
   %
   % The Brown Badly Scaled Function (unpublished).
   %
@@ -16,7 +16,7 @@ classdef Brown_bsf < FunctionND
   %   
 
   methods
-    function self = Brown_bsf()
+    function self = Brown_badly_scaled_function()
 	  self@FunctionND(int32(2)) ;
       self.exact_solutions = [ 10^6 ; 2*10^(-6) ]; % one known solution 
       self.guesses         = [ 1; 1] ;
@@ -35,7 +35,7 @@ classdef Brown_bsf < FunctionND
     function g = grad( self, x )
       %g = self.FD_grad(x);
       %return
-	    % use analitic gradient
+	  % use analitic gradient
       self.check_x(x);
       g  = zeros ( 1, 2 );
 	  f1 = x(1) - 10^6;

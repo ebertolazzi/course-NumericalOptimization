@@ -5,7 +5,7 @@ classdef Powell_singular_function < FunctionMap
             arity = 4;
             M     = 4;
             self@FunctionMap(int32(arity) , int32(M)) ;
-            self.exact_solutions = [0,0,0,0];       % one known solution
+            self.exact_solutions = [0;0;0;0];    % one known solution
             self.guesses         = [3;-1;0;1] ;  % one guess
         end
         
