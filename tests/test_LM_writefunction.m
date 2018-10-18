@@ -16,7 +16,7 @@ addpath(genpath('../lib'));
 addpath(genpath('../functions'));
 
 commando = input(['\nWrite the "call" to the function you want Levendberg Marquart to provide' ...
-               'you the minimum of:\nExample: BoxThreeDimensionalFunction( 10 )\n\n'],'s');
+               ' you the minimum of:\nExample: ExtendedRosenbrock( 10 )\n\n'],'s');
 
 eval([ 'funTest1 =' commando ]);
 
