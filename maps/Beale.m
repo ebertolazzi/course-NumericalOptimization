@@ -33,8 +33,8 @@ classdef Beale < FunctionMap
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = Beale()
       self@FunctionMap(int32(2),int32(3));
-      self.exact_solutions = [ 1.0; 1.0  ];     % one known solution
-      self.guesses         = [ -1.2; -1.0 ];
+      self.exact_solutions = [ 3.0; 0.5  ];     % one known solution
+      self.guesses         = [ 1.0; 1.0 ];
       self.c = [ 1.5, 2.25, 2.625 ];
     end
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
