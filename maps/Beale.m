@@ -58,7 +58,7 @@ classdef Beale < FunctionMap
       % use analitic tensor of second derivative
       X = x(1);
       Y = x(2);
-      T        = zeros(2,2,2);
+      T        = zeros(3,2,2);
       T(1,:,:) = [ 0, 1; 1, 0 ];
       T(2,:,:) = [ 0, 2*Y; 2*Y, 2*X ];
       T(3,:,:) = [ 0, 3*Y^2; 3*Y^2, 6*X*Y ];
