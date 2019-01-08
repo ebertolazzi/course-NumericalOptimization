@@ -35,7 +35,7 @@
             M = 3;
         end    
       self@FunctionMap(int32(3),int32(M)); 
-      self.exact_solutions = [50, 25, 1.5] % one exact solution   
+      self.exact_solutions = [50; 25; 1.5]; % one exact solution   
       self.guesses         = [5.0;2.5;0.15]; 
       end
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
