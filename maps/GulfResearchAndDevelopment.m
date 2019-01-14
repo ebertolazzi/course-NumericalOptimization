@@ -27,7 +27,7 @@
     function self = GulfResearchAndDevelopment( varargin )
         if nargin == 1 
             if varargin{1} < 3 || varargin{1} > 100 || ~isinteger(varargin{1})
-                error('GulfResearchAndDevelopmentD: argument must be an integer between 3 and 100, found %f', varargin{1});
+                error('GulfResearchAndDevelopment: argument m must be an integer between 3 and 100, found %f', varargin{1});
             else    
                 M = varargin{1};
             end    

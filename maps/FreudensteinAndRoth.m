@@ -23,7 +23,7 @@
 
   methods
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    function self = FreudsteinAndRoth()
+    function self = FreudensteinAndRoth()
       self@FunctionMap(int32(2),int32(2)); 
       self.exact_solutions        = [5;4]; % one exact solution  
       self.approximated_solutions = [11.41;-0.8968]; % one approximated solution 
