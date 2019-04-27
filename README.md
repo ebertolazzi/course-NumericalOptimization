@@ -1,9 +1,4 @@
-<<<<<<< HEAD
-# seconda riga /home/matteo
-=======
-### README
-# prima riga
-# seconda riga
+Code for the course
+-------------------
 
-https://www.benfrederickson.com/numerical-optimization/
->>>>>>> master
+Numerical optimization. Algorithms and practical implementation - [MMSE0019]
