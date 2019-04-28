@@ -29,23 +29,23 @@ classdef DiscreteIntegralEquation < FunctionMap
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = DiscreteIntegralEquation( varargin )
       if nargin == 0
-        n = int32(2);
+        N = int32(2);
       elseif nargin == 1
-        n = varargin{1};
+        N = varargin{1};
       else
         error('DiscreteIntegralEquation: too many arguments in constructor');
       end
-      if ~isinteger(n)
-        error('DiscreteIntegralEquation: argument must be an integer, found %s',class(n));
+      if ~isinteger(N)
+        error('DiscreteIntegralEquation: argument must be an integer, found %s',class(N));
       end
-      if n <= 1
-        error('DiscreteIntegralEquation: argument must be an integer > 1, found %d',n);
+      if N <= 1
+        error('DiscreteIntegralEquation: argument must be an integer > 1, found %d',N);
       end
-      m = n;
-      self@FunctionMap(int32(m),int32(n));
-      self.h = 1/(n+1);
-      self.t = h*(1:1:n);
-      self.exact_solutions = zeros(m,0); % unknown solutions, f=0;
+      M = N;
+      self@FunctionMap(int32(M),int32(N));
+      self.h = 1/(double(N)+1);
+      self.t = self.h*(1:1:N);
+      self.exact_solutions = zeros(M,0); % unknown solutions, f=0;
       self.guesses         = self.t.*(self.t-1);
       
     end
@@ -53,10 +53,10 @@ classdef DiscreteIntegralEquation < FunctionMap
     function F = evalMap(self,x)
       % evaluate the entries (not squared).
       self.check_x(x);
-      F    = zeros(m,1);
-      for i = 1:m
+      F    = zeros(self.M,1);
+      for i = 1:self.M
           F(i) = x(i);
-          for j=1:n
+          for j=1:self.N
               if j <= i
                     F(i) = F(i)+self.h/2*(1-self.t(i))*self.t(j)*(x(j)+self.t(j)+1)^3; 
               else
@@ -69,9 +69,9 @@ classdef DiscreteIntegralEquation < FunctionMap
     function J = jacobian( self, x )
       % use analytic jacobian
       self.check_x( x );
-      J    = zeros(m,n);
-      for i = 1:m
-          for j=i:n
+      J    = zeros(self.M,self.N);
+      for i = 1:self.M
+          for j=i:self.N
               if j < i
                   J(i,j) = self.h/2*(1-self.t(i))*self.t(j)*3*(x(j)+self.t(j)+1)^2;
               elseif j == i
@@ -86,9 +86,9 @@ classdef DiscreteIntegralEquation < FunctionMap
     function T = tensor( self, x )
       % use analytic tensor
       self.check_x( x );
-      T    = zeros(m,n,n);
-      for i = 1:m
-          for j = 1:n
+      T    = zeros(self.M,self.N,self.N);
+      for i = 1:self.M
+          for j = 1:self.N
               if j <= i
                   T(i,j,j) = self.h*(1-self.t(i))*self.t(j)*3*(x(j)+self.t(j)+1);
               else

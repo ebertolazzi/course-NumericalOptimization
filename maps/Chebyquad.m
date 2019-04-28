@@ -25,47 +25,44 @@ classdef Chebyquad < FunctionMap
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = Chebyquad( varargin )
       if nargin == 0
-        n = int32(2);
-        m = int32(2);
+        N = 2;
+        M = 2;
       elseif nargin == 1
-        n = varargin{1};
-        m = varargin{1};
+        N = varargin{1};
+        M = varargin{1};
       elseif nargin > 2
         error('Chebyquad: too many arguments in constructor');
       else
-        n = varargin{1};
-        m = varargin{2}; 
+        N = varargin{1};
+        M = varargin{2}; 
       end
-      if ~isinteger(n) || ~isinteger(m)
-        error('Chebyquad: arguments must be integers, found %s and %s',class(n), class(m));
+      if N <= 1
+        error('Chebyquad: argument n must be an integer > 1, found %d',N);
       end
-      if n <= 1
-        error('Chebyquad: argument n must be an integer > 1, found %d',n);
+      if M < N
+        error('Chebyquad: argument m must be an integer >= n, found %d',M);
       end
-      if m < n
-        error('Chebyquad: argument m must be an integer >= n, found %d',m);
-      end
-      self@FunctionMap(int32(m),int32(n));
+      self@FunctionMap(int32(M),int32(N));
       self.exact_solutions = []; % no exact solutions;
                                  % f=0 for m=n, 1<=n<=7, and n=9
                                  % f=3.51687...10^(-3) for m=n=8,
                                  % f=6.50395...10^(-3) for m=n=10
-      self.guesses         = 1/(n+1)*(1:1:n);
+      self.guesses         = 1/(N+1)*(1:1:N);
       
     end
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function F = evalMap(self,x)
       % evaluate the entries (not squared).
       self.check_x(x);
-      F    = zeros(m,1);
-      t    = zeros(m,n);
-      t(1,:) = ones(1,n);
+      F    = zeros(self.M,1);
+      t    = zeros(self.M,self.N);
+      t(1,:) = ones(1,self.N);
       t(2,:) = x;
       F(1) = 1;
-      F(2) = 1/n*sum(t(2,:))+1/3;
-      for i = 3:m
+      F(2) = 1/double(self.N)*sum(t(2,:))+1/3;
+      for i = 3:self.M
           t(i,:) = 2*x.*t(i-1,:)-t(i-2,:);
-          F(i) = 1/n*sum(t(i,:));
+          F(i) = 1/double(self.N)*sum(t(i,:));
           if isinteger(i/2)
               F(i) = F(i) + 1/(i^2-1);
           end    
@@ -75,30 +72,30 @@ classdef Chebyquad < FunctionMap
     function J = jacobian( self, x )
       % use analytic jacobian
       self.check_x( x );
-      J    = zeros(m,n);
-      t    = zeros(m,n);
-      t(1,:) = ones(1,n);
+      J    = zeros(self.M,self.N);
+      t    = zeros(self.M,self.N);
+      t(1,:) = ones(1,self.N);
       t(2,:) = x;
-      J(2,:) = 1/n*ones(1,n);
-      for i = 3:m
+      J(2,:) = 1/double(self.N)*ones(1,self.N);
+      for i = 3:self.M
           t(i,:) = 2*x.*t(i-1,:)-t(i-2,:);
-          J(i,:) = 1/n*(2*t(i-1,:) + 2*n*x.*J(i-1,:) - n*J(i-2,:));
+          J(i,:) = 1/double(self.N)*(2*t(i-1,:) + 2*double(self.N)*x.*J(i-1,:) - double(self.N)*J(i-2,:));
       end   
     end
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function t = tensor( self, x )
       % use analytic tensor
       self.check_x( x );
-      T    = zeros(m,n,n);
-      J    = zeros(m,n);
-      t    = zeros(m,n);
-      t(1,:) = ones(1,n);
+      T    = zeros(self.M,self.N,self.N);
+      J    = zeros(self.M,self.N);
+      t    = zeros(self.M,self.N);
+      t(1,:) = ones(1,self.N);
       t(2,:) = x;
-      J(2,:) = 1/n*ones(1,n);
-      for i = 3:m
+      J(2,:) = 1/double(self.N)*ones(1,self.N);
+      for i = 3:self.M
           t(i,:) = 2*x.*t(i-1,:)-t(i-2,:);
-          J(i,:) = 1/n*(2*t(i-1,:) + 2*n*x.*J(i-1,:) - n*J(i-2,:));
-          for j = 1 : n
+          J(i,:) = 1/double(self.N)*(2*t(i-1,:) + 2*double(self.N)*x.*J(i-1,:) - double(self.N)*J(i-2,:));
+          for j = 1 : self.N
               T(i,j,j) = 4*J(i-1,j) + 2*x(j)*T(i-1,j,j) - T(i-2,j,j);  
           end
       end   

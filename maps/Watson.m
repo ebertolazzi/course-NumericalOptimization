@@ -49,7 +49,7 @@
       for i = 1:29
          t(i) = i/29;
          F(i) = -x(1)^2-1;
-         for j = 2:N
+         for j = 2:self.N
              F(i) = F(i) + (j-1)*x(j)*t(i)^(j-2) - (x(j)*t(i)^(j-1))^2;
          end    
       end
@@ -60,12 +60,12 @@
     function J = jacobian( self, x )
       % use analytic jacobian
       self.check_x( x );
-      J    = zeros(31,N);
+      J    = zeros(31,self.N);
       t    = zeros(29,1);    
       for i = 1:29
          t(i) = i/29;
          J(i,1) = -2*x(1);
-         for j=2:N
+         for j=2:self.N
          J(i,j) = (j-1)*t(i)^(j-2) -2*(t(i)^(j-1))^2*x(j);%DFi/Dx(j)
          end
       end   
@@ -77,10 +77,10 @@
       % use analytic tensor
       self.check_x( x );
       t    = zeros(29,1);    
-      T    = zeros(31,N,N);
+      T    = zeros(31,self.N,self.N);
       for i = 1:29
          t(i) = i/29;
-         for j =1:N
+         for j =1:self.N
             T(i,j,j) = -2*(t(i)^(j-1))^2;
          end    
       end

@@ -44,8 +44,8 @@
       X3   = x(3);
       X4   = x(4);
       X5   = x(5);
-      F    = zeros(1,33);
-      t    = zeros(1,33);
+      F    = zeros(33,1);
+      t    = zeros(33,1);
       for i=1:33
           t(i) = 10*(i-1);
           F(i) = self.y(i) - (X1 + X2*exp(-t(i)*X4) + X3*exp(-t(i)*X5));

@@ -27,7 +27,7 @@
     function self = GulfResearchAndDevelopment( varargin )
         if nargin == 1 
             if varargin{1} < 3 || varargin{1} > 100 || ~isinteger(varargin{1})
-                error('GulfResearchAndDevelopment: argument m must be an integer between 3 and 100, found %f', varargin{1});
+                error('GulfResearchAndDevelopmentD: argument must be an integer between 3 and 100, found %f', varargin{1});
             else    
                 M = varargin{1};
             end    
@@ -35,7 +35,7 @@
             M = 3;
         end    
       self@FunctionMap(int32(3),int32(M)); 
-      self.exact_solutions = [50; 25; 1.5]; % one exact solution   
+      self.exact_solutions = [50, 25, 1.5]; % one exact solution   
       self.guesses         = [5.0;2.5;0.15]; 
       end
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -44,13 +44,13 @@
       X1   = x(1);
       X2   = x(2);
       X3   = x(3);
-      F    = zeros(M,1);
-      t    = zeros(M,1);    
-      y    = zeros(M,1);
-      for i = 1:M
+      F    = zeros(self.M,1);
+      t    = zeros(self.M,1);    
+      y    = zeros(self.M,1);
+      for i = 1:self.M
          t(i) = i/100;
          y(i) = 25+(-50*log(t(i)))^(2/3);
-         F(i) = exp(-abs(y(i)*M*i*X2)^X3/X1)-t(i);
+         F(i) = exp(-abs(y(i)*double(self.M)*i*X2)^X3/X1)-t(i);
       end    
     end
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -60,15 +60,15 @@
       X1   = x(1);
       X2   = x(2);
       X3   = x(3);
-      J    = zeros(M,3);
-      t    = zeros(M,1);    
-      y    = zeros(M,1);
-      for i = 1:M
+      J    = zeros(self.M,3);
+      t    = zeros(self.M,1);    
+      y    = zeros(self.M,1);
+      for i = 1:self.M
          t(i) = i/100;
          y(i) = 25+(-50*log(t(i)))^(2/3);
-         J(i,:) = [exp(-abs(y(i)*M*i*X2)^X3/X1)*(abs(y(i)*M*i*X2)^X3/X1^2),...%DFi/DX1
-                  exp(-abs(y(i)*M*i*X2)^X3/X1)*(-X3/X1*abs(y(i)*M*i*X2)^X3/X2),...%DFi/DX2
-                  exp(-abs(y(i)*M*i*X2)^X3/X1)*(-abs(y(i)*M*i*X2)^X3/X1*log(abs(y(i)*M*i*X2)))];%DFi/DX3
+         J(i,:) = [exp(-abs(y(i)*double(self.M)*i*X2)^X3/X1)*(abs(y(i)*double(self.M)*i*X2)^X3/X1^2),...%DFi/DX1
+                  exp(-abs(y(i)*double(self.M)*i*X2)^X3/X1)*(-X3/X1*abs(y(i)*double(self.M)*i*X2)^X3/X2),...%DFi/DX2
+                  exp(-abs(y(i)*double(self.M)*i*X2)^X3/X1)*(-abs(y(i)*double(self.M)*i*X2)^X3/X1*log(abs(y(i)*double(self.M)*i*X2)))];%DFi/DX3
      end   
     end
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -78,39 +78,39 @@
       X1   = x(1);
       X2   = x(2);
       X3   = x(3);
-      t    = zeros(M,1);    
-      y    = zeros(M,1);
-      T    = zeros(M,3,3);
-      for i = 1:M
+      t    = zeros(self.M,1);    
+      y    = zeros(self.M,1);
+      T    = zeros(self.M,3,3);
+      for i = 1:self.M
             t(i) = i/100;
             y(i) = 25+(-50*log(t(i)))^(2/3);
             % D2F / DX1DX1
-            T(i,1,1) = exp(-abs(y(i)*M*i*X2)^X3/X1)*(-2*abs(y(i)*M*i*X2)^X3/X1^3)+...
-                exp(-abs(y(i)*M*i*X2)^X3/X1)*(abs(y(i)*M*i*X2)^X3/X1^2)^2;
+            T(i,1,1) = exp(-abs(y(i)*double(self.M)*i*X2)^X3/X1)*(-2*abs(y(i)*double(self.M)*i*X2)^X3/X1^3)+...
+                exp(-abs(y(i)*double(self.M)*i*X2)^X3/X1)*(abs(y(i)*double(self.M)*i*X2)^X3/X1^2)^2;
             % D2F / DX1DX2
-            T(i,1,2) = exp(-abs(y(i)*M*i*X2)^X3/X1)*((-X3/X1/X2*abs(y(i)*M*i*X2)^X3)*...
-                (1/X1^2*abs(y(i)*M*i*X2)^X3)+(X3/X1^2/X2*abs(y(i)*M*i*X2)^X3));
+            T(i,1,2) = exp(-abs(y(i)*double(self.M)*i*X2)^X3/X1)*((-X3/X1/X2*abs(y(i)*double(self.M)*i*X2)^X3)*...
+                (1/X1^2*abs(y(i)*double(self.M)*i*X2)^X3)+(X3/X1^2/X2*abs(y(i)*double(self.M)*i*X2)^X3));
             % D2F / DX1DX3
-            T(i,1,3) = exp(-abs(y(i)*M*i*X2)^X3/X1)*...
-                ((abs(y(i)*M*i*X2)^X3/X1*log(abs(y(i)*M*i*X2)))*(1-abs(y(i)*M*i*X2)^X3/X1^2));
+            T(i,1,3) = exp(-abs(y(i)*double(self.M)*i*X2)^X3/X1)*...
+                ((abs(y(i)*double(self.M)*i*X2)^X3/X1*log(abs(y(i)*double(self.M)*i*X2)))*(1-abs(y(i)*double(self.M)*i*X2)^X3/X1^2));
             % D2F / DX2DX1
             T(i,2,1) = T(i,1,2);
             % D2F / DX2DX2
-            T(i,2,2) = exp(-abs(y(i)*M*i*X2)^X3/X1)*((-X3/X1/X2*abs(y(i)*M*i*X2)^X3)^2+...
-                X3/X1/X2^2*abs(y(i)*M*i*X2)^X3*(1-X3));
+            T(i,2,2) = exp(-abs(y(i)*double(self.M)*i*X2)^X3/X1)*((-X3/X1/X2*abs(y(i)*double(self.M)*i*X2)^X3)^2+...
+                X3/X1/X2^2*abs(y(i)*double(self.M)*i*X2)^X3*(1-X3));
             % D2F / DX2DX3
-            T(i,2,3) = exp(-abs(y(i)*M*i*X2)^X3/X1)*...
-                ((-abs(y(i)*M*i*X2)^X3/X1*log(abs(y(i)*M*i*X2)))*...
-                (-X3/X1/X2*abs(y(i)*M*i*X2)^X3)+...
-                (-abs(y(i)*M*i*X2)^X3/X1/X2-X3/X1/X2*abs(y(i)*M*i*X2)^X3*log(abs(y(i)*M*i*X2))));
+            T(i,2,3) = exp(-abs(y(i)*double(self.M)*i*X2)^X3/X1)*...
+                ((-abs(y(i)*double(self.M)*i*X2)^X3/X1*log(abs(y(i)*double(self.M)*i*X2)))*...
+                (-X3/X1/X2*abs(y(i)*double(self.M)*i*X2)^X3)+...
+                (-abs(y(i)*double(self.M)*i*X2)^X3/X1/X2-X3/X1/X2*abs(y(i)*double(self.M)*i*X2)^X3*log(abs(y(i)*double(self.M)*i*X2))));
             % D2F / DX3DX1
             T(i,3,1) = T(i,1,3);
             % D2F / DX3DX2
             T(i,3,2) = T(i,2,3);
             % D2F / DX3DX3
-            T(i,3,3) = exp(-abs(y(i)*M*i*X2)^X3/X1)*...
-                ((-abs(y(i)*M*i*X2)^X3/X1*log(abs(y(i)*M*i*X2)))^2+...
-                (-(log(abs(y(i)*M*i*X2)))^2/X1*abs(y(i)*M*i*X2)^X3));
+            T(i,3,3) = exp(-abs(y(i)*double(self.M)*i*X2)^X3/X1)*...
+                ((-abs(y(i)*double(self.M)*i*X2)^X3/X1*log(abs(y(i)*double(self.M)*i*X2)))^2+...
+                (-(log(abs(y(i)*double(self.M)*i*X2)))^2/X1*abs(y(i)*double(self.M)*i*X2)^X3));
       end
     end
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

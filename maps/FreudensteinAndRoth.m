@@ -24,9 +24,8 @@
   methods
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function self = FreudensteinAndRoth()
-      self@FunctionMap(int32(2),int32(2)); 
-      self.exact_solutions        = [5;4]; % one exact solution  
-      self.approximated_solutions = [11.41;-0.8968]; % one approximated solution 
+      self@FunctionMap(int32(2), int32(2)); 
+      self.exact_solutions        = [5;4]; % one exact solution   
       self.guesses                 = [0.5;-2];           
     end
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -34,27 +33,28 @@
       % evaluate the entries (not squared).
       X1   = x(1);
       X2   = x(2);
-      F    = zeros(2,1);
-      F(1) = -13 + X1 + ((5 - X2)*X2 - 2)*X2;
-      F(2) = -29 + X1 + ((X2 + 1)*X2 - 14)*X2;
+      F = [-13 + X1 + ((5 - X2)*X2 - 2)*X2;...
+          -29 + X1 + ((X2 + 1)*X2 - 14)*X2];
     end
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function J = jacobian( self, x )
       % use analytic jacobian
-      self.check_x( x );
+      %self.check_x( x )
       X2 = x(2);
-      J = [ 1, +10*X2 - 3*X2^2 -2; 1, 3*X2^2 +2*X2 -14 ];
+      A = 10*X2 - 3*X2^2 -2;
+      B = 3*X2^2 +2*X2 -14;
+      J = [ 1, A; 1, B ];
     end
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function T = tensor( self, x )
       % use analytic tensor
-      self.check_x( x );
+      %self.check_x( x );
       X2 = x(2);
       T = zeros(2,2,2);
       % D J / D X1
       T(1,:,:) = [ 0, 0; 0, 0 ];
       % D J / D X2
-      T(2,:,:) = [ 0, 10 -6*X2; 0, 6*X2 + 2 ];
+      T(2,:,:) = [0, 10 - 6*X2; 0, 6*X2 + 2];
     end
     %- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function [f,g] = eval_FG( self, x )
