@@ -1,5 +1,6 @@
-addpath('C:\Users\Lola\Desktop\Dottorato\Numerical Optimization/Functions');
-addpath('C:\Users\Lola\Desktop\Dottorato\Numerical Optimization/lib');
+addpath('../functions');
+addpath('../lib');
+addpath('../maps');
 
 funTest1 = Wood();
 
