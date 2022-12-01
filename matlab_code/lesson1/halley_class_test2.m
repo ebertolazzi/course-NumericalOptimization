@@ -1,0 +1,12 @@
+fun      = @(x) x.*exp(-x.*x)+sin(x);
+Dfun     = @(x) exp(-x.^2) - 2.*x.^2*exp(-x.^2) + cos(x);
+DDfun    = @(x) (4*x.^3 - 6*x)*exp(-x.^2) - sin(x);
+x0       = -4;
+%tol      = 1e-50;
+%max_iter = 100;
+%verbose  = 'iter';
+NS = halley_class();
+NS.set_tolerance( 1e-10 );
+x = NS.solve( fun, Dfun, DDfun, x0 );
+fprintf('x = %g\n',x);
+fprintf('f(x) = %g\n',fun(x));
